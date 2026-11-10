@@ -8,13 +8,12 @@
 
 ## What this is
 
-I grew up on the *Power of Chaos* PC games: Yugi the Destiny, Kaiba the Revenge and Joey the Passion. They were three
-separate games, each with one opponent, and you had to juggle installs to carry your cards between them. They also
-stopped in 2004.
+*Power of Chaos* was three separate PC games: Yugi the Destiny, Kaiba the Revenge and Joey the Passion. Each had one
+opponent, and carrying your cards from one to the next meant juggling installs. The series stopped in 2004.
 
-Chaos Rift is my attempt at the game I wanted back then. Yugi, Kaiba and Joey are all in one place with one collection
-and one deck builder, and it keeps going where the originals stopped: Jaden as a fourth rival, a card pool of 2,015
-cards (the three originals together had under 800), new modes, a tournament, and a duel table in 3D.
+Chaos Rift puts all three into one game with one collection and one deck builder, rebuilt from scratch, and then
+keeps going: Jaden as a fourth rival, a card pool of 2,015 cards (the three originals together had under 800), new
+modes, a tournament, and a duel table in 3D.
 
 It is free and it will stay free. There is no account and nothing to buy.
 
