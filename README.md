@@ -1,69 +1,75 @@
 <h1 align="center">Chaos Rift</h1>
-<p align="center">All three <i>Power of Chaos</i> games in one, rebuilt from scratch and then taken further.</p>
+<p align="center"><b>Three games. One deck. The Gods are waking up.</b></p>
 <p align="center">
-  <a href="https://3good5you.itch.io/chaos-rift"><b>Download (Windows / macOS)</b></a>
+  <a href="https://3good5you.itch.io/chaos-rift"><b>Download free for Windows / macOS</b></a>
 </p>
 
 ![Main menu](docs/screens/01-main-menu.jpg)
 
-## What this is
+Remember *Power of Chaos*? Yugi the Destiny, Kaiba the Revenge, Joey the Passion. Three separate games, one duelist
+each, and every time you switched you left your cards behind.
 
-*Power of Chaos* was three separate PC games: Yugi the Destiny, Kaiba the Revenge and Joey the Passion. Each had one
-opponent, and carrying your cards from one to the next meant juggling installs. The series stopped in 2004.
+Chaos Rift ends that. Every duelist, every card, one collection, one deck you take anywhere. Then it keeps going where
+the old games stopped.
 
-Chaos Rift puts all three into one game with one collection and one deck builder, rebuilt from scratch, and then
-keeps going: Jaden as a fourth rival, a card pool of 2,015 cards (the three originals together had under 800), new
-modes, a tournament, and a duel table in 3D.
-
-It is free and it will stay free. There is no account and nothing to buy.
+**Free. No account. No shop that wants your money.**
 
 ![A duel](docs/screens/02-duel.jpg)
 
-## What's in it
+### 2,015 cards that actually work
 
-**The cards.** 2,015 of them, and each one does what its text says. I did not want "close enough" effects, so chains,
-flip effects, fusions, rituals, counters, coin tosses and dice all go through a real rules engine. You can play under
-the 2003 or the 2004 ban list.
+The originals had under 800. Chaos Rift has 2,015, and every effect runs on a real rules engine: chains, flips,
+fusions, rituals, coin tosses. Dark Magician, Blue-Eyes, Red-Eyes, Exodia, all here. Play by the 2003 or 2004 ban list.
 
-**The rivals.** Yugi, Kaiba, Joey and Jaden. Each has a set of decks that gets nastier as you beat them. The old CPU
-followed a fixed script and you could learn to walk around it. This one tries its options out on copies of the duel
-before it commits. It does not look at your hand or your face-down cards to do that; it shuffles what it cannot see
-and plays the turn out. In a best-of-three it also side-decks against what you showed it.
+### Rivals who fight back
 
-**Ways to play**
+Yugi, Kaiba, Joey, and now Jaden. Their decks get meaner every time you beat them. The CPU plays your turn out in its
+head before it commits, so the old tricks won't save you. It never cheats by looking at your hand. In a best-of-three
+it side-decks against whatever you showed it.
+
+### Ten ways to duel
 
 | | |
 |---|---|
-| Regular | One duel, or a best-of-three match with side decking |
-| Gauntlet | Four rivals back to back with one deck. Your Life Points carry over |
-| Pack Duel | Open six packs and duel with whatever you pulled |
-| Limited Duel | A different restriction on your collection each day |
-| Legend | A rival with their best deck. Pays the most |
-| Chaos Duel | Every third turn a rule changes for both players |
-| Challenges | Eight puzzles. You have one turn to win and there is one way to do it |
-
-There is also an eight-player tournament, LAN duels for two PCs on the same network, and replays you can save and
-watch later.
+| Regular | One duel, or best of three with side decking |
+| Gauntlet | Four rivals back to back. Your Life Points carry over |
+| Pack Duel | Six fresh packs. Build from what you pulled |
+| Limited Duel | A new restriction on your collection every day |
+| Legend | A rival at full strength. Biggest payout in the game |
+| Chaos Duel | Every third turn, the rules break |
+| Challenges | One turn. One way to win. Find it |
+| Tournament | Eight duelists, one bracket, prizes by placing |
+| LAN Duel | You and a friend, same network |
+| Replays | Keep the wins worth watching again |
 
 ![Tournament](docs/screens/10-tournament.jpg)
 
-**The collection.** You win cards after every duel, flipped face up one at a time, and buy the ones you are missing
-with Duel Points in the Shop. Beat a rival for the first time and you get their starter deck, revealed card by card.
+### Win it, own it
+
+Cards drop after every duel. First win over a rival hands you their starter deck. Spend your Duel Points on 31 card
+backs, 20 playmats and 18 frames, or win the Tournament for playmats you can't buy anywhere.
 
 ![Deck unlocked](docs/screens/14-deck-unlock.jpg)
 
-**Make the table yours.** The Shop also sells 31 card backs, 20 playmats and 18 profile frames. Each playmat brings its
-own world under the table, and a few can only be won by taking the tournament.
-
 ![Card backs in the shop](docs/screens/16-shop-card-backs.jpg)
 
-**The deck builder.** Main, Side and Fusion decks, filters that stay out of the way, and import/export for `.ydk`
-files and the original games' `.ydc` files, so your old decks still work.
+### Build the deck you remember
+
+Main, Side and Fusion decks, fast filters, and import/export for `.ydk` files and the original games' `.ydc` files.
+Your old decks still work.
 
 ![Deck builder](docs/screens/07-deck-builder.jpg)
 
-**Small things I cared about.** Winning with Exodia or Destiny Board gets a proper finish and not a pop-up. Right
-click always means back or pass. Space moves to the next phase. Double-click your deck to give up.
+### Finishes worth the grind
+
+Complete Exodia and the duel doesn't end on a text box. It ends on a show.
+
+## Coming next: the Egyptian Gods
+
+Obelisk the Tormentor. Slifer the Sky Dragon. The Winged Dragon of Ra. They're the next big drop, and they won't just
+be big numbers on a card.
+
+Also on the way: online duels, more rivals, more decks, more ways to dress your table.
 
 ## Status
 
@@ -72,14 +78,6 @@ Mac yet, so tell me if it works.
 
 Known rough spots: the CPU still makes the odd strange play, and about 870 of the newer cards have only been checked
 by the automated tests and not by hand in a real duel. If a card does something wrong, please report it.
-
-## Coming next
-
-- Online duels (today it is LAN only)
-- Hand-checking the newer cards in real duels
-- A smarter CPU in the late game
-- A tested macOS build
-- More rivals, decks, card backs and playmats
 
 ## How it's built
 
