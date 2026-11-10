@@ -759,7 +759,7 @@ void fragment() {
         v.Count.Visible = s.Counter > 0 && s.Loc is Loc.Monster or Loc.Spell or Loc.Field;
         v.Count.Text = s.Counter.ToString();
         UpdateMarks(v);
-        v.Stat.Visible = s.Loc == Loc.Monster && (s.Up || s.Side == 0);
+        v.Stat.Visible = s.Loc == Loc.Monster && (s.Up || s.Side == 0) && !crackedEarly.Contains(v.Card.Uid);
         if (!v.Stat.Visible) return;
         var d = v.Card.Data;
         v.StatAtk.Text = s.Atk.ToString();
@@ -1028,6 +1028,13 @@ void fragment() {
         View? veiled = null, discarded = null;
         double extra = 0;
         if (s.Ev?.Kind is EvKind.LeftField or EvKind.BattleEnd) AimClear();
+        // The battle is over: a monster shattered early with its opponent but spared after all (Waboku, a shield) comes back.
+        if (s.Ev?.Kind is EvKind.AfterDamage or EvKind.BattleEnd)
+            foreach (var u in crackedEarly.Where(u => s.Cards[u].Loc == Loc.Monster).ToList())
+            {
+                crackedEarly.Remove(u);
+                if (views.TryGetValue(u, out var sv)) { sv.Root.Visible = true; UpdateStat(sv, false); }
+            }
         if (s.Ev is { Kind: EvKind.LeftField or EvKind.ToGrave, Card: { } lc } && views.TryGetValue(lc.Uid, out var lv))
         {
             // Destroyed comes after the card has left; a battle loss says so on the leave itself (a chain answering the move
@@ -1036,7 +1043,7 @@ void fragment() {
             if (s.Ev.Kind == EvKind.LeftField && destroying.TryGetValue(lc.Uid, out var how))
             {
                 Vector3 From((bool Battle, Card? By) h, View v) => h.By != null && views.TryGetValue(h.By.Uid, out var bv) ? bv.Root.GlobalPosition : v.Root.GlobalPosition + Vector3.Back;
-                if (crackedEarly.Remove(lc.Uid)) { }   // already shattering with the monster it fought
+                if (crackedEarly.Remove(lc.Uid)) { }   // already shattered with the monster it fought: its move plays hidden
                 else if (how.Battle)
                 {
                     CrackBreak(lv, From(how, lv));
@@ -1044,10 +1051,7 @@ void fragment() {
                     // put the second one batches later: it stays hidden until its own move).
                     int other = mutualPair.A == lc.Uid ? mutualPair.B : mutualPair.B == lc.Uid ? mutualPair.A : -1;
                     if (other >= 0 && views.TryGetValue(other, out var ov) && ov.S.Loc == Loc.Monster && crackedEarly.Add(other))
-                    {
-                        CrackBreak(ov, lv.Root.GlobalPosition);
-                        HideFor(ov, 60);
-                    }
+                        CrackBreak(ov, lv.Root.GlobalPosition);   // hidden until its own LeftField (HideFor skips crackedEarly)
                 }
                 else EffectBurn(lv);
                 veiled = lv;
@@ -1210,6 +1214,14 @@ void fragment() {
                     else if (t == null) Lunge(a, null, side, onHit: _ => DirectHit(side));
                     else Lunge(a, t, side);
                     return locked ? 1.5 : 1.0;
+                }
+            case EvKind.AfterCalc when e.Card is { } ca && e.Other is { } ct:
+                {
+                    // Damage-Step responses (Rush Recklessly...) can change who loses after the clash was shown: the real pair.
+                    St x = s.Cards[ca.Uid], y = s.Cards[ct.Uid];
+                    bool both = x.Loc == Loc.Monster && y is { Loc: Loc.Monster, Up: true, Def: false } && x.Atk == y.Atk && x.Atk > 0;
+                    mutualPair = both ? (ca.Uid, ct.Uid) : (-1, -1);
+                    return 0;
                 }
             case EvKind.Destroyed:
                 return e.Battle ? 0.55 : 0.6;   // the shatter / burn started when the card left the field (Play)

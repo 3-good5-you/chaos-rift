@@ -83,7 +83,7 @@ public partial class DuelField
     /// The attacker charges its target (or the rival). grind: the defender holds (DEF too high), so the
     /// attacker grinds against it in a stream of sparks, then is thrown back.
     /// onHit replaces the small flash at the moment of impact; repel throws the attacker back afterwards.
-    void Lunge(View? a, View? t, int side, bool grind = false, Action<Vector3>? onHit = null, bool repel = false, bool quiet = false, string? windup = null)
+    void Lunge(View? a, View? t, int side, bool grind = false, Action<Vector3>? onHit = null, bool repel = false, bool quiet = false, string? windup = null, float reach = 0.82f)
     {
         if (a == null) return;
         void C(string n) { if (!quiet) Cue(n, 0, a.Card); }
@@ -93,7 +93,7 @@ public partial class DuelField
         var home = Target(a, a.S);
         var start = home.Origin;
         var dest = t != null ? t.Root.GlobalPosition : DirectPoint(side);
-        var hit = start.Lerp(dest, 0.82f) + Vector3.Up * 0.2f;
+        var hit = start.Lerp(dest, reach) + Vector3.Up * 0.2f;
         var back = start + Vector3.Up * 0.6f + (start - dest).Normalized() * 0.2f;
         a.Stat.Visible = false;
         a.Tw = CreateTween();

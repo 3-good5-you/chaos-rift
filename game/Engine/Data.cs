@@ -17,7 +17,10 @@ public sealed class CardData
     public bool Modern;
     public string[] Rulings = Array.Empty<string>();
     public string[] Series = Array.Empty<string>();
-    public string Archetype = "";   // the archetype the card database files it under (card lab families)
+    public string Archetype = "";
+    public bool StatsUnknown;   // printed ATK/DEF "?" (Slifer, Ra): 0 on the field before effects
+    public string AtkText => StatsUnknown || Atk < 0 ? "?" : Atk.ToString();
+    public string DefText => StatsUnknown || Def < 0 ? "?" : Def.ToString();   // the archetype the card database files it under (card lab families)
 
     /// Archetype membership by the official rule: the archetype's name is part of the card's name (case matters:
     /// "HERO" covers Elemental/Destiny/Evil HERO, not "Hero Kid").
@@ -128,6 +131,7 @@ public sealed class CardDb
 
         foreach (var kv in Res("tcg_text.json").RootElement.EnumerateObject())
             if (ByIdx.TryGetValue(int.Parse(kv.Name), out var td)) td.TcgDesc = kv.Value.GetString();
+        foreach (var (name, atk, text) in Gods) if (ByName.TryGetValue(name, out var gl)) foreach (var g in gl) MakeGod(g, atk, text);
 
         foreach (var kv in Res("effects.json").RootElement.GetProperty("cards").EnumerateObject())
         {
@@ -178,6 +182,23 @@ public sealed class CardDb
         ("Overload Fusion", 1), ("Future Fusion", 1), ("Monster Gate", 1), ("Burial from a Different Dimension", 1), ("Treeborn Frog", 1), ("Mind Control", 1),
         ("Rescue Cat", 1), ("Brain Control", 1), ("Volcanic Shell", 1), ("Cyber Valley", 1),
     };
+
+    /// The Egyptian Gods: blank 0/0 cards in the original games, given their current official text (their HD art prints it).
+    /// ATK -1 = "?" (0 on the field before effects).
+    static readonly (string Name, int Atk, string Text)[] Gods =
+    {
+        ("Obelisk the Tormentor", 4000, "Requires 3 Tributes to Normal Summon (cannot be Normal Set). This card's Normal Summon cannot be negated. When Normal Summoned, cards and effects cannot be activated. Neither player can target this card with card effects. Once per turn, during the End Phase, if this card was Special Summoned: Send it to the GY. You can Tribute 2 monsters; destroy all monsters your opponent controls. This card cannot declare an attack the turn this effect is activated."),
+        ("Slifer the Sky Dragon", -1, "Requires 3 Tributes to Normal Summon (cannot be Normal Set). This card's Normal Summon cannot be negated. When Normal Summoned, cards and effects cannot be activated. Once per turn, during the End Phase, if this card was Special Summoned: Send it to the GY. Gains 1000 ATK/DEF for each card in your hand. If a monster(s) is Normal or Special Summoned to your opponent's field in Attack Position: That monster(s) loses 2000 ATK, then if its ATK has been reduced to 0 as a result, destroy it."),
+        ("The Winged Dragon of Ra", -1, "Cannot be Special Summoned. Requires 3 Tributes to Normal Summon (cannot be Normal Set). This card's Normal Summon cannot be negated. When Normal Summoned, other cards and effects cannot be activated. When this card is Normal Summoned: You can pay LP so that you only have 100 left; this card gains ATK/DEF equal to the amount of LP paid. You can pay 1000 LP, then target 1 monster on the field; destroy that target."),
+    };
+
+    static void MakeGod(CardData g, int atk, string text)
+    {
+        g.Frame = "Effect"; g.Attribute = "DIVINE"; g.Race = "Divine-Beast"; g.Level = 10;
+        g.Atk = g.Def = Math.Max(0, atk); g.StatsUnknown = atk < 0;
+        g.Desc = g.TcgDesc = text; g.Modern = true; g.Archetype = "Egyptian God";
+        g.PackMask |= Expansion;   // collectable (the Shop), like the expansion cards
+    }
 
     static void Add<K>(Dictionary<K, List<CardData>> d, K k, CardData c) where K : notnull
     {

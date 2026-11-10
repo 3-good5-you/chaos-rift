@@ -272,7 +272,7 @@ public partial class CardDetail : Panel
         {
             type.Text = $"{d.Attribute}  ·  {d.Race.ToUpperInvariant()} / {d.Frame.ToUpperInvariant()}";
             stars.Text = new string('★', Math.Max(0, d.Level));
-            stats.Text = $"ATK {d.Atk}    DEF {d.Def}";
+            stats.Text = $"ATK {d.AtkText}    DEF {d.DefText}";
         }
         else
         {

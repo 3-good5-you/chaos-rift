@@ -60,6 +60,7 @@ public static class Shop
     /// What a card costs: limited cards the most, then by strength.
     public static int Price(CardData d)
     {
+        if (d.Name is "Obelisk the Tormentor" or "Slifer the Sky Dragon" or "The Winged Dragon of Ra") return 9000;   // the Gods: a long save, not a pack pull
         int lim = DeckRules.Limit(d);
         if (lim <= 1) return lim == 0 ? 2400 : 1800;
         if (lim == 2) return 1200;

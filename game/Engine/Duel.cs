@@ -259,8 +259,9 @@ public sealed partial class Duel
     Stat StatCore(Card c, Stat st)
     {
         if (c.Var("swapturn") == Turn) (st.BaseAtk, st.BaseDef) = (st.BaseDef, st.BaseAtk);
-        if (c.Var("baseatkturn") == Turn) st.BaseAtk = c.Var("baseatk") - 1;   // "its original ATK becomes X" until the end of the turn
-        if (c.Var("basedefturn") == Turn) st.BaseDef = c.Var("basedef") - 1;
+        // "its original ATK becomes X" until the end of the turn; int.MaxValue = while it stays (Sphere Mode's 4000 ATK Ra)
+        if (c.Var("baseatkturn") is var bt && (bt == Turn || bt == int.MaxValue)) st.BaseAtk = c.Var("baseatk") - 1;
+        if (c.Var("basedefturn") is var dt && (dt == Turn || dt == int.MaxValue)) st.BaseDef = c.Var("basedef") - 1;
         if (c.Var("hat") == 1) { st.BaseAtk = 0; st.BaseDef = 0; }
         st.Add(c.Var("modatk"), c.Var("moddef"));
         var src = Sources().ToList();
@@ -419,6 +420,8 @@ public sealed partial class Duel
 
     async Flow OpenWindow(Ev e)
     {
+        // An Egyptian God's Normal Summon opens no response window: nothing can negate it or answer it.
+        if (e is { Kind: EvKind.Summoned, Card: { } god } && (SummonKind)e.Arg is SummonKind.Normal or SummonKind.Tribute && S(god)?.SummonLock == true) return;
         var prev = Window;
         Window = e;
         try

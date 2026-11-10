@@ -61,8 +61,15 @@ public static class Progression
         // Yugi's Exodia decks (v1.0), a third of the time at EASY (their measured strength vs the starter decks, 7-20%):
         // level 1 the Exodia Necross deck, level 2 the instant-win one.
         if (rival == "yugi" && pick.Level is 1 or 2 && rng.Int(3) == 0) return pick with { DeckKey = pick.Level == 1 ? "yugi/x_exodia_gy" : "yugi/x_exodia_insta" };
+        // Rare God decks (2026-11-10): at HARD and EXPERT, 1 duel in 20 the rival brings an Egyptian God deck instead.
+        if (pick.Level >= 5 && rng.Int(GodOdds) == 0) return pick with { DeckKey = GodDeck(rng) };
         return pick with { DeckKey = $"{rival}/x_lv{pick.Level}" };
     }
+
+    /// The rare Egyptian God decks (remastered_decks.json god/x_*): one per God, and one with all three.
+    public static readonly string[] GodDecks = { "god/x_obelisk", "god/x_slifer", "god/x_ra", "god/x_pantheon" };
+    public const int GodOdds = 20;
+    public static string GodDeck(Rng rng) => GodDecks[rng.Int(GodDecks.Length)];
 
     /// Remake rule (Yugi, Kaiba): the original re-rolls every duel, so beating a HARD deck often fell back to NORMAL.
     /// On a win streak the rival never drops below the level you last beat, and every 3rd win in a row goes one higher.

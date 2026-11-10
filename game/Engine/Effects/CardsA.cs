@@ -100,10 +100,11 @@ public static partial class Scripts
 
         Spell("Monster Reborn", async x =>
         {
-            var g = x.D.Players.SelectMany(p => p.Grave).Where(c => c.Data.IsMonster).ToList();
+            // Only monsters it can legally Special Summon (not Ra, not a Fusion that was never properly Summoned).
+            var g = x.D.Players.SelectMany(p => p.Grave).Where(c => c.Data.IsMonster && x.D.CanSpecialSummon(c, x.Me, by: x.Self)).ToList();
             var t = await x.Pick(g, "Special Summon which monster?");
             if (t != null) await x.D.SpecialSummon(t, x.Me, await x.D.ChoosePosition(x.Me, t), by: x.Self);
-        }, x => x.D.FreeMonsterZones(x.Me) > 0 && x.D.Players.Any(p => p.Grave.Any(c => c.Data.IsMonster))
+        }, x => x.D.FreeMonsterZones(x.Me) > 0 && x.D.Players.Any(p => p.Grave.Any(c => c.Data.IsMonster && x.D.CanSpecialSummon(c, x.Me, by: x.Self)))
             && !(x.Classic && x.D.CountActive("Call of the Dark") > 0));
 
         static Script Pump(string name, int atk, int def) => Spell(name,

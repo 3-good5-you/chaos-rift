@@ -170,7 +170,8 @@ public partial class DuelField
     void HideFor(View v, double s)
     {
         v.Root.Visible = false; v.Stat.Visible = false;
-        After(s, () => { v.Root.Visible = v.S.Loc != Loc.None; if (v.Root.Visible) UpdateStat(v, false); });
+        // A monster that already broke with the one it fought stays gone until its own move to the Graveyard plays.
+        After(s, () => { if (crackedEarly.Contains(v.Card.Uid)) return; v.Root.Visible = v.S.Loc != Loc.None; if (v.Root.Visible) UpdateStat(v, false); });
     }
 
     // ---------------------------------------------------------------- 1. destroyed by battle: MD crack, orange
@@ -612,8 +613,11 @@ void fragment() {
     /// Equal attackers charge each other and meet; the cracks follow as they leave the field.
     void MeetInMiddle(View a, View t, int side, Action<Vector3>? onMeet = null)
     {
-        Lunge(t, a, 1 - side, onHit: _ => { }, quiet: true);
-        Lunge(a, t, side, windup: "windup_meet", onHit: h => { Cue("meet"); Glint("md/burst", FxEmber, h, 360, 0.3f, 1.1f, 0.4); Shake(0.1f); onMeet?.Invoke(h); });
+        // Each charges just under halfway, so the two cards meet in the middle and the burst lands between them (it used to
+        // land by the defender's emptied zone: both went 82% of the way and crossed; playtest 2026-11-10).
+        var mid = Target(a, a.S).Origin.Lerp(Target(t, t.S).Origin, 0.5f) + Vector3.Up * 0.2f;
+        Lunge(t, a, 1 - side, onHit: _ => { }, quiet: true, reach: 0.44f);
+        Lunge(a, t, side, windup: "windup_meet", reach: 0.44f, onHit: _ => { Cue("meet"); Glint("md/burst", FxEmber, mid, 360, 0.3f, 1.1f, 0.4); Shake(0.1f); onMeet?.Invoke(mid); });
     }
 
     // ---------------------------------------------------------------- 14. direct attack: shockwave on their side

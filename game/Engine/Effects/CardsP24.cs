@@ -283,7 +283,6 @@ public static partial class Scripts
             s.Can = x => Up(x) && x.My.Lp > 1000 && x.D.AllMonsters.Any(m => m != x.Self);
             s.Cost = async x => x.D.Pay(x.Me, 1000, x.Self);
             s.Run = async x => { var t = await x.Pick(x.D.AllMonsters.Where(m => m != x.Self), "Send which monster to the GY?"); if (t != null) await x.D.ToGrave(t, x.Self); };
-            s.Note = "The Egyptian Gods are not in the game yet, so its revival never happens in a duel.";
         }
         {
             var s = S("The Winged Dragon of Ra - Sphere Mode");

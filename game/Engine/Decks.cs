@@ -203,7 +203,15 @@ public static class DeckRules
     {
         var db = CardDb.Shared;
         var f = db.Fusions.FirstOrDefault(r => db.ByKonami.TryGetValue(r.Result, out var l) && l.Any(c => c.Name == fusion.Name));
-        if (f == null) return new();
+        if (f == null)
+        {
+            // Newer Fusions (anime pool): their first text line lists the materials; named cards there are the recipe.
+            var line = fusion.Desc.Split('\n')[0];
+            var named = System.Text.RegularExpressions.Regex.Matches(line, "\"([^\"]+)\"").Select(m => m.Groups[1].Value)
+                .Where(n => n != fusion.Name && db.ByName.ContainsKey(n)).Select(db.Named).ToList();
+            // no Polymerization here: these decks also fuse with Miracle Fusion, Fusion Gate, Power Bond...
+            return named;
+        }
         CardData M(int konami) => db.ByKonami[konami][0];
         // Blue-Eyes Ultimate Dragon is listed as BEWD + BEWD; it takes three.
         var mats = f.A == f.B && fusion.Name == "Blue-Eyes Ultimate Dragon" ? new List<CardData> { M(f.A), M(f.A), M(f.A) } : new List<CardData> { M(f.A), M(f.B) };

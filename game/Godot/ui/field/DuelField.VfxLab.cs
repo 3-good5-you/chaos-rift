@@ -296,7 +296,7 @@ public partial class DuelField
             {
                 labPlayed = true;   // once per run: a variant that reloads the field would otherwise replay itself
                 var p = a[10..].Split(':');
-                int e = int.Parse(p[0]) - 1, v = p.Length > 1 ? int.Parse(p[1]) - 1 : 0;
+                int e = int.TryParse(p[0], out var en) ? en - 1 : labEvents.FindIndex(x => x.Name.Contains(p[0], StringComparison.OrdinalIgnoreCase)), v = p.Length > 1 ? int.Parse(p[1]) - 1 : 0;   // a row by number or by name
                 After(1.0, () => { LabSelect(e); LabRun(e, v); });
             }
     }

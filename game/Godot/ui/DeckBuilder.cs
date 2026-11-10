@@ -170,7 +170,7 @@ public partial class DeckBuilder : RiftMenu
 
     void ShowHover(CardData d)
     {
-        string stats = d.IsMonster ? $"  ·  ATK {d.Atk} / DEF {d.Def}" : "";
+        string stats = d.IsMonster ? $"  ·  ATK {d.AtkText} / DEF {d.DefText}" : "";
         hoverLine.Text = $"{d.Name}{stats}  —  {(d.TcgDesc ?? d.Desc).Replace('\n', ' ')}";
     }
 

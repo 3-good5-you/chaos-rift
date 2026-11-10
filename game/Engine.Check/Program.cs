@@ -28,6 +28,8 @@ static class Program
             Console.WriteLine(d.StateHash());
             return 0;
         }
+        if (args.Length >= 1 && args[0] == "scenarios") { RemasteredChecks(); Scenarios.Run(Check); Console.WriteLine(failures == 0 ? "ALL CHECKS PASSED" : $"{failures} CHECK(S) FAILED"); return failures == 0 ? 0 : 1; }
+        if (args.Length >= 1 && args[0] == "godduels") return GodDuels.Run(args.Length > 1 ? int.Parse(args[1]) : 50, args.Contains("seer"));
         if (args.Length >= 1 && args[0] == "puzzles") { PuzzleChecks(); return 0; }
         if (args.Length >= 1 && args[0] == "labtest") return LabTests.Run(args.Length > 1 ? args[1] : "");
         if (args.Length >= 1 && args[0] == "audit") return Audit.Run(args.Length > 1 ? args[1] : "");
@@ -86,7 +88,7 @@ static class Program
             return failures == 0 ? 0 : 1;
         }
         var db = CardDb.Shared;
-        int pc = db.ByIdx.Count - db.ByIdx.Values.Count(d => d.Modern);
+        int pc = db.ByIdx.Values.Count(d => d.Idx < 2000);   // the Gods (1108-1110) are PoC cards given modern text
         Check(pc == 1114, $"1114 PoC cards loaded (got {pc}), plus {db.ByIdx.Count - pc} anime-pool cards");
         Check(db.Effects.Count == 464, $"464 effects loaded (got {db.Effects.Count})");
         Check(db.Fusions.Count > 50 && db.Rituals.Count > 0, "fusion/ritual tables loaded");
@@ -105,6 +107,11 @@ static class Program
         TournamentChecks();
         DiceChecks();
         Scenarios.Run(Check);
+        {
+            var gods = GodDuels.Play(3, seer: false, seed: 9, fail: m => Console.WriteLine("FAIL god duel " + m));
+            Check(gods.Values.All(s => s.Errors == 0), $"God decks: CPU duels run clean ({gods.Values.Sum(s => s.Errors)} errors)");
+            Check(gods.Values.Sum(s => s.Count.Where(c => c.Key.StartsWith("on field:")).Sum(c => c.Value)) > 0, "God decks: the CPU summons its Gods");
+        }
         int n = args.Length > 1 && args[0] == "duels" ? int.Parse(args[1]) : 300;
         RandomDuels(n);
         AiDuels(n / 3);
@@ -198,11 +205,22 @@ static class Program
             var deck = new Deck(k, main, extra);
             Check(main.Count == 40, $"{k}: 40 cards (got {main.Count})");
             Check(DeckRules.Problem(deck, all, "joey") is null, $"{k}: legal under 2004 ({DeckRules.Problem(deck, all, "joey")})");
-            Check(DeckRules.FusionsMissingMaterials(deck).Count == 0, $"{k}: Fusion materials in the deck");
+            Check(DeckRules.FusionsMissingMaterials(deck).All(f => f.Modern), $"{k}: Fusion materials in the deck");   // CPU decks: the original fusion table only (newer Fusions are prompted in the deck builder)
             var unscripted = main.Select(db.Get).Where(c => db.Effects.ContainsKey(c.KonamiId) && Scripts.Get(c) is not { Implemented: true }).Select(c => c.Name).Distinct().ToList();
             Check(unscripted.Count == 0, $"{k}: every effect scripted ({string.Join(", ", unscripted)})");
             deck.Side.AddRange(db.DeckSide(k));
             Check(deck.Side.Count is > 0 and <= 15 && DeckRules.Problem(deck, all, "joey") is null, $"{k}: side deck legal ({DeckRules.Problem(deck, all, "joey")})");
+            // The 2003 list forbids the Gods themselves (blank cards then); the CPU keeps its decks as-is under 2003 (ForCpu).
+            if (k.StartsWith("god/"))
+            {
+                var noGods = new Deck(k, main.Where(i => db.Get(i).Race != "Divine-Beast"), extra);
+                noGods.Side.AddRange(deck.Side);
+                string? why = DeckRules.Problem(noGods, all, "kaiba");
+                Check(why is null || why.Contains("more card"), $"{k}: legal under 2003 apart from the Gods ({why})");
+                var over = deck.Main.Concat(deck.Side).Distinct().Select(db.Get).Where(c => new[] { "joey", "kaiba" }.Any(l => deck.CopiesNamed(c.Name) > DeckRules.Limit(c, l) && !(l == "kaiba" && c.Race == "Divine-Beast")))
+                    .Select(c => $"{c.Name} x{deck.CopiesNamed(c.Name)} (2004 {DeckRules.Limit(c, "joey")}, 2003 {DeckRules.Limit(c, "kaiba")})").Distinct().ToList();
+                Check(over.Count == 0 && DeckRules.ForCpu(main, "joey").SequenceEqual(main), $"{k}: within both limit lists ({string.Join("; ", over)})");
+            }
         }
         // CPU decks under the ban list: 2004 makes them legal (same size), 2003 leaves them as the originals were.
         int fixedDecks = 0;
@@ -669,7 +687,7 @@ static class Program
     static void ProgressionChecks()
     {
         var decks = CardDb.Shared.DeckNames().Concat(CardDb.Shared.RemasteredDeckNames()).ToHashSet();
-        int expertDecks = 0;
+        int expertDecks = 0, godDecks = 0;
         var rng = new Rng(77);
         var levels = new HashSet<int>();
         for (int i = 0; i < 3000; i++)
@@ -683,9 +701,18 @@ static class Program
                 levels.Add(pick.Level);
                 if (!decks.Contains(pick.DeckKey)) { Check(false, $"progression picked unknown deck {pick.DeckKey}"); return; }
                 if (pick.DeckKey == $"{r}/x_lv{pick.Level}" || (r == "yugi" && pick.DeckKey.StartsWith("yugi/x_exodia") && pick.Level is 1 or 2)) expertDecks++;
+                else if (Progression.GodDecks.Contains(pick.DeckKey) && pick.Level >= 5) godDecks++;
             }
         }
-        Check(expertDecks == 4 * 3000, "every pick brings the rival's deck for its level (Yugi: or an Exodia deck at EASY)");
+        Check(expertDecks + godDecks == 4 * 3000, "every pick brings the rival's deck for its level (Yugi: or an Exodia deck at EASY; HARD+: rarely a God deck)");
+        Check(godDecks > 0 && godDecks < 4 * 3000 / 25, $"God decks are rare ({godDecks} of {4 * 3000} picks)");
+        var hard = new Profile { CollectionPercent = 30 }; hard.Of("joey").Level = 6;
+        var godRolls = Enumerable.Range(0, 4000).Select(_ => Progression.Pick("joey", hard, rng).DeckKey).Where(Progression.GodDecks.Contains).ToList();
+        Check(godRolls.Count is > 120 and < 300 && Progression.GodDecks.All(godRolls.Contains), $"HARD+: about 1 duel in {Progression.GodOdds} brings a God deck, each of the four ({godRolls.Count}/4000)");
+        Check(new Profile().Of("joey").Level == 1 && Enumerable.Range(0, 2000).All(_ => !Progression.GodDecks.Contains(Progression.Pick("joey", new Profile(), rng).DeckKey)), "EASY: never a God deck");
+        var legendDays = Enumerable.Range(0, 366).Select(k => new DateTime(2026, 1, 1).AddDays(k)).ToList();
+        int legendGods = legendDays.Count(day => Progression.GodDecks.Contains(Modes.Legend("kaiba", day).DeckKey));
+        Check(legendGods is > 10 and < 60 && legendDays.All(day => Modes.Legend("kaiba", day) == Modes.Legend("kaiba", day)), $"Legend: a God deck on a rare day, the same all day ({legendGods}/366)");
         Check(levels.SetEquals(Enumerable.Range(1, 7)), $"difficulty levels 1..7 all reachable ({string.Join(",", levels.OrderBy(x => x))})");
         var p = new Profile();
         for (int i = 0; i < 3; i++) Progression.Record(p, "joey", true);

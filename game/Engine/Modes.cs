@@ -22,8 +22,14 @@ public static class Modes
 
     // ---------------------------------------------------------------- Legend
 
-    /// The rival at the top level with their strongest remake deck.
-    public static OpponentPick Legend(string rival) => new(rival, $"{rival}/x_lv7", 7);
+    /// The rival at the top level with their strongest remake deck; on a rare day (1 in 12, per rival, the same all
+    /// day so every screen agrees) an Egyptian God deck instead.
+    public static OpponentPick Legend(string rival, DateTime? day = null)
+    {
+        var d = day ?? DateTime.Today;
+        int roll = d.Year * 400 + d.DayOfYear + rival.Sum(ch => ch) * 7;
+        return new(rival, roll % 12 == 0 ? Progression.GodDecks[roll / 12 % Progression.GodDecks.Length] : $"{rival}/x_lv7", 7);
+    }
     public static readonly (int Dp, int Cards, int New) LegendPrize = (600, 3, 2);
 
     // ---------------------------------------------------------------- Limited Duel

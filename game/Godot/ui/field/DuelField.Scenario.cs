@@ -13,6 +13,7 @@ namespace PoC.Game.UI;
 /// timewizard — Time Wizard on your field: its effect asks you to call the coin.
 /// dice    — Celtic Guardian on your field, Graceful Dice in hand: activate it to roll the dice cup.
 /// mutual  — your Celtic Guardian attacks theirs (equal ATK): both destroyed.
+/// mutualtrap — the same with a set Call Of The Haunted on their side (a window after the first destruction): response windows split the battle's steps.
 /// exodia  — four pieces in hand; Kaiba ends his turn and your draw brings the fifth: the Exodia finish.
 /// fusion  — Flame Manipulator and Masaki on your field, Polymerization activated: the Fusion plays live.
 /// Test hooks: `--point=Card Name` moves the mouse onto that card, `--click=Card Name` clicks it once your
@@ -35,6 +36,7 @@ public partial class DuelField
             case "timewizard": you = new[] { "Time Wizard", "Mystical Elf", "Silver Fang", "Battle Ox", "Celtic Guardian" }; them = new[] { "Gemini Elf" }; break;
             case "dice": you = new[] { "Celtic Guardian", "Graceful Dice", "Mystical Elf", "Silver Fang", "Battle Ox" }; them = new[] { "Gemini Elf" }; break;
             case "search": you = new[] { "Sangan", "Trap Hole", "Battle Ox", "Mystical Elf", "Feral Imp" }; them = new[] { "Gemini Elf" }; break;
+            case "mutualtrap": you = new[] { "Celtic Guardian", "Mystical Elf", "Silver Fang", "Battle Ox", "Feral Imp" }; them = new[] { "Celtic Guardian", "Call Of The Haunted" }; break;
             case "mutual": you = new[] { "Celtic Guardian", "Mystical Elf", "Silver Fang", "Battle Ox", "Feral Imp" }; them = new[] { "Celtic Guardian" }; break;
             case "exodia": you = new[] { "Exodia the Forbidden One", "Left Arm of the Forbidden One", "Right Arm of the Forbidden One", "Left Leg of the Forbidden One", "Celtic Guardian", "Mystical Elf", "Right Leg of the Forbidden One" }; them = new[] { "Gemini Elf", "Battle Ox" }; break;
             case "fusion": you = new[] { "Flame Manipulator", "Masaki the Legendary Swordsman", "Polymerization", "Mystical Elf", "Silver Fang" }; them = new[] { "Gemini Elf" }; break;
@@ -103,9 +105,9 @@ public partial class DuelField
                 Do(Is(Act.Summon, "Celtic Guardian"));
                 while (D.Pending is { Kind: Ask.Respond } r) D.Submit(new Command(r.Player, new[] { r.Options.Count - 1 }));
                 break;                                            // your Main Phase: click Graceful Dice to roll
-            case "mutual":
+            case "mutual" or "mutualtrap":
                 Do(Is(Act.Summon, "Celtic Guardian")); Do(Is(Act.EndTurn));
-                Do(Is(Act.Summon, "Celtic Guardian")); Do(Is(Act.EndTurn));
+                Do(Is(Act.Summon, "Celtic Guardian")); if (scenario == "mutualtrap") Do(Is(Act.SetSpell, "Call Of The Haunted")); Do(Is(Act.EndTurn));
                 Do(Is(Act.ToBattle)); liveMove = Is(Act.Attack, "Celtic Guardian", "Celtic Guardian");   // the battle plays live
                 break;
             case "exodia":

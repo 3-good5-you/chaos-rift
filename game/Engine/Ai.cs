@@ -69,7 +69,7 @@ public sealed partial class Ai
             Ask.Battle => Battle(d, p),
             Ask.Respond => Respond(d, p),
             Ask.Position => Position(d, p),
-            Ask.YesNo => 0,
+            Ask.YesNo => IsRaPay(p) && !RaPays(d, Others(d, p.Source!)) ? 1 : 0,
             Ask.Pick => -1,
             _ => 0,
         };
@@ -161,6 +161,8 @@ public sealed partial class Ai
         // Stage 2: summon, monster effects, spells, then normal summon / set.
         i = SummonChoice(d, p);
         if (i >= 0) return Take(p, i, "s");
+        i = GodEffect(d, p);
+        if (i >= 0) return i;
         // Special Summon procedures (Spirit of Flames, Dark Necrofear, Gate Guardian...): the original held these in
         // hand forever (every brain).
         i = Find(p, o => o.Act == Act.Special && !Done("x" + o.Card!.Uid) && o.Card.Data.Atk >= 1200);
@@ -212,10 +214,13 @@ public sealed partial class Ai
         {
             var o = p.Options[k];
             if (o.Act != Act.Summon || o.Card!.Data.Level < 5) continue;
-            int need = o.Card.Data.Level >= 7 ? 2 : 1;
-            var keep = Me(d).MonstersOnField.OrderByDescending(TributeValue(d)).Take(Math.Max(0, Me(d).MonstersOnField.Count() - need))
-                .Where(c => c.FaceUp && !c.Defense).Select(d.Atk).Append(o.Card.Data.Atk).ToList();
-            int sc = Score(d, keep) + opp.Count(m => o.Card.Data.Atk > Guard(d, m));
+            int need = d.TributesFor(o.Card);   // the Gods take 3
+            var rest = Me(d).MonstersOnField.OrderByDescending(TributeValue(d)).Take(Math.Max(0, Me(d).MonstersOnField.Count() - need))
+                .Where(c => c.FaceUp && !c.Defense).Select(d.Atk).ToList();
+            int atk = SummonAtk(d, o.Card, rest);
+            if (IsGod(o.Card) && GodWorth(d, o.Card, atk)) return k;
+            var keep = rest.Append(atk).ToList();
+            int sc = Score(d, keep) + opp.Count(m => atk > Guard(d, m));
             if (sc > bestScore) { bestScore = sc; best = k; }
         }
         if (best >= 0 && bestScore >= baseScore) return best;
@@ -241,6 +246,77 @@ public sealed partial class Ai
             return Pos(p, cands[0], WantsDefense(d, c.Data.Atk, c.Data.Def) || opp.Count > 0);
         }
         return -1;
+    }
+
+    // ---------------------------------------------------------------- Egyptian Gods (every brain)
+
+    static bool IsGod(Card c) => c.Data.Race == "Divine-Beast";
+    static bool IsRaPay(Prompt p) => p.Kind == Ask.YesNo && p.Source?.Name == "The Winged Dragon of Ra" && p.Text.StartsWith("Pay");
+    List<int> Others(Duel d, Card not) => Me(d).MonstersOnField.Where(m => m != not && m.FaceUp && !m.Defense).Select(d.Atk).ToList();
+
+    /// The ATK a monster will have once Normal Summoned: printed ATK, except the Gods whose ATK is made on the field.
+    int SummonAtk(Duel d, Card c, List<int> others) => c.Name switch
+    {
+        "Slifer the Sky Dragon" => 1000 * (Me(d).Hand.Count - 1),
+        "The Winged Dragon of Ra" => RaPays(d, others) ? Me(d).Lp - 100 : 0,
+        _ => c.Data.Atk,
+    };
+
+    /// Ra's "pay so you only have 100 LP": only for the kill this turn, or against an opponent with nothing left to
+    /// answer it (no Spell/Trap set, at most one card in hand, nothing that stands up to Ra). At 100 LP any burn or
+    /// direct hit ends the duel and Ra's own destroy effect (1000 LP) is gone, so a slow game is never worth it.
+    bool RaPays(Duel d, List<int> others)
+    {
+        var opp = Opp(d);
+        int pay = Me(d).Lp - 100;
+        if (pay <= 0) return false;
+        if (d.Phase == Phase.Main1 && d.Turn > 1 && Score(d, others.Append(pay)) / 10 >= opp.Lp) return true;
+        return pay >= opp.Lp && opp.Hand.Count <= 1 && !opp.SpellsOnField.Any() && opp.MonstersOnField.All(m => Guard(d, m) < pay);
+    }
+
+    /// A God is worth its 3 Tributes: Obelisk always; Slifer with a hand to fuel it; Ra when it pays for the kill or
+    /// can start shooting monsters (1000 LP each); Sphere Mode when it can call Ra.
+    bool GodWorth(Duel d, Card c, int atk) => c.Name switch
+    {
+        "Obelisk the Tormentor" => true,
+        "Slifer the Sky Dragon" => atk >= Math.Max(2000, OppBestAtk(d)),
+        "The Winged Dragon of Ra" => atk > 0 || Me(d).Lp >= 3000 && RaShot(d),
+        "The Winged Dragon of Ra - Sphere Mode" => Me(d).Hand.Concat(Me(d).Deck).Any(x => x.Name == "The Winged Dragon of Ra"),
+        _ => false,
+    };
+
+    /// An opponent's monster worth 1000 LP of Ra's destroy effect.
+    bool RaShot(Duel d) => Opp(d).MonstersOnField.Any(m => !m.FaceUp || Math.Max(d.Atk(m), d.Def(m)) >= 1000);
+
+    /// The Gods' Main Phase effects: Obelisk's wipe when it opens lethal or takes 2+ monsters it can't beat (or 3+);
+    /// Ra's destroy while LP stays above 2000; Sphere Mode always (it becomes a 4000 ATK Ra).
+    int GodEffect(Duel d, Prompt p)
+    {
+        for (int i = 0; i < p.Options.Count; i++)
+        {
+            if (p.Options[i] is not { Act: Act.Activate, Card: { OnField: true } c } || !IsGod(c)) continue;
+            string key = $"g{c.Uid}/{Me(d).Lp}";   // Ra may shoot again once its LP was paid
+            if (Done(key)) continue;
+            bool go = c.Name switch
+            {
+                "Obelisk the Tormentor" => ObeliskOk(d, c),
+                "The Winged Dragon of Ra" => Me(d).Lp > 2000 && RaShot(d),
+                "The Winged Dragon of Ra - Sphere Mode" => true,
+                _ => false,
+            };
+            if (go) return Take(p, i, key);
+        }
+        return -1;
+    }
+
+    bool ObeliskOk(Duel d, Card ob)
+    {
+        var opp = Opp(d).MonstersOnField.ToList();
+        if (opp.Count == 0) return false;
+        int left = Me(d).MonstersOnField.Where(m => m != ob).OrderBy(TributeValue(d)).Skip(2)
+            .Where(m => m.FaceUp && !m.Defense && d.CanAttack(m)).Sum(d.Atk);
+        if (d.Phase == Phase.Main1 && d.Turn > 1 && left >= Opp(d).Lp) return true;   // the wipe opens a lethal attack
+        return opp.Count >= 3 || opp.Count >= 2 && opp.Max(m => Guard(d, m)) >= d.Atk(ob);
     }
 
     /// Prefer Set (face-down Defense) over Summon for the same card when the comparator wants Defense.

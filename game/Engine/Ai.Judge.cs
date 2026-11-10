@@ -29,6 +29,8 @@ public sealed partial class Ai
         switch (p.Kind)
         {
             case Ask.Main: return JudgeMain(d, p);
+            // Ra's LP payment pays off in the Battle Phase, past what a judged world plays out: the rule decides.
+            case Ask.YesNo when IsRaPay(p): return Rule(d, p);
             case Ask.Battle or Ask.Respond or Ask.YesNo or Ask.Choose:
                 return Best(d, p, Rule(d, p), Enumerable.Range(0, p.Options.Count).Where(i => !Doubled(d, p.Options[i])).Select(i => new[] { i }));
             case Ask.Pick:
@@ -71,7 +73,8 @@ public sealed partial class Ai
             Report(p.Options[best], Gain(best));
             return new[] { best };
         }
-        for (int guard = 0; IsPlay(p.Options[rule]) && Gain(rule) < -JudgeMargin && guard < 20; guard++)
+        // A God the rules chose to summon stays summoned: three Tributes look like a loss until it swings.
+        for (int guard = 0; IsPlay(p.Options[rule]) && Gain(rule) < -JudgeMargin && !(p.Options[rule] is { Act: Act.Summon, Card: { } g } && IsGod(g)) && guard < 20; guard++)
         {
             int uid = p.Options[rule].Card!.Uid;
             Overruled?.Invoke($"Main veto {p.Options[rule]} {Gain(rule):0}");

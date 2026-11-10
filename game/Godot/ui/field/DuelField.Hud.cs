@@ -99,7 +99,7 @@ void fragment() { float r = length((UV - 0.5) * vec2(1.6, 1.0)); COLOR = vec4(co
         {
             detailType.Text = $"{d.Attribute}  ·  {d.Race.ToUpperInvariant()} / {d.Frame.ToUpperInvariant()}";
             detailStars.Text = new string('★', Math.Max(0, d.Level));
-            detailStats.Text = $"ATK {d.Atk}    DEF {d.Def}";
+            detailStats.Text = $"ATK {d.AtkText}    DEF {d.DefText}";
         }
         else
         {

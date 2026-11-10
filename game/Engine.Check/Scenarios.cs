@@ -229,6 +229,13 @@ static class Scenarios
         });
 
         // Put deck cards straight onto the field (face-up Attack) to build a board quickly.
+        // A card straight into its owner's GY (Duel.Place only knows zones on the field).
+        static void ToGy(Sc s, int p, Card c)
+        {
+            s.D.P(p).Hand.Remove(c); s.D.P(p).Deck.Remove(c);
+            s.D.P(p).Grave.Add(c); c.Loc = Loc.Grave;
+        }
+
         static Card Put(Sc s, int p, string name)
         {
             var c = s.D.P(p).Deck.Concat(s.D.P(p).Hand).First(x => x.Name == name);
@@ -240,7 +247,7 @@ static class Scenarios
         T("Polymerization needs a zone: all 5 full and hand-only materials = no activation", () =>
         {
             var s = new Sc(new[] { "Polymerization", "Flame Manipulator", "Masaki the Legendary Swordsman" }, new string[0], extra0: new[] { "Flame Swordsman" });
-            for (int i = 0; i < 5; i++) Put(s, 0, Filler);
+            for (int i = 0; i < 5; i++) Put(s, 0, Filler); s.D.RefreshPrompt();
             check(!s.D.MainOptions(0, true).Any(o => o.Act == Act.Activate && o.Card!.Name == "Polymerization"), "Polymerization not offered with 5 monsters and hand materials");
             s.D.P(0).Monsters[4]!.Loc = Loc.Grave; s.D.P(0).Monsters[4] = null;   // free a zone: offered again
             check(s.D.MainOptions(0, true).Any(o => o.Act == Act.Activate && o.Card!.Name == "Polymerization"), "Polymerization offered with a free zone");
@@ -270,7 +277,7 @@ static class Scenarios
         {
             var s = new Sc(new[] { "Penguin Soldier" }, new string[0]);
             s.Do(Act.Set, "Penguin Soldier").PassAll().EndTurn();
-            Put(s, 1, Filler); Put(s, 1, Filler);
+            Put(s, 1, Filler); Put(s, 1, Filler); s.D.RefreshPrompt();
             s.EndTurn();
             s.Do(Act.FlipSummon, "Penguin Soldier");
             while (s.Has(Ask.Respond)) s.Pass();
@@ -433,6 +440,179 @@ static class Scenarios
             var cmd = new Ai(0, 1).Decide(s.D);
             check(s.D.Pending!.Options[cmd.Picks[0]].Card == mine, $"equipped to {s.D.Pending.Options[cmd.Picks[0]].Card}");
         });
+
+        T("Deck builder: Fusions (old table and newer cards) and Rituals offer what they need", () =>
+        {
+            var db = CardDb.Shared;
+            string Need(string n) => string.Join(",", DeckRules.Needs(db.Named(n)).Select(c => c.Name));
+            check(Need("Ambulance Rescueroid") == "Rescueroid,Ambulanceroid", $"Ambulance Rescueroid -> {Need("Ambulance Rescueroid")}");
+            check(Need("Flame Swordsman").Contains("Polymerization") && Need("Flame Swordsman").Contains("Flame Manipulator"), $"Flame Swordsman -> {Need("Flame Swordsman")}");
+            check(Need("Black Luster Soldier").Contains("Black Luster Ritual"), $"Black Luster Soldier -> {Need("Black Luster Soldier")}");
+            check(Need("Thousand Knives").Contains("Dark Magician"), $"Dark Magic Attack -> {Need("Thousand Knives")}");
+        });
+
+        // The Egyptian Gods (2026-11-09).
+        T("Obelisk: 3 Tributes, Trap Hole can't answer it, untargetable, its effect wipes the field and stops its attack", () =>
+        {
+            var s = new Sc(new[] { "Obelisk the Tormentor" }, new[] { "Trap Hole" });
+            s.EndTurn();
+            s.Do(Act.SetSpell, "Trap Hole").EndTurn();
+            check(s.D.P(0).Hand.Any(c => c.Name == "Obelisk the Tormentor") && !s.D.Pending!.Options.Any(o => o.Act == Act.Set && o.Card!.Name == "Obelisk the Tormentor"), "Obelisk can't be Set");
+            for (int i = 0; i < 5; i++) Put(s, 0, Filler); s.D.RefreshPrompt();
+            s.Do(Act.Summon, "Obelisk the Tormentor").Pick(Filler, Filler, Filler);
+            var ob = s.Mon(0, "Obelisk the Tormentor");
+            check(ob != null && s.D.Atk(ob) == 4000 && !s.Has(Ask.Respond), $"Obelisk is out at 4000 and no response window opened ({s.D.Pending})");
+            check(s.D.Forbidden(Q.Target, ob!, 1), "Obelisk can't be targeted");
+            Put(s, 1, Filler); Put(s, 1, Filler); s.D.RefreshPrompt();
+            s.Do(Act.Activate, "Obelisk the Tormentor").Pick(Filler, Filler).PassAll();
+            check(!s.D.P(1).MonstersOnField.Any(), "every opponent monster destroyed");
+            check(!s.D.CanAttack(ob!) && !s.D.Pending!.Options.Any(o => o.Act == Act.ToBattle), "Obelisk can't attack the turn it used its effect");
+        });
+
+        T("A Special Summoned God goes to the GY in the End Phase (Obelisk via Monster Reborn)", () =>
+        {
+            var s = new Sc(new[] { "Monster Reborn", "Obelisk the Tormentor" }, new string[0]);
+            var ob = s.D.P(0).Hand.First(c => c.Name == "Obelisk the Tormentor");
+            ToGy(s, 0, ob); s.D.RefreshPrompt();
+            s.Do(Act.Activate, "Monster Reborn");
+            if (s.Has(Ask.Pick)) s.Pick("Obelisk the Tormentor");
+            s.PassAll();
+            if (s.Has(Ask.Position)) s.AttackPos();
+            check(ob.Loc == Loc.Monster && ob.Summoned == SummonKind.Special, $"Obelisk revived ({ob.Loc})");
+            s.EndTurn();
+            check(ob.Loc == Loc.Grave, $"back in the GY at the End Phase ({ob.Loc})");
+        });
+
+        T("Slifer: ATK = 1000 x hand; an opponent's Attack Position summon loses 2000 and dies at 0", () =>
+        {
+            var s = new Sc(new[] { "Slifer the Sky Dragon" }, new[] { "Neo the Magic Swordsman", "Gemini Elf" });
+            for (int i = 0; i < 3; i++) Put(s, 0, Filler); s.D.RefreshPrompt();
+            s.Do(Act.Summon, "Slifer the Sky Dragon").Pick(Filler, Filler, Filler);
+            var sl = s.Mon(0, "Slifer the Sky Dragon")!;
+            check(s.D.Atk(sl) == 1000 * s.D.P(0).Hand.Count && !s.Has(Ask.Respond), $"Slifer ATK {s.D.Atk(sl)} with {s.D.P(0).Hand.Count} in hand");
+            s.EndTurn();
+            s.Do(Act.Summon, "Gemini Elf").AttackPos().PassAll();
+            var ge = s.Mon(1, "Gemini Elf");
+            check(ge == null, $"Gemini Elf (1900) dropped to 0 and was destroyed ({(ge == null ? "gone" : s.D.Atk(ge).ToString())})");
+        });
+
+        T("Ra: can't be Special Summoned; pays down to 100 LP for ATK; 1000 LP destroys a monster", () =>
+        {
+            var s = new Sc(new[] { "The Winged Dragon of Ra", "Monster Reborn" }, new string[0]);
+            var ra = s.D.P(0).Hand.First(c => c.Name == "The Winged Dragon of Ra");
+            check(!s.D.CanSpecialSummon(ra, 0), "Ra can't be Special Summoned");
+            for (int i = 0; i < 3; i++) Put(s, 0, Filler); s.D.RefreshPrompt();
+            s.Do(Act.Summon, "The Winged Dragon of Ra").Pick(Filler, Filler, Filler);
+            if (s.Has(Ask.YesNo)) s.Yes();
+            check(s.D.P(0).Lp == 100 && s.D.Atk(ra) == 7900 && s.D.Def(ra) == 7900, $"LP {s.D.P(0).Lp}, Ra {s.D.Atk(ra)}/{s.D.Def(ra)}");
+            s.D.P(0).Lp = 8000;
+            var foe = Put(s, 1, Filler); s.D.RefreshPrompt();
+            s.Do(Act.Activate, "The Winged Dragon of Ra");
+            if (s.Has(Ask.Pick)) s.PickUid(foe.Uid);
+            s.PassAll();
+            check(s.D.P(0).Lp == 7000 && !foe.Valid(), $"paid 1000 (LP {s.D.P(0).Lp}), target destroyed");
+        });
+
+        // God edge cases (2026-11-10).
+        foreach (bool attack in new[] { true, false })
+            T($"Slifer: an opponent's Special Summon in {(attack ? "Attack" : "Defense")} Position {(attack ? "loses 2000" : "is left alone")}", () =>
+            {
+                var s = new Sc(new[] { "Slifer the Sky Dragon" }, new[] { "Monster Reborn", "Gemini Elf" });
+                for (int i = 0; i < 3; i++) Put(s, 0, Filler); s.D.RefreshPrompt();
+                s.Do(Act.Summon, "Slifer the Sky Dragon").Pick(Filler, Filler, Filler);
+                s.EndTurn();
+                var ge = s.D.P(1).Hand.First(c => c.Name == "Gemini Elf");
+                ToGy(s, 1, ge); s.D.RefreshPrompt();
+                s.Do(Act.Activate, "Monster Reborn");
+                if (s.Has(Ask.Pick)) s.Pick("Gemini Elf");
+                s.PassAll();
+                if (s.Has(Ask.Position)) s.Opt(attack ? "Attack Position" : "Defense Position");
+                s.PassAll();
+                if (attack) check(!ge.Valid() || ge.Loc != Loc.Monster, $"Gemini Elf (1900) Special Summoned in Attack Position dropped to 0 and was destroyed ({ge.Loc})");
+                else check(ge.Loc == Loc.Monster && s.D.Atk(ge) == 1900, $"Gemini Elf in Defense Position keeps 1900 ({ge.Loc} {s.D.Atk(ge)})");
+            });
+
+        T("A Special Summoned Slifer goes to the GY in the End Phase", () =>
+        {
+            var s = new Sc(new[] { "Monster Reborn", "Slifer the Sky Dragon" }, new string[0]);
+            var sl = s.D.P(0).Hand.First(c => c.Name == "Slifer the Sky Dragon");
+            ToGy(s, 0, sl); s.D.RefreshPrompt();
+            s.Do(Act.Activate, "Monster Reborn");
+            if (s.Has(Ask.Pick)) s.Pick("Slifer the Sky Dragon");
+            s.PassAll();
+            if (s.Has(Ask.Position)) s.AttackPos();
+            check(sl.Loc == Loc.Monster && sl.Summoned == SummonKind.Special, $"Slifer revived ({sl.Loc})");
+            s.EndTurn();
+            check(sl.Loc == Loc.Grave, $"back in the GY at the End Phase ({sl.Loc})");
+        });
+
+        T("Ra in the GY: Monster Reborn can't bring it back", () =>
+        {
+            var s = new Sc(new[] { "Monster Reborn", "The Winged Dragon of Ra" }, new string[0]);
+            var ra = s.D.P(0).Hand.First(c => c.Name == "The Winged Dragon of Ra");
+            ToGy(s, 0, ra); s.D.RefreshPrompt();
+            bool can = s.D.Pending!.Options.Any(o => o.Act == Act.Activate && o.Card!.Name == "Monster Reborn");
+            if (can) { s.Do(Act.Activate, "Monster Reborn"); check(!(s.Has(Ask.Pick) && s.D.Pending!.Options.Any(o => o.Card == ra)), "Ra offered to Monster Reborn"); }
+            check(ra.Loc == Loc.Grave, $"Ra stays in the GY ({ra.Loc})");
+        });
+
+        foreach (var answer in new[] { "Solemn Judgment", "Trap Hole", "Bottomless Trap Hole", "Torrential Tribute" })
+            T($"{answer} can't answer a God's Normal Summon (Ra)", () =>
+            {
+                var s = new Sc(new[] { "The Winged Dragon of Ra" }, new[] { answer });
+                s.EndTurn();
+                s.Do(Act.SetSpell, answer).EndTurn();
+                for (int i = 0; i < 3; i++) Put(s, 0, Filler); s.D.RefreshPrompt();
+                s.Do(Act.Summon, "The Winged Dragon of Ra").Pick(Filler, Filler, Filler);
+                check(!(s.D.Pending is { Kind: Ask.Respond, Player: 1 }), $"{answer}: the opponent got a response window ({s.D.Pending})");
+                if (s.Has(Ask.YesNo)) s.No();
+                s.PassAll();
+                check(s.Mon(0, "The Winged Dragon of Ra") != null, "Ra stays on the field");
+            });
+
+        T("Sphere Mode: Normal Summoned with 3 Tributes, then Tributes itself for a 4000 ATK Ra from the Deck", () =>
+        {
+            var s = new Sc(new[] { "The Winged Dragon of Ra - Sphere Mode", "The Winged Dragon of Ra" }, new string[0]);
+            for (int i = 0; i < 3; i++) Put(s, 0, Filler); s.D.RefreshPrompt();
+            s.Do(Act.Summon, "The Winged Dragon of Ra - Sphere Mode").Pick(Filler, Filler, Filler).PassAll();
+            check(s.Mon(0, "The Winged Dragon of Ra - Sphere Mode") != null, "Sphere Mode on the field");
+            s.Do(Act.Activate, "The Winged Dragon of Ra - Sphere Mode");
+            if (s.Has(Ask.Pick)) s.Pick("The Winged Dragon of Ra");
+            s.PassAll();
+            var ra = s.Mon(0, "The Winged Dragon of Ra");
+            check(ra != null && s.D.Atk(ra) == 4000, $"Ra out at {(ra == null ? "-" : s.D.Atk(ra))} ATK");
+            s.EndTurn();
+            check(s.Mon(0, "The Winged Dragon of Ra") != null, "that Ra stays past the End Phase");
+        });
+
+        // The CPU and the Gods (rules brain: hand-placed boards aren't in the command log the look-ahead replays).
+        T("CPU: Tribute Summons Obelisk with 3 monsters, then wipes 3 opponent monsters with it", () =>
+        {
+            var s = new Sc(new[] { "Obelisk the Tormentor" }, new string[0]);
+            for (int i = 0; i < 5; i++) Put(s, 0, Filler);
+            for (int i = 0; i < 3; i++) Put(s, 1, Filler);
+            s.D.RefreshPrompt();
+            var ai = new Ai(0, 3, Brain.Plus);
+            for (int k = 0; k < 30 && s.D.Phase is Phase.Main1 && s.D.Pending!.Player == 0; k++) s.D.Submit(ai.Decide(s.D));
+            check(s.Mon(0, "Obelisk the Tormentor") != null, "Obelisk summoned");
+            check(!s.D.P(1).MonstersOnField.Any(), $"Obelisk's effect used ({s.D.P(1).MonstersOnField.Count()} opponent monsters left)");
+        });
+
+        foreach (bool lethal in new[] { true, false })
+            T($"CPU: Ra pays down to 100 LP {(lethal ? "for the kill" : "never without one")}", () =>
+            {
+                var s = new Sc(new[] { "The Winged Dragon of Ra" }, new[] { "Trap Hole" });
+                s.EndTurn();
+                if (!lethal) { s.Do(Act.SetSpell, "Trap Hole"); Put(s, 1, Filler); s.D.RefreshPrompt(); }
+                s.EndTurn();
+                if (lethal) s.D.P(1).Lp = 5000;
+                for (int i = 0; i < 3; i++) Put(s, 0, Filler); s.D.RefreshPrompt();
+                s.Do(Act.Summon, "The Winged Dragon of Ra").Pick(Filler, Filler, Filler);
+                check(s.Has(Ask.YesNo), $"Ra asks to pay ({s.D.Pending})");
+                var cmd = new Ai(0, 3, Brain.Plus).Decide(s.D);
+                bool pays = s.D.Pending!.Options[cmd.Picks[0]].Text == "Yes";
+                check(pays == lethal, $"Ra pays: {pays}");
+            });
 
         // Playtest 2026-11-09: the game's CPU sat on a strong monster and never entered the Battle Phase.
         T("CPU (game brain): a lone attacker against an empty field attacks", () =>

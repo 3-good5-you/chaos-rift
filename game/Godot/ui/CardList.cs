@@ -85,7 +85,7 @@ public partial class CardList : RiftMenu
         string type = d.IsMonster ? $"{d.Attribute}  ·  {d.Race}  ·  LEVEL {d.Level}" : $"{d.Frame} {d.Kind}";
         Put(detail, type.ToUpperInvariant(), Thin, 18, Mist, new Vector2(x, y + 50));
         float ty = y + 86;
-        if (d.IsMonster) { Put(detail, $"ATK {d.Atk}    DEF {d.Def}", Title, 24, GoldLight, new Vector2(x, ty)); ty += 44; }
+        if (d.IsMonster) { Put(detail, $"ATK {d.AtkText}    DEF {d.DefText}", Title, 24, GoldLight, new Vector2(x, ty)); ty += 44; }
         var t = Put(detail, d.TcgDesc ?? d.Desc, Body, 20, Mist, new Vector2(x, ty), new Vector2(w, H - ty - 70));
         t.AutowrapMode = TextServer.AutowrapMode.WordSmart; t.CustomMinimumSize = new Vector2(w, 0); t.Size = new Vector2(w, H - ty - 70);
         int own = P.Count(d.Idx);

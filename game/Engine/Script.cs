@@ -196,6 +196,7 @@ public sealed class Script
     public Func<Ctx, int, int>? HandLimit;   // (player) -> that player's hand size limit, or -1 for no change (Enervating Mist)
     public int TributeMax;                   // with TributeAny: at most this many Tributes in all (Fog King: 0 or 1)
     public bool NoSet;                       // cannot be Normal Set
+    public bool SummonLock;                  // "This card's Normal Summon cannot be negated. When Normal Summoned, cards and effects cannot be activated" (Egyptian Gods)
     public Func<Ctx, bool>? HandTrap;        // this Trap may be activated from the hand when this holds (Harpie's Feather Storm)
     public Func<Ctx, Card, bool>? TributeOk;  // on the monster being Normal Summoned: which monsters may be Tributed for it
     public bool NotMaterial;                 // "Cannot be used as Fusion Material"

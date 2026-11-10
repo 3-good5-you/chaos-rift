@@ -237,7 +237,7 @@ public sealed partial class Duel
         if (s?.NoNormalSummon == true) return false;
         if (s?.NormalSummonOk?.Invoke(X(c)) == false) return false;
         if (set && s?.NoSet == true) return false;
-        if (c.Data.Race == "Divine-Beast") return false;
+        if (c.Data.Race == "Divine-Beast" && s?.TributesNeeded == null) return false;   // only the scripted Divine-Beasts (the Gods, Sphere Mode); not Immortal Phoenix
         if (Forbidden(set ? Q.SetMonster : Q.NormalSummon, c, p)) return false;
         int need = TributesFor(c);
         int have = Tributable(p, c).Sum(t => TributeWeight(t, c));

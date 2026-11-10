@@ -52,7 +52,13 @@ public sealed class Tournament
         var seats = new List<string> { You };
         while (seats.Count < Size && pool.Count > 0) { int i = rng.Int(pool.Count); seats.Add(pool[i]); pool.RemoveAt(i); }
         Seats = seats.ToArray();
+        // Rare God decks: a HARD-or-better duelist brings an Egyptian God deck 1 tournament in 20 (rolled once, here).
+        foreach (var k in Seats.Skip(1)) if (Get(k).Level >= 5 && rng.Int(Progression.GodOdds) == 0) gods[k] = Progression.GodDeck(rng);
     }
+
+    readonly Dictionary<string, string> gods = new();
+    /// A seat's duelist with the deck they brought to this tournament.
+    public Duelist Seat(string key) => gods.TryGetValue(key, out var g) ? Get(key) with { Deck = g } : Get(key);
 
     public static Duelist Get(string key) => Roster.First(d => d.Key == key);
     public static readonly string[] RoundNames = { "QUARTERFINAL", "SEMIFINAL", "FINAL" };
@@ -69,8 +75,8 @@ public sealed class Tournament
             for (int m = 0; m < Winners[Round].Length; m++)
             {
                 var (a, b) = Pair(Round, m);
-                if (a == You && b != null) return Get(b);
-                if (b == You && a != null) return Get(a);
+                if (a == You && b != null) return Seat(b);
+                if (b == You && a != null) return Seat(a);
             }
             return null;
         }
@@ -84,7 +90,7 @@ public sealed class Tournament
         {
             var (a, b) = Pair(Round, m);
             if (a == null || b == null || a == You || b == You || Winners[Round][m] != null) continue;
-            Winners[Round][m] = Duel(Get(a), Get(b), quick);
+            Winners[Round][m] = Duel(Seat(a), Seat(b), quick);
         }
     }
 
