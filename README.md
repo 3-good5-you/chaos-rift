@@ -1,104 +1,116 @@
-<h1 align="center">CHAOS RIFT</h1>
-<p align="center"><b>A free, fan-made duel simulator. 2,000+ cards, a CPU that thinks ahead, and a look of its own.</b></p>
+<h1 align="center">Chaos Rift</h1>
+<p align="center">All three <i>Power of Chaos</i> games in one, rebuilt from scratch and then taken further.</p>
 <p align="center">
-  <a href="https://3good5you.itch.io/chaos-rift"><b>Download for Windows / macOS</b></a> ·
-  <a href="#features">Features</a> ·
-  <a href="#build-from-source">Build from source</a> ·
-  <a href="#legal">Legal</a>
+  <a href="https://3good5you.itch.io/chaos-rift"><b>Download (Windows / macOS)</b></a>
 </p>
 
 ![Main menu](docs/screens/01-main-menu.jpg)
 
-Chaos Rift is a ground-up remake of the classic *Power of Chaos* PC duels: the same era of cards and rules, rebuilt on a
-new engine with a 3D duel table, seven ways to play, a full collection to earn, and LAN duels against a friend.
-No accounts, no timers, no purchases. Install and duel.
+## What this is
 
-![A duel in progress](docs/screens/02-duel.jpg)
+I grew up on the *Power of Chaos* PC games: Yugi the Destiny, Kaiba the Revenge and Joey the Passion. They were three
+separate games, each with one opponent, and you had to juggle installs to carry your cards between them. They also
+stopped in 2004.
 
-## Features
+Chaos Rift is my attempt at the game I wanted back then. Yugi, Kaiba and Joey are all in one place with one collection
+and one deck builder, and it keeps going where the originals stopped: Jaden as a fourth rival, a card pool of 2,015
+cards (the three originals together had under 800), new modes, a tournament, and a duel table in 3D.
 
-### 2,000+ cards, every effect scripted
-- **2,015 cards** in the pool, each with its real effect, not a simplified stand-in: chains, flip effects, tributes, fusions,
-  rituals, counters, coin tosses, dice and continuous effects all resolve by the rules.
-- **15,000+ lines of card scripts**, checked by an automated harness that plays hundreds of full duels and walks scripted
-  rulings before every release.
-- **Two ban lists** (2003 and 2004 formats), switchable in Options.
+It is free and it will stay free. There is no account and nothing to buy.
 
-### Rivals worth beating
-- **Four rivals** (Yugi, Kaiba, Joey, Jaden), each with a ladder of decks that grows from starter to expert as you win.
-- **A CPU that looks ahead.** It replays its options on copies of the duel with your hidden cards re-dealt (it never peeks),
-  plays both sides forward, and picks the line that leaves the best board. It also side-decks against what you showed it
-  between the duels of a match.
+![A duel](docs/screens/02-duel.jpg)
 
-### Seven ways to duel
-| Mode | What it is |
+## What's in it
+
+**The cards.** 2,015 of them, and each one does what its text says. I did not want "close enough" effects, so chains,
+flip effects, fusions, rituals, counters, coin tosses and dice all go through a real rules engine. You can play under
+the 2003 or the 2004 ban list.
+
+**The rivals.** Yugi, Kaiba, Joey and Jaden. Each has a set of decks that gets nastier as you beat them. The old CPU
+followed a fixed script and you could learn to walk around it. This one tries its options out on copies of the duel
+before it commits. It does not look at your hand or your face-down cards to do that; it shuffles what it cannot see
+and plays the turn out. In a best-of-three it also side-decks against what you showed it.
+
+**Ways to play**
+
+| | |
 |---|---|
-| **Regular** | Single duel or best-of-three match with side decking |
-| **Gauntlet** | Four rivals in a row, one deck, your Life Points carry over |
-| **Pack Duel** | Open six packs, build a deck from what you pulled, duel with it |
-| **Limited Duel** | A rule of the day reshapes your collection |
-| **Legend** | A rival at full power, for the biggest single payout |
-| **Chaos Duel** | Every third turn the rift rewrites a rule: double draws, no battle, ATK surges |
-| **Challenges** | Eight win-this-turn puzzles with exactly one answer |
+| Regular | One duel, or a best-of-three match with side decking |
+| Gauntlet | Four rivals back to back with one deck. Your Life Points carry over |
+| Pack Duel | Open six packs and duel with whatever you pulled |
+| Limited Duel | A different restriction on your collection each day |
+| Legend | A rival with their best deck. Pays the most |
+| Chaos Duel | Every third turn a rule changes for both players |
+| Challenges | Eight puzzles. You have one turn to win and there is one way to do it |
 
-Plus an **eight-duelist Tournament** with a mirrored bracket and prizes by finishing place, **LAN Duel** for two PCs on one
-network, and **Replays** you can save and watch back.
+There is also an eight-player tournament, LAN duels for two PCs on the same network, and replays you can save and
+watch later.
 
-![Tournament bracket](docs/screens/10-tournament.jpg)
+![Tournament](docs/screens/10-tournament.jpg)
 
-### A collection to earn
-- Win cards after every duel; spend Duel Points in the **Shop** on the cards you are missing.
-- **Dozens of card backs, playmats and profile frames**, including prize mats only a tournament champion gets.
-- **Deck Builder** with Main / Side / Fusion zones, one-row filters, deck covers, and import / export of `.ydc` and `.ydk`
-  deck files.
+**The collection.** You win cards after duels and buy the ones you are missing with Duel Points, like the originals.
+On top of that there are card backs, playmats and profile frames to unlock. A few playmats can only be won by taking
+the tournament.
+
+**The deck builder.** Main, Side and Fusion decks, filters that stay out of the way, and import/export for `.ydk`
+files and the original games' `.ydc` files, so your old decks still work.
 
 ![Deck builder](docs/screens/07-deck-builder.jpg)
 
-### Special finishes
-Winning by Exodia does not end on a text box. Exodia, Destiny Board, deck-out and the other alternate wins each get
-their own staged finish.
+**Small things I cared about.** Winning with Exodia or Destiny Board gets a proper finish and not a pop-up. Right
+click always means back or pass. Space moves to the next phase. Double-click your deck to give up.
 
-### Built to feel good
-- A 3D duel table with a playmat world for each side, attack lunges, summon bursts and chain links.
-- The **Chaos Rift** look: every menu is one sheet torn in two, light on one side and dark on the other.
-- Right click is always "back" or "pass"; Space moves to the next phase; double-click your Deck to surrender.
+## Status
 
-## Under the hood
-- **`game/Engine`**: a deterministic duel engine in C# (.NET 8) with no engine or UI dependency. A duel is a setup plus a
-  command log, so replays, LAN lockstep and the CPU's look-ahead all rebuild the same duel from the same log.
-- **`game/Engine.Check`**: the test harness. Scenarios for rulings, random and CPU-vs-CPU duels, LAN lockstep, replay
-  round-trips, and tools to train and measure the CPU.
-- **`game/Godot`**: the game itself (Godot 4.7, C#). Every screen is built in code on a small shared kit.
-- **`game/tools`**: packaging (Windows installer, macOS image) and the generators for the game's own mats, backs and sounds.
+Version 1.0. The Windows build is the one I play and test. The macOS build exists but nobody has tried it on a real
+Mac yet, so tell me if it works.
 
-## Build from source
+Known rough spots: the CPU still makes the odd strange play, and about 870 of the newer cards have only been checked
+by the automated tests and not by hand in a real duel. If a card does something wrong, please report it.
 
-You need the [.NET 8 SDK](https://dotnet.microsoft.com/download) and [Godot 4.7 (.NET)](https://godotengine.org/download).
+## How it's built
+
+- `game/Engine` is the duel engine: plain C# on .NET 8, no dependency on Godot. A duel is a starting setup plus a list
+  of commands, and that one idea is what replays, LAN play and the CPU's look-ahead are all built on.
+- `game/Engine.Check` is the test program. It runs ruling scenarios, plays CPU-vs-CPU duels, checks that two LAN
+  peers stay in sync and that replays play back the same. It is also where the CPU gets trained and measured.
+- `game/Godot` is the game (Godot 4.7, C#). The screens are built in code, not in the editor.
+- `game/tools` has the packaging script and the generators for the playmats, card backs and sound effects I made.
+
+## Building
+
+You need the [.NET 8 SDK](https://dotnet.microsoft.com/download) and [Godot 4.7 .NET](https://godotengine.org/download).
+
+Run the engine tests (no Godot needed):
 
 ```bash
-# engine + all checks (no Godot needed)
 dotnet run --project game/Engine.Check -c Release
 ```
 
+Run the game:
+
 ```bash
-# the game
 dotnet build game/Godot/PoC.csproj
 godot --path game/Godot
 ```
 
-This repository holds **code only**. The game's art and audio are not here (see [ASSETS.md](ASSETS.md)); to run from
-source, install the release build and copy its asset folders into `game/Godot/`, as described there.
+The art and audio are not in this repository, so the game will not start from a fresh clone. [ASSETS.md](ASSETS.md)
+explains what is missing and how to get it from an installed copy.
 
-## Contributing
-Bug reports with a saved replay are the most useful thing you can send: a replay reproduces the duel exactly. Card
-ruling fixes are welcome; add a scenario to `game/Engine.Check/Scenarios.cs` that fails before your fix.
+## Reporting bugs
+
+Save a replay of the duel where it went wrong (the button is on the results screen) and attach it to an issue. A
+replay reproduces the whole duel on my machine, which makes most bugs much quicker to find.
+
+Fixes for card rulings are welcome. Please add a scenario to `game/Engine.Check/Scenarios.cs` that fails without your
+change.
 
 ## Legal
-Chaos Rift is an **unofficial, non-commercial fan project**. It is free, has no ads, and accepts no donations.
 
-Yu-Gi-Oh! and all related card names, characters and artwork are trademarks and copyrights of their respective owners,
-including Konami and Studio Dice/Shueisha. This project is not affiliated with, endorsed by or sponsored by any of them.
-If you are a rights holder and want something removed, open an issue and it will be taken down.
+This is an unofficial fan project. It is free, has no ads, and I do not take donations for it.
 
-The source code in this repository is released under the [MIT License](LICENSE). That licence covers the code only, not
-any third-party names, card text or artwork.
+Yu-Gi-Oh!, Power of Chaos, and the card names, characters and artwork belong to their owners, including Konami and
+Studio Dice/Shueisha. I am not affiliated with or endorsed by any of them. If you hold rights to something here and
+want it gone, open an issue and I will remove it.
+
+The code is under the [MIT License](LICENSE). That covers the code only.
