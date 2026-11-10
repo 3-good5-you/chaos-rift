@@ -1,7 +1,7 @@
 <h1 align="center">CHAOS RIFT</h1>
 <p align="center"><b>A free, fan-made duel simulator. 2,000+ cards, a CPU that thinks ahead, and a look of its own.</b></p>
 <p align="center">
-  <a href="ITCH_URL"><b>Download for Windows / macOS</b></a> ·
+  <a href="https://3good5you.itch.io/chaos-rift"><b>Download for Windows / macOS</b></a> ·
   <a href="#features">Features</a> ·
   <a href="#build-from-source">Build from source</a> ·
   <a href="#legal">Legal</a>
