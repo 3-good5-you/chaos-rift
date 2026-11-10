@@ -47,9 +47,15 @@ watch later.
 
 ![Tournament](docs/screens/10-tournament.jpg)
 
-**The collection.** You win cards after duels and buy the ones you are missing with Duel Points, like the originals.
-On top of that there are card backs, playmats and profile frames to unlock. A few playmats can only be won by taking
-the tournament.
+**The collection.** You win cards after every duel, flipped face up one at a time, and buy the ones you are missing
+with Duel Points in the Shop. Beat a rival for the first time and you get their starter deck, revealed card by card.
+
+![Deck unlocked](docs/screens/14-deck-unlock.jpg)
+
+**Make the table yours.** The Shop also sells 31 card backs, 20 playmats and 18 profile frames. Each playmat brings its
+own world under the table, and a few can only be won by taking the tournament.
+
+![Card backs in the shop](docs/screens/16-shop-card-backs.jpg)
 
 **The deck builder.** Main, Side and Fusion decks, filters that stay out of the way, and import/export for `.ydk`
 files and the original games' `.ydc` files, so your old decks still work.
@@ -66,6 +72,14 @@ Mac yet, so tell me if it works.
 
 Known rough spots: the CPU still makes the odd strange play, and about 870 of the newer cards have only been checked
 by the automated tests and not by hand in a real duel. If a card does something wrong, please report it.
+
+## Coming next
+
+- Online duels (today it is LAN only)
+- Hand-checking the newer cards in real duels
+- A smarter CPU in the late game
+- A tested macOS build
+- More rivals, decks, card backs and playmats
 
 ## How it's built
 
