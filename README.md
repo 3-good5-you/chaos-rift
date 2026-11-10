@@ -99,6 +99,7 @@ In a duel:
 
 Around the game:
 - New cards get a NEW tag in the card list until you look at them.
+- The game checks for updates when it starts and tells you when a new version is out.
 - Your save, decks and Duel Points carry over when you install an update.
 
 ## Status

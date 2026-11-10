@@ -78,6 +78,7 @@ void fragment() {
 		introPlayed = true;
 		if (intro) Intro(); else RandomPair();
 		GetTree().CreateTimer(intro ? 4.6 : 0.6).Timeout += () => { if (Focus < 0) SetFocus(0); };
+		Updater.Check(this, v => GetTree().CreateTimer(intro ? 5.0 : 0.5).Timeout += () => { if (starter == null) Ask($"Chaos Rift {v} is out (you have {Updater.Current}).", ("UPDATE", () => { CloseToast(); OS.ShellOpen(Updater.Page); }), ("LATER", CloseToast)); });
 		if (Session.NeedsStarter && (!Shooting || OS.GetCmdlineUserArgs().Contains("--starter"))) GetTree().CreateTimer(intro ? 5.0 : 1.0).Timeout += StarterPick;
 	}
 

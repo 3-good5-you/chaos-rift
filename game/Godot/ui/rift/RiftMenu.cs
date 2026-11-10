@@ -64,10 +64,11 @@ void fragment() {
     const string TwoToneCode = @"shader_type canvas_item;
 uniform float lit = 0.0;
 uniform float dim = 1.0;
+uniform float dark = 0.0;   // 1 = always the dark-side colours (text on a dark bar over the rift)
 " + CrackFn + @"
 void fragment() {
   float a = texture(TEXTURE, UV).a * COLOR.a;
-  float d = crack_d(SCREEN_UV, TIME);
+  float d = dark > 0.5 ? 1.0 : crack_d(SCREEN_UV, TIME);
   float y = smoothstep(0.3, 0.72, UV.y);
   vec3 graphite = mix(vec3(0.26, 0.26, 0.29), vec3(0.05, 0.05, 0.06), y);
   vec3 silver = mix(vec3(1.0), vec3(0.62, 0.64, 0.7), y);
@@ -266,6 +267,7 @@ void fragment() {
         e.GuiInput += ev => { if (ev.IsActionPressed("ui_cancel")) { box.QueueFree(); e.AcceptEvent(); } };
         Button(box, "OK", new Vector2(W / 2 + 470, 76), Ok, 22);
         Button(box, "CANCEL", new Vector2(W / 2 - 500, 76), () => box.QueueFree(), 18);
+        Darken(box);
         e.GrabFocus();
     }
 
@@ -318,9 +320,17 @@ void fragment() {
         Put(toast, text, Body, 24, Silver, new Vector2(80, 30), new Vector2(W - 160, 36), HorizontalAlignment.Center);
         float x = W / 2 - (choices.Length - 1) * 160;
         foreach (var (label, act) in choices) { Button(toast, label, new Vector2(x, 100), act, 22); x += 320; }
+        Darken(toast);
         if (choices.Length == 0) GetTree().CreateTimer(1.6).Timeout += CloseToast;
     }
     protected void CloseToast() { toast?.QueueFree(); toast = null; }
+
+    /// Two-tone text inside a dark bar (toasts, name prompts) keeps the dark-side colours wherever the rift runs.
+    static void Darken(Node n)
+    {
+        if (n is CanvasItem { Material: ShaderMaterial m } && m.Shader?.Code?.Contains("uniform float dark") == true) m.SetShaderParameter("dark", 1f);
+        foreach (var c in n.GetChildren()) Darken(c);
+    }
 
     /// Small fading word at the bottom ("SAVED").
     protected void Flash(string s)
