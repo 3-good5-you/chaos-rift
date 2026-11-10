@@ -1,5 +1,5 @@
 {
- "_derived_from": "yugi_pc.exe. Live tracing of every engine/AI function while a CPU duel was played (tools/poc_trace.py + data/duel_logs/yugi_duel_c_779_traced.txt) located the CPU-only code; Ghidra decompile (yugi_ai*.c) gives the logic. 'conf': seen = confirmed in trace/decompile, inferred = reading of the code not checked in play.",
+ "_derived_from": "Rule tables for the classic CPU opponent.",
  "model": "Rule-based script, no search or lookahead. Each CPU turn walks 7 fixed stages; each stage repeatedly issues one command and returns 'not done' until it has nothing left, then the next stage runs. Choices come from hard-coded priority lists with per-card conditions plus a 'simulate the board and score it' helper for monster plays.",
  "entry": {
   "addr": "0x579210",
