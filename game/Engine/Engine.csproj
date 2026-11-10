@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>PoC.Engine</RootNamespace>
+    <NoWarn>CS1998</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Engine.Check" />
+  </ItemGroup>
+  <!-- Single source of truth: the reverse-engineered data in remake/data, embedded at build time. -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\remake\data\cards.json" LogicalName="cards.json" />
+    <EmbeddedResource Include="..\..\remake\data\effects.json" LogicalName="effects.json" />
+    <EmbeddedResource Include="..\..\remake\data\rule_tables.json" LogicalName="rule_tables.json" />
+    <EmbeddedResource Include="..\..\remake\data\decks.json" LogicalName="decks.json" />
+    <EmbeddedResource Include="..\..\remake\data\ai.json" LogicalName="ai.json" />
+    <EmbeddedResource Include="..\..\remake\data\tcg_text.json" LogicalName="tcg_text.json" />
+    <!-- Remake-authored content (not decoded data). -->
+    <EmbeddedResource Include="remastered_decks.json" LogicalName="remastered_decks.json" />
+    <EmbeddedResource Include="pool_cards.json" LogicalName="pool_cards.json" />
+    <EmbeddedResource Include="ai_value.json" LogicalName="ai_value.json" Condition="Exists('ai_value.json')" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,12 @@
+bin/
+obj/
+__pycache__/
+.godot/
+*.import
+!game/Godot/assets/fonts/*.import
+
+# art and audio are not part of this repository (see ASSETS.md)
+game/Godot/cards/
+game/Godot/assets/*
+!game/Godot/assets/fonts/
+builds/

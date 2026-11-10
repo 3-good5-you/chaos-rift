@@ -1,0 +1,3175 @@
+{
+ "yugi": {
+  "fusion": [
+   {
+    "result": "Flame Swordsman",
+    "materials": [
+     "Flame Manipulator",
+     "Masaki the Legendary Swordsman"
+    ],
+    "ids": [
+     14,
+     141,
+     292
+    ]
+   },
+   {
+    "result": "Zombie Warrior",
+    "materials": [
+     "Skull Servant",
+     "Battle Warrior"
+    ],
+    "ids": [
+     29,
+     23,
+     99
+    ]
+   },
+   {
+    "result": "Gaia the Dragon Champion",
+    "materials": [
+     "Gaia The Fierce Knight",
+     "Curse of Dragon"
+    ],
+    "ids": [
+     36,
+     37,
+     38
+    ]
+   },
+   {
+    "result": "Karbonala Warrior",
+    "materials": [
+     "M-Warrior #1",
+     "M-Warrior #2"
+    ],
+    "ids": [
+     42,
+     159,
+     160
+    ]
+   },
+   {
+    "result": "Thousand Dragon",
+    "materials": [
+     "Baby Dragon",
+     "Time Wizard"
+    ],
+    "ids": [
+     68,
+     3,
+     15
+    ]
+   },
+   {
+    "result": "Barox",
+    "materials": [
+     "Ryu-Kishin",
+     "Frenzied Panda"
+    ],
+    "ids": [
+     85,
+     4,
+     200
+    ]
+   },
+   {
+    "result": "Rabid Horseman",
+    "materials": [
+     "Battle Ox",
+     "Mystic Horseman"
+    ],
+    "ids": [
+     91,
+     25,
+     90
+    ]
+   },
+   {
+    "result": "Kamionwizard",
+    "materials": [
+     "Mystical Elf",
+     "Curtain of the Dark Ones"
+    ],
+    "ids": [
+     114,
+     1,
+     103
+    ]
+   },
+   {
+    "result": "Charubin the Fire Knight",
+    "materials": [
+     "Monster Egg",
+     "Hinotama Soul"
+    ],
+    "ids": [
+     132,
+     146,
+     209
+    ]
+   },
+   {
+    "result": "Darkfire Dragon",
+    "materials": [
+     "Firegrass",
+     "Petit Dragon"
+    ],
+    "ids": [
+     167,
+     156,
+     199
+    ]
+   },
+   {
+    "result": "Fusionist",
+    "materials": [
+     "Petit Angel",
+     "Mystical Sheep #2"
+    ],
+    "ids": [
+     188,
+     207,
+     281
+    ]
+   },
+   {
+    "result": "Flame Ghost",
+    "materials": [
+     "Skull Servant",
+     "Dissolverock"
+    ],
+    "ids": [
+     214,
+     23,
+     243
+    ]
+   },
+   {
+    "result": "B. Skull Dragon",
+    "materials": [
+     "Summoned Skull",
+     "Red-Eyes B. Dragon"
+    ],
+    "ids": [
+     216,
+     21,
+     81
+    ]
+   },
+   {
+    "result": "Roaring Ocean Snake",
+    "materials": [
+     "Mystic Lamp",
+     "Hyosube"
+    ],
+    "ids": [
+     222,
+     386,
+     646
+    ]
+   },
+   {
+    "result": "Rare Fish",
+    "materials": [
+     "Fusionist",
+     "Enchanting Mermaid"
+    ],
+    "ids": [
+     229,
+     188,
+     250
+    ]
+   },
+   {
+    "result": "Mavelus",
+    "materials": [
+     "Tyhone",
+     "Wings of Wicked Flame"
+    ],
+    "ids": [
+     271,
+     12,
+     100
+    ]
+   },
+   {
+    "result": "Dragoness the Wicked Knight",
+    "materials": [
+     "Armaill",
+     "One-Eyed Shield Dragon"
+    ],
+    "ids": [
+     293,
+     171,
+     295
+    ]
+   },
+   {
+    "result": "Labyrinth Tank",
+    "materials": [
+     "Giga-Tech Wolf",
+     "Cannon Soldier"
+    ],
+    "ids": [
+     369,
+     411,
+     511
+    ]
+   },
+   {
+    "result": "Bickuribox",
+    "materials": [
+     "Crass Clown",
+     "Dream Clown"
+    ],
+    "ids": [
+     384,
+     94,
+     119
+    ]
+   },
+   {
+    "result": "Giltia the D. Knight",
+    "materials": [
+     "Guardian of the Labyrinth",
+     "Protector of the Throne"
+    ],
+    "ids": [
+     388,
+     235,
+     279
+    ]
+   },
+   {
+    "result": "Metal Dragon",
+    "materials": [
+     "Steel Ogre Grotto #1",
+     "Lesser Dragon"
+    ],
+    "ids": [
+     408,
+     556,
+     560
+    ]
+   },
+   {
+    "result": "Kaiser Dragon",
+    "materials": [
+     "Winged Dragon, Guardian of the Fortress #1",
+     "Fairy Dragon"
+    ],
+    "ids": [
+     426,
+     6,
+     602
+    ]
+   },
+   {
+    "result": "Deepsea Shark",
+    "materials": [
+     "Bottom Dweller",
+     "Tongyo"
+    ],
+    "ids": [
+     436,
+     438,
+     542
+    ]
+   },
+   {
+    "result": "Kaminari Attack",
+    "materials": [
+     "Ocubeam",
+     "Mega Thunderball"
+    ],
+    "ids": [
+     457,
+     395,
+     536
+    ]
+   },
+   {
+    "result": "Punished Eagle",
+    "materials": [
+     "Niwatori",
+     "Blue-Winged Crown"
+    ],
+    "ids": [
+     464,
+     537,
+     635
+    ]
+   },
+   {
+    "result": "Crimson Sunbird",
+    "materials": [
+     "Faith Bird",
+     "Skull Red Bird"
+    ],
+    "ids": [
+     466,
+     124,
+     465
+    ]
+   },
+   {
+    "result": "Soul Hunter",
+    "materials": [
+     "Lord of the Lamp",
+     "Invader from Another Dimension"
+    ],
+    "ids": [
+     470,
+     148,
+     559
+    ]
+   },
+   {
+    "result": "Vermillion Sparrow",
+    "materials": [
+     "Rhaimundos of the Red Sword",
+     "Fireyarou"
+    ],
+    "ids": [
+     472,
+     150,
+     290
+    ]
+   },
+   {
+    "result": "Pragtical",
+    "materials": [
+     "Trakadon",
+     "Flame Viper"
+    ],
+    "ids": [
+     481,
+     569,
+     643
+    ]
+   },
+   {
+    "result": "Flower Wolf",
+    "materials": [
+     "Silver Fang",
+     "Darkworld Thorns"
+    ],
+    "ids": [
+     486,
+     64,
+     566
+    ]
+   },
+   {
+    "result": "Musician King",
+    "materials": [
+     "Witch of the Black Forest",
+     "Lady of Faith"
+    ],
+    "ids": [
+     494,
+     573,
+     611
+    ]
+   },
+   {
+    "result": "Cyber Saurus",
+    "materials": [
+     "Two-Headed King Rex",
+     "Blast Juggler"
+    ],
+    "ids": [
+     507,
+     31,
+     416
+    ]
+   },
+   {
+    "result": "Bracchio-raidus",
+    "materials": [
+     "Two-Headed King Rex",
+     "Crawling Dragon #2"
+    ],
+    "ids": [
+     508,
+     31,
+     80
+    ]
+   },
+   {
+    "result": "Skullbird",
+    "materials": [
+     "Temple of Skulls",
+     "Takuhee"
+    ],
+    "ids": [
+     520,
+     145,
+     580
+    ]
+   },
+   {
+    "result": "Mystical Sand",
+    "materials": [
+     "Giant Soldier of Stone",
+     "Ancient Elf"
+    ],
+    "ids": [
+     530,
+     73,
+     432
+    ]
+   },
+   {
+    "result": "Kwagar Hercules",
+    "materials": [
+     "Hercules Beetle",
+     "Kuwagata Alpha"
+    ],
+    "ids": [
+     532,
+     51,
+     479
+    ]
+   },
+   {
+    "result": "Skelgon",
+    "materials": [
+     "Blackland Fire Dragon",
+     "The Snake Hair"
+    ],
+    "ids": [
+     544,
+     9,
+     35
+    ]
+   },
+   {
+    "result": "Great Mammoth of Goldfine",
+    "materials": [
+     "The Snake Hair",
+     "Dragon Zombie"
+    ],
+    "ids": [
+     563,
+     35,
+     96
+    ]
+   },
+   {
+    "result": "Empress Judge",
+    "materials": [
+     "Queen's Double",
+     "Hibikime"
+    ],
+    "ids": [
+     571,
+     634,
+     648
+    ]
+   },
+   {
+    "result": "Rose Spectre of Dunn",
+    "materials": [
+     "Feral Imp",
+     "Snakeyashi"
+    ],
+    "ids": [
+     593,
+     5,
+     619
+    ]
+   },
+   {
+    "result": "Twin-Headed Thunder Dragon",
+    "materials": [
+     "Thunder Dragon",
+     "Thunder Dragon"
+    ],
+    "ids": [
+     612,
+     424,
+     424
+    ]
+   },
+   {
+    "result": "Marine Beast",
+    "materials": [
+     "Water Magician",
+     "Behegon"
+    ],
+    "ids": [
+     616,
+     429,
+     549
+    ]
+   },
+   {
+    "result": "Warrior of Tradition",
+    "materials": [
+     "Beautiful Headhuntress",
+     "Sonic Maid"
+    ],
+    "ids": [
+     617,
+     233,
+     298
+    ]
+   },
+   {
+    "result": "Amphibious Bugroth",
+    "materials": [
+     "Ground Attacker Bugroth",
+     "Guardian of the Sea"
+    ],
+    "ids": [
+     638,
+     274,
+     444
+    ]
+   },
+   {
+    "result": "Skull Knight",
+    "materials": [
+     "Tainted Wisdom",
+     "Ancient Brain"
+    ],
+    "ids": [
+     706,
+     161,
+     174
+    ]
+   },
+   {
+    "result": "Meteor B. Dragon",
+    "materials": [
+     "Red-Eyes B. Dragon",
+     "Meteor Dragon"
+    ],
+    "ids": [
+     712,
+     81,
+     711
+    ]
+   },
+   {
+    "result": "Alligator's Sword Dragon",
+    "materials": [
+     "Baby Dragon",
+     "Alligator's Sword"
+    ],
+    "ids": [
+     812,
+     3,
+     760
+    ]
+   },
+   {
+    "result": "Chimera the Flying Mythical Beast",
+    "materials": [
+     "Gazelle the King of Mythical Beasts",
+     "Berfomet"
+    ],
+    "ids": [
+     1241,
+     746,
+     1240
+    ]
+   },
+   {
+    "result": "Thousand-Eyes Restrict",
+    "materials": [
+     "Relinquished",
+     "Thousand-Eyes Idol"
+    ],
+    "ids": [
+     1334,
+     730,
+     1333
+    ]
+   },
+   {
+    "result": "Humanoid Worm Drake",
+    "materials": [
+     "Worm Drake",
+     "Humanoid Slime"
+    ],
+    "ids": [
+     1404,
+     1403,
+     1402
+    ]
+   },
+   {
+    "result": "St. Joan",
+    "materials": [
+     "The Forgiving Maiden",
+     "Marie the Fallen One"
+    ],
+    "ids": [
+     1445,
+     1444,
+     1446
+    ]
+   },
+   {
+    "result": "The Last Warrior from Another Planet",
+    "materials": [
+     "Zombyra the Dark",
+     "Maryokutai"
+    ],
+    "ids": [
+     1526,
+     1523,
+     1525
+    ]
+   },
+   {
+    "result": 999,
+    "materials": [
+     999,
+     999
+    ],
+    "ids": [
+     999,
+     999,
+     999
+    ]
+   }
+  ],
+  "ritual": [
+   {
+    "monster": "Super War-Lion",
+    "spell": "War-Lion Ritual",
+    "tribute_levels": 7,
+    "ids": [
+     355,
+     672
+    ]
+   },
+   {
+    "monster": "Zera The Mant",
+    "spell": "Zera Ritual",
+    "tribute_levels": 8,
+    "ids": [
+     359,
+     670
+    ]
+   },
+   {
+    "monster": "Black Luster Soldier",
+    "spell": "Black Luster Ritual",
+    "tribute_levels": 8,
+    "ids": [
+     363,
+     669
+    ]
+   },
+   {
+    "monster": "Fiend's Mirror",
+    "spell": "Beastly Mirror Ritual",
+    "tribute_levels": 6,
+    "ids": [
+     364,
+     673
+    ]
+   },
+   {
+    "monster": "Performance of Sword",
+    "spell": "Commencement Dance",
+    "tribute_levels": 6,
+    "ids": [
+     700,
+     675
+    ]
+   },
+   {
+    "monster": "Hungry Burger",
+    "spell": "Hamburger Recipe",
+    "tribute_levels": 6,
+    "ids": [
+     701,
+     676
+    ]
+   },
+   {
+    "monster": "Skull Guardian",
+    "spell": "Novox's Prayer",
+    "tribute_levels": 7,
+    "ids": [
+     703,
+     678
+    ]
+   },
+   {
+    "monster": "Chakra",
+    "spell": "Resurrection of Chakra",
+    "tribute_levels": 7,
+    "ids": [
+     708,
+     693
+    ]
+   },
+   {
+    "monster": "Crab Turtle",
+    "spell": "Turtle Oath",
+    "tribute_levels": 8,
+    "ids": [
+     709,
+     691
+    ]
+   },
+   {
+    "monster": "Garma Sword",
+    "spell": "Garma Sword Oath",
+    "tribute_levels": 7,
+    "ids": [
+     715,
+     696
+    ]
+   },
+   {
+    "monster": "Javelin Beetle",
+    "spell": "Javelin Beetle Pact",
+    "tribute_levels": 8,
+    "ids": [
+     716,
+     695
+    ]
+   },
+   {
+    "monster": "Fortress Whale",
+    "spell": "Fortress Whale's Oath",
+    "tribute_levels": 7,
+    "ids": [
+     717,
+     699
+    ]
+   },
+   {
+    "monster": "Dokurorider",
+    "spell": "Revival of Dokurorider",
+    "tribute_levels": 6,
+    "ids": [
+     718,
+     698
+    ]
+   },
+   {
+    "monster": "Magician of Black Chaos",
+    "spell": "Dark Magic Ritual",
+    "tribute_levels": 8,
+    "ids": [
+     721,
+     720
+    ]
+   },
+   {
+    "monster": "Relinquished",
+    "spell": "Black Illusion Ritual",
+    "tribute_levels": 1,
+    "ids": [
+     730,
+     958
+    ]
+   },
+   {
+    "monster": "The Masked Beast",
+    "spell": "Curse of the Masked Beast",
+    "tribute_levels": 8,
+    "ids": [
+     1411,
+     1416
+    ]
+   }
+  ],
+  "limits": [
+   {
+    "card": "Kuriboh",
+    "max": 0,
+    "id": 1901
+   },
+   {
+    "card": "Scapegoat",
+    "max": 0,
+    "id": 1902
+   },
+   {
+    "card": "Glory of the King's Hand",
+    "max": 0,
+    "id": 1903
+   },
+   {
+    "card": "Obelisk the Tormentor",
+    "max": 0,
+    "id": 1910
+   },
+   {
+    "card": "Slifer the Sky Dragon",
+    "max": 0,
+    "id": 1911
+   },
+   {
+    "card": "The Winged Dragon of Ra",
+    "max": 0,
+    "id": 1912
+   },
+   {
+    "card": "Insect Monster Token",
+    "max": 0,
+    "id": 1920
+   },
+   {
+    "card": "Kuriboh Token",
+    "max": 0,
+    "id": 1921
+   },
+   {
+    "card": "Sheep Token",
+    "max": 0,
+    "id": 1922
+   },
+   {
+    "card": "Slime Token",
+    "max": 0,
+    "id": 1923
+   },
+   {
+    "card": "Exodia the Forbidden One",
+    "max": 1,
+    "id": 20
+   },
+   {
+    "card": "Left Leg of the Forbidden One",
+    "max": 1,
+    "id": 17
+   },
+   {
+    "card": "Left Arm of the Forbidden One",
+    "max": 1,
+    "id": 19
+   },
+   {
+    "card": "Right Leg of the Forbidden One",
+    "max": 1,
+    "id": 16
+   },
+   {
+    "card": "Right Arm of the Forbidden One",
+    "max": 1,
+    "id": 18
+   },
+   {
+    "card": "Pot of Greed",
+    "max": 1,
+    "id": 1010
+   },
+   {
+    "card": "Graceful Charity",
+    "max": 1,
+    "id": 968
+   },
+   {
+    "card": "Change of Heart",
+    "max": 1,
+    "id": 1027
+   },
+   {
+    "card": "Dark Hole",
+    "max": 1,
+    "id": 335
+   },
+   {
+    "card": "Raigeki",
+    "max": 1,
+    "id": 336
+   },
+   {
+    "card": "Monster Reborn",
+    "max": 1,
+    "id": 1008
+   },
+   {
+    "card": "Mirror Force",
+    "max": 1,
+    "id": 1056
+   },
+   {
+    "card": "Delinquent Duo",
+    "max": 1,
+    "id": 1071
+   },
+   {
+    "card": "Confiscation",
+    "max": 1,
+    "id": 1070
+   },
+   {
+    "card": "Painful Choice",
+    "max": 1,
+    "id": 1081
+   },
+   {
+    "card": "The Forceful Sentry",
+    "max": 1,
+    "id": 1077
+   },
+   {
+    "card": "Snatch Steal",
+    "max": 1,
+    "id": 1068
+   },
+   {
+    "card": "Cyber Jar",
+    "max": 1,
+    "id": 1106
+   },
+   {
+    "card": "Upstart Goblin",
+    "max": 1,
+    "id": 1065
+   },
+   {
+    "card": "Swords of Revealing Light",
+    "max": 1,
+    "id": 347
+   },
+   {
+    "card": "Card Destruction",
+    "max": 1,
+    "id": 1221
+   },
+   {
+    "card": "Witch of the Black Forest",
+    "max": 1,
+    "id": 573
+   },
+   {
+    "card": "Imperial Order",
+    "max": 1,
+    "id": 1154
+   },
+   {
+    "card": "Jinzo",
+    "max": 1,
+    "id": 751
+   },
+   {
+    "card": "Ceasefire",
+    "max": 1,
+    "id": 1150
+   },
+   {
+    "card": "Premature Burial",
+    "max": 1,
+    "id": 1160
+   },
+   {
+    "card": "Call Of The Haunted",
+    "max": 1,
+    "id": 1095
+   },
+   {
+    "card": "Morphing Jar",
+    "max": 1,
+    "id": 590
+   },
+   {
+    "card": "Limiter Removal",
+    "max": 1,
+    "id": 1314
+   },
+   {
+    "card": "Sangan",
+    "max": 2,
+    "id": 47
+   },
+   {
+    "card": "Heavy Storm",
+    "max": 2,
+    "id": 1061
+   },
+   {
+    "card": "Nobleman of Crossout",
+    "max": 2,
+    "id": 1157
+   },
+   {
+    "card": "Backup Soldier",
+    "max": 2,
+    "id": 1147
+   },
+   {
+    "card": "Morphing Jar #2",
+    "max": 2,
+    "id": 1163
+   }
+  ],
+  "attribute_boosts": []
+ },
+ "kaiba": {
+  "fusion": [
+   {
+    "result": "Flame Swordsman",
+    "materials": [
+     "Flame Manipulator",
+     "Masaki the Legendary Swordsman"
+    ],
+    "ids": [
+     14,
+     141,
+     292
+    ]
+   },
+   {
+    "result": "Zombie Warrior",
+    "materials": [
+     "Skull Servant",
+     "Battle Warrior"
+    ],
+    "ids": [
+     29,
+     23,
+     99
+    ]
+   },
+   {
+    "result": "Gaia the Dragon Champion",
+    "materials": [
+     "Gaia The Fierce Knight",
+     "Curse of Dragon"
+    ],
+    "ids": [
+     36,
+     37,
+     38
+    ]
+   },
+   {
+    "result": "Karbonala Warrior",
+    "materials": [
+     "M-Warrior #1",
+     "M-Warrior #2"
+    ],
+    "ids": [
+     42,
+     159,
+     160
+    ]
+   },
+   {
+    "result": "Thousand Dragon",
+    "materials": [
+     "Baby Dragon",
+     "Time Wizard"
+    ],
+    "ids": [
+     68,
+     3,
+     15
+    ]
+   },
+   {
+    "result": "Barox",
+    "materials": [
+     "Ryu-Kishin",
+     "Frenzied Panda"
+    ],
+    "ids": [
+     85,
+     4,
+     200
+    ]
+   },
+   {
+    "result": "Rabid Horseman",
+    "materials": [
+     "Battle Ox",
+     "Mystic Horseman"
+    ],
+    "ids": [
+     91,
+     25,
+     90
+    ]
+   },
+   {
+    "result": "Kamionwizard",
+    "materials": [
+     "Mystical Elf",
+     "Curtain of the Dark Ones"
+    ],
+    "ids": [
+     114,
+     1,
+     103
+    ]
+   },
+   {
+    "result": "Charubin the Fire Knight",
+    "materials": [
+     "Monster Egg",
+     "Hinotama Soul"
+    ],
+    "ids": [
+     132,
+     146,
+     209
+    ]
+   },
+   {
+    "result": "Darkfire Dragon",
+    "materials": [
+     "Firegrass",
+     "Petit Dragon"
+    ],
+    "ids": [
+     167,
+     156,
+     199
+    ]
+   },
+   {
+    "result": "Fusionist",
+    "materials": [
+     "Petit Angel",
+     "Mystical Sheep #2"
+    ],
+    "ids": [
+     188,
+     207,
+     281
+    ]
+   },
+   {
+    "result": "Flame Ghost",
+    "materials": [
+     "Skull Servant",
+     "Dissolverock"
+    ],
+    "ids": [
+     214,
+     23,
+     243
+    ]
+   },
+   {
+    "result": "B. Skull Dragon",
+    "materials": [
+     "Summoned Skull",
+     "Red-Eyes B. Dragon"
+    ],
+    "ids": [
+     216,
+     21,
+     81
+    ]
+   },
+   {
+    "result": "Roaring Ocean Snake",
+    "materials": [
+     "Mystic Lamp",
+     "Hyosube"
+    ],
+    "ids": [
+     222,
+     386,
+     646
+    ]
+   },
+   {
+    "result": "Rare Fish",
+    "materials": [
+     "Fusionist",
+     "Enchanting Mermaid"
+    ],
+    "ids": [
+     229,
+     188,
+     250
+    ]
+   },
+   {
+    "result": "Mavelus",
+    "materials": [
+     "Tyhone",
+     "Wings of Wicked Flame"
+    ],
+    "ids": [
+     271,
+     12,
+     100
+    ]
+   },
+   {
+    "result": "Dragoness the Wicked Knight",
+    "materials": [
+     "Armaill",
+     "One-Eyed Shield Dragon"
+    ],
+    "ids": [
+     293,
+     171,
+     295
+    ]
+   },
+   {
+    "result": "Labyrinth Tank",
+    "materials": [
+     "Giga-Tech Wolf",
+     "Cannon Soldier"
+    ],
+    "ids": [
+     369,
+     411,
+     511
+    ]
+   },
+   {
+    "result": "Bickuribox",
+    "materials": [
+     "Crass Clown",
+     "Dream Clown"
+    ],
+    "ids": [
+     384,
+     94,
+     119
+    ]
+   },
+   {
+    "result": "Giltia the D. Knight",
+    "materials": [
+     "Guardian of the Labyrinth",
+     "Protector of the Throne"
+    ],
+    "ids": [
+     388,
+     235,
+     279
+    ]
+   },
+   {
+    "result": "Metal Dragon",
+    "materials": [
+     "Steel Ogre Grotto #1",
+     "Lesser Dragon"
+    ],
+    "ids": [
+     408,
+     556,
+     560
+    ]
+   },
+   {
+    "result": "Kaiser Dragon",
+    "materials": [
+     "Winged Dragon, Guardian of the Fortress #1",
+     "Fairy Dragon"
+    ],
+    "ids": [
+     426,
+     6,
+     602
+    ]
+   },
+   {
+    "result": "Deepsea Shark",
+    "materials": [
+     "Bottom Dweller",
+     "Tongyo"
+    ],
+    "ids": [
+     436,
+     438,
+     542
+    ]
+   },
+   {
+    "result": "Kaminari Attack",
+    "materials": [
+     "Ocubeam",
+     "Mega Thunderball"
+    ],
+    "ids": [
+     457,
+     395,
+     536
+    ]
+   },
+   {
+    "result": "Punished Eagle",
+    "materials": [
+     "Niwatori",
+     "Blue-Winged Crown"
+    ],
+    "ids": [
+     464,
+     537,
+     635
+    ]
+   },
+   {
+    "result": "Crimson Sunbird",
+    "materials": [
+     "Faith Bird",
+     "Skull Red Bird"
+    ],
+    "ids": [
+     466,
+     124,
+     465
+    ]
+   },
+   {
+    "result": "Soul Hunter",
+    "materials": [
+     "Lord of the Lamp",
+     "Invader from Another Dimension"
+    ],
+    "ids": [
+     470,
+     148,
+     559
+    ]
+   },
+   {
+    "result": "Vermillion Sparrow",
+    "materials": [
+     "Rhaimundos of the Red Sword",
+     "Fireyarou"
+    ],
+    "ids": [
+     472,
+     150,
+     290
+    ]
+   },
+   {
+    "result": "Pragtical",
+    "materials": [
+     "Trakadon",
+     "Flame Viper"
+    ],
+    "ids": [
+     481,
+     569,
+     643
+    ]
+   },
+   {
+    "result": "Flower Wolf",
+    "materials": [
+     "Silver Fang",
+     "Darkworld Thorns"
+    ],
+    "ids": [
+     486,
+     64,
+     566
+    ]
+   },
+   {
+    "result": "Musician King",
+    "materials": [
+     "Witch of the Black Forest",
+     "Lady of Faith"
+    ],
+    "ids": [
+     494,
+     573,
+     611
+    ]
+   },
+   {
+    "result": "Cyber Saurus",
+    "materials": [
+     "Two-Headed King Rex",
+     "Blast Juggler"
+    ],
+    "ids": [
+     507,
+     31,
+     416
+    ]
+   },
+   {
+    "result": "Bracchio-raidus",
+    "materials": [
+     "Two-Headed King Rex",
+     "Crawling Dragon #2"
+    ],
+    "ids": [
+     508,
+     31,
+     80
+    ]
+   },
+   {
+    "result": "Skullbird",
+    "materials": [
+     "Temple of Skulls",
+     "Takuhee"
+    ],
+    "ids": [
+     520,
+     145,
+     580
+    ]
+   },
+   {
+    "result": "Mystical Sand",
+    "materials": [
+     "Giant Soldier of Stone",
+     "Ancient Elf"
+    ],
+    "ids": [
+     530,
+     73,
+     432
+    ]
+   },
+   {
+    "result": "Kwagar Hercules",
+    "materials": [
+     "Hercules Beetle",
+     "Kuwagata Alpha"
+    ],
+    "ids": [
+     532,
+     51,
+     479
+    ]
+   },
+   {
+    "result": "Skelgon",
+    "materials": [
+     "Blackland Fire Dragon",
+     "The Snake Hair"
+    ],
+    "ids": [
+     544,
+     9,
+     35
+    ]
+   },
+   {
+    "result": "Great Mammoth of Goldfine",
+    "materials": [
+     "The Snake Hair",
+     "Dragon Zombie"
+    ],
+    "ids": [
+     563,
+     35,
+     96
+    ]
+   },
+   {
+    "result": "Empress Judge",
+    "materials": [
+     "Queen's Double",
+     "Hibikime"
+    ],
+    "ids": [
+     571,
+     634,
+     648
+    ]
+   },
+   {
+    "result": "Rose Spectre of Dunn",
+    "materials": [
+     "Feral Imp",
+     "Snakeyashi"
+    ],
+    "ids": [
+     593,
+     5,
+     619
+    ]
+   },
+   {
+    "result": "Twin-Headed Thunder Dragon",
+    "materials": [
+     "Thunder Dragon",
+     "Thunder Dragon"
+    ],
+    "ids": [
+     612,
+     424,
+     424
+    ]
+   },
+   {
+    "result": "Marine Beast",
+    "materials": [
+     "Water Magician",
+     "Behegon"
+    ],
+    "ids": [
+     616,
+     429,
+     549
+    ]
+   },
+   {
+    "result": "Warrior of Tradition",
+    "materials": [
+     "Beautiful Headhuntress",
+     "Sonic Maid"
+    ],
+    "ids": [
+     617,
+     233,
+     298
+    ]
+   },
+   {
+    "result": "Amphibious Bugroth",
+    "materials": [
+     "Ground Attacker Bugroth",
+     "Guardian of the Sea"
+    ],
+    "ids": [
+     638,
+     274,
+     444
+    ]
+   },
+   {
+    "result": "Skull Knight",
+    "materials": [
+     "Tainted Wisdom",
+     "Ancient Brain"
+    ],
+    "ids": [
+     706,
+     161,
+     174
+    ]
+   },
+   {
+    "result": "Meteor B. Dragon",
+    "materials": [
+     "Red-Eyes B. Dragon",
+     "Meteor Dragon"
+    ],
+    "ids": [
+     712,
+     81,
+     711
+    ]
+   },
+   {
+    "result": "Alligator's Sword Dragon",
+    "materials": [
+     "Baby Dragon",
+     "Alligator's Sword"
+    ],
+    "ids": [
+     812,
+     3,
+     760
+    ]
+   },
+   {
+    "result": "Chimera the Flying Mythical Beast",
+    "materials": [
+     "Gazelle the King of Mythical Beasts",
+     "Berfomet"
+    ],
+    "ids": [
+     1241,
+     746,
+     1240
+    ]
+   },
+   {
+    "result": "Thousand-Eyes Restrict",
+    "materials": [
+     "Relinquished",
+     "Thousand-Eyes Idol"
+    ],
+    "ids": [
+     1334,
+     730,
+     1333
+    ]
+   },
+   {
+    "result": "Humanoid Worm Drake",
+    "materials": [
+     "Worm Drake",
+     "Humanoid Slime"
+    ],
+    "ids": [
+     1404,
+     1403,
+     1402
+    ]
+   },
+   {
+    "result": "St. Joan",
+    "materials": [
+     "The Forgiving Maiden",
+     "Marie the Fallen One"
+    ],
+    "ids": [
+     1445,
+     1444,
+     1446
+    ]
+   },
+   {
+    "result": "The Last Warrior from Another Planet",
+    "materials": [
+     "Zombyra the Dark",
+     "Maryokutai"
+    ],
+    "ids": [
+     1526,
+     1523,
+     1525
+    ]
+   },
+   {
+    "result": 999,
+    "materials": [
+     999,
+     999
+    ],
+    "ids": [
+     999,
+     999,
+     999
+    ]
+   }
+  ],
+  "ritual": [
+   {
+    "monster": "Super War-Lion",
+    "spell": "War-Lion Ritual",
+    "tribute_levels": 7,
+    "ids": [
+     355,
+     672
+    ]
+   },
+   {
+    "monster": "Zera The Mant",
+    "spell": "Zera Ritual",
+    "tribute_levels": 8,
+    "ids": [
+     359,
+     670
+    ]
+   },
+   {
+    "monster": "Black Luster Soldier",
+    "spell": "Black Luster Ritual",
+    "tribute_levels": 8,
+    "ids": [
+     363,
+     669
+    ]
+   },
+   {
+    "monster": "Fiend's Mirror",
+    "spell": "Beastly Mirror Ritual",
+    "tribute_levels": 6,
+    "ids": [
+     364,
+     673
+    ]
+   },
+   {
+    "monster": "Performance of Sword",
+    "spell": "Commencement Dance",
+    "tribute_levels": 6,
+    "ids": [
+     700,
+     675
+    ]
+   },
+   {
+    "monster": "Hungry Burger",
+    "spell": "Hamburger Recipe",
+    "tribute_levels": 6,
+    "ids": [
+     701,
+     676
+    ]
+   },
+   {
+    "monster": "Skull Guardian",
+    "spell": "Novox's Prayer",
+    "tribute_levels": 7,
+    "ids": [
+     703,
+     678
+    ]
+   },
+   {
+    "monster": "Chakra",
+    "spell": "Resurrection of Chakra",
+    "tribute_levels": 7,
+    "ids": [
+     708,
+     693
+    ]
+   },
+   {
+    "monster": "Crab Turtle",
+    "spell": "Turtle Oath",
+    "tribute_levels": 8,
+    "ids": [
+     709,
+     691
+    ]
+   },
+   {
+    "monster": "Garma Sword",
+    "spell": "Garma Sword Oath",
+    "tribute_levels": 7,
+    "ids": [
+     715,
+     696
+    ]
+   },
+   {
+    "monster": "Javelin Beetle",
+    "spell": "Javelin Beetle Pact",
+    "tribute_levels": 8,
+    "ids": [
+     716,
+     695
+    ]
+   },
+   {
+    "monster": "Fortress Whale",
+    "spell": "Fortress Whale's Oath",
+    "tribute_levels": 7,
+    "ids": [
+     717,
+     699
+    ]
+   },
+   {
+    "monster": "Dokurorider",
+    "spell": "Revival of Dokurorider",
+    "tribute_levels": 6,
+    "ids": [
+     718,
+     698
+    ]
+   },
+   {
+    "monster": "Magician of Black Chaos",
+    "spell": "Dark Magic Ritual",
+    "tribute_levels": 8,
+    "ids": [
+     721,
+     720
+    ]
+   },
+   {
+    "monster": "Relinquished",
+    "spell": "Black Illusion Ritual",
+    "tribute_levels": 1,
+    "ids": [
+     730,
+     958
+    ]
+   },
+   {
+    "monster": "The Masked Beast",
+    "spell": "Curse of the Masked Beast",
+    "tribute_levels": 8,
+    "ids": [
+     1411,
+     1416
+    ]
+   }
+  ],
+  "limits": [
+   {
+    "card": "Scapegoat",
+    "max": 0,
+    "id": 1902
+   },
+   {
+    "card": "Glory of the King's Hand",
+    "max": 0,
+    "id": 1903
+   },
+   {
+    "card": "Obelisk the Tormentor",
+    "max": 0,
+    "id": 1910
+   },
+   {
+    "card": "Slifer the Sky Dragon",
+    "max": 0,
+    "id": 1911
+   },
+   {
+    "card": "The Winged Dragon of Ra",
+    "max": 0,
+    "id": 1912
+   },
+   {
+    "card": "Insect Monster Token",
+    "max": 0,
+    "id": 1920
+   },
+   {
+    "card": "Kuriboh Token",
+    "max": 0,
+    "id": 1921
+   },
+   {
+    "card": "Sheep Token",
+    "max": 0,
+    "id": 1922
+   },
+   {
+    "card": "Slime Token",
+    "max": 0,
+    "id": 1923
+   },
+   {
+    "card": "Exodia the Forbidden One",
+    "max": 1,
+    "id": 20
+   },
+   {
+    "card": "Left Leg of the Forbidden One",
+    "max": 1,
+    "id": 17
+   },
+   {
+    "card": "Left Arm of the Forbidden One",
+    "max": 1,
+    "id": 19
+   },
+   {
+    "card": "Right Leg of the Forbidden One",
+    "max": 1,
+    "id": 16
+   },
+   {
+    "card": "Right Arm of the Forbidden One",
+    "max": 1,
+    "id": 18
+   },
+   {
+    "card": "Pot of Greed",
+    "max": 1,
+    "id": 1010
+   },
+   {
+    "card": "Graceful Charity",
+    "max": 1,
+    "id": 968
+   },
+   {
+    "card": "Change of Heart",
+    "max": 1,
+    "id": 1027
+   },
+   {
+    "card": "Dark Hole",
+    "max": 1,
+    "id": 335
+   },
+   {
+    "card": "Raigeki",
+    "max": 1,
+    "id": 336
+   },
+   {
+    "card": "Monster Reborn",
+    "max": 1,
+    "id": 1008
+   },
+   {
+    "card": "Mirror Force",
+    "max": 1,
+    "id": 1056
+   },
+   {
+    "card": "Delinquent Duo",
+    "max": 1,
+    "id": 1071
+   },
+   {
+    "card": "Confiscation",
+    "max": 1,
+    "id": 1070
+   },
+   {
+    "card": "Painful Choice",
+    "max": 1,
+    "id": 1081
+   },
+   {
+    "card": "The Forceful Sentry",
+    "max": 1,
+    "id": 1077
+   },
+   {
+    "card": "Snatch Steal",
+    "max": 1,
+    "id": 1068
+   },
+   {
+    "card": "Cyber Jar",
+    "max": 1,
+    "id": 1106
+   },
+   {
+    "card": "Upstart Goblin",
+    "max": 1,
+    "id": 1065
+   },
+   {
+    "card": "Swords of Revealing Light",
+    "max": 1,
+    "id": 347
+   },
+   {
+    "card": "Card Destruction",
+    "max": 1,
+    "id": 1221
+   },
+   {
+    "card": "Witch of the Black Forest",
+    "max": 1,
+    "id": 573
+   },
+   {
+    "card": "Imperial Order",
+    "max": 1,
+    "id": 1154
+   },
+   {
+    "card": "Jinzo",
+    "max": 1,
+    "id": 751
+   },
+   {
+    "card": "Ceasefire",
+    "max": 1,
+    "id": 1150
+   },
+   {
+    "card": "Premature Burial",
+    "max": 1,
+    "id": 1160
+   },
+   {
+    "card": "Call Of The Haunted",
+    "max": 1,
+    "id": 1095
+   },
+   {
+    "card": "Limiter Removal",
+    "max": 1,
+    "id": 1314
+   },
+   {
+    "card": "Sangan",
+    "max": 1,
+    "id": 47
+   },
+   {
+    "card": "Heavy Storm",
+    "max": 1,
+    "id": 1061
+   },
+   {
+    "card": "Harpie's Feather Duster",
+    "max": 1,
+    "id": 671
+   },
+   {
+    "card": "Magic Cylinder",
+    "max": 1,
+    "id": 1214
+   },
+   {
+    "card": "Ceasefire",
+    "max": 1,
+    "id": 1150
+   },
+   {
+    "card": "Ring of Destruction",
+    "max": 1,
+    "id": 939
+   },
+   {
+    "card": "Mage Power",
+    "max": 1,
+    "id": 1450
+   },
+   {
+    "card": "United We Stand",
+    "max": 1,
+    "id": 1449
+   },
+   {
+    "card": "Sinister Serpent",
+    "max": 1,
+    "id": 474
+   },
+   {
+    "card": "Nobleman of Crossout",
+    "max": 2,
+    "id": 1157
+   },
+   {
+    "card": "Backup Soldier",
+    "max": 2,
+    "id": 1147
+   },
+   {
+    "card": "Morphing Jar #2",
+    "max": 2,
+    "id": 1163
+   },
+   {
+    "card": "Morphing Jar",
+    "max": 2,
+    "id": 590
+   }
+  ],
+  "attribute_boosts": [
+   {
+    "card": "Hoshiningen",
+    "id": 491,
+    "atk_by_attribute": {
+     "LIGHT": 500,
+     "DARK": -400,
+     "WATER": 0,
+     "FIRE": 0,
+     "EARTH": 0,
+     "WIND": 0
+    }
+   },
+   {
+    "card": "Witch's Apprentice",
+    "id": 627,
+    "atk_by_attribute": {
+     "LIGHT": -400,
+     "DARK": 500,
+     "WATER": 0,
+     "FIRE": 0,
+     "EARTH": 0,
+     "WIND": 0
+    }
+   },
+   {
+    "card": "Star Boy",
+    "id": 523,
+    "atk_by_attribute": {
+     "LIGHT": 0,
+     "DARK": 0,
+     "WATER": 500,
+     "FIRE": -400,
+     "EARTH": 0,
+     "WIND": 0
+    }
+   },
+   {
+    "card": "Little Chimera",
+    "id": 597,
+    "atk_by_attribute": {
+     "LIGHT": 0,
+     "DARK": 0,
+     "WATER": -400,
+     "FIRE": 500,
+     "EARTH": 0,
+     "WIND": 0
+    }
+   },
+   {
+    "card": "Milus Radiant",
+    "id": 526,
+    "atk_by_attribute": {
+     "LIGHT": 0,
+     "DARK": 0,
+     "WATER": 0,
+     "FIRE": 0,
+     "EARTH": 500,
+     "WIND": -400
+    }
+   },
+   {
+    "card": "Bladefly",
+    "id": 608,
+    "atk_by_attribute": {
+     "LIGHT": 0,
+     "DARK": 0,
+     "WATER": 0,
+     "FIRE": 0,
+     "EARTH": -400,
+     "WIND": 500
+    }
+   }
+  ]
+ },
+ "joey": {
+  "fusion": [
+   {
+    "result": "Flame Swordsman",
+    "materials": [
+     "Flame Manipulator",
+     "Masaki the Legendary Swordsman"
+    ],
+    "ids": [
+     14,
+     141,
+     292
+    ]
+   },
+   {
+    "result": "Zombie Warrior",
+    "materials": [
+     "Skull Servant",
+     "Battle Warrior"
+    ],
+    "ids": [
+     29,
+     23,
+     99
+    ]
+   },
+   {
+    "result": "Gaia the Dragon Champion",
+    "materials": [
+     "Gaia The Fierce Knight",
+     "Curse of Dragon"
+    ],
+    "ids": [
+     36,
+     37,
+     38
+    ]
+   },
+   {
+    "result": "Karbonala Warrior",
+    "materials": [
+     "M-Warrior #1",
+     "M-Warrior #2"
+    ],
+    "ids": [
+     42,
+     159,
+     160
+    ]
+   },
+   {
+    "result": "Thousand Dragon",
+    "materials": [
+     "Baby Dragon",
+     "Time Wizard"
+    ],
+    "ids": [
+     68,
+     3,
+     15
+    ]
+   },
+   {
+    "result": "Barox",
+    "materials": [
+     "Ryu-Kishin",
+     "Frenzied Panda"
+    ],
+    "ids": [
+     85,
+     4,
+     200
+    ]
+   },
+   {
+    "result": "Rabid Horseman",
+    "materials": [
+     "Battle Ox",
+     "Mystic Horseman"
+    ],
+    "ids": [
+     91,
+     25,
+     90
+    ]
+   },
+   {
+    "result": "Kamionwizard",
+    "materials": [
+     "Mystical Elf",
+     "Curtain of the Dark Ones"
+    ],
+    "ids": [
+     114,
+     1,
+     103
+    ]
+   },
+   {
+    "result": "Charubin the Fire Knight",
+    "materials": [
+     "Monster Egg",
+     "Hinotama Soul"
+    ],
+    "ids": [
+     132,
+     146,
+     209
+    ]
+   },
+   {
+    "result": "Darkfire Dragon",
+    "materials": [
+     "Firegrass",
+     "Petit Dragon"
+    ],
+    "ids": [
+     167,
+     156,
+     199
+    ]
+   },
+   {
+    "result": "Fusionist",
+    "materials": [
+     "Petit Angel",
+     "Mystical Sheep #2"
+    ],
+    "ids": [
+     188,
+     207,
+     281
+    ]
+   },
+   {
+    "result": "Flame Ghost",
+    "materials": [
+     "Skull Servant",
+     "Dissolverock"
+    ],
+    "ids": [
+     214,
+     23,
+     243
+    ]
+   },
+   {
+    "result": "B. Skull Dragon",
+    "materials": [
+     "Summoned Skull",
+     "Red-Eyes B. Dragon"
+    ],
+    "ids": [
+     216,
+     21,
+     81
+    ]
+   },
+   {
+    "result": "Roaring Ocean Snake",
+    "materials": [
+     "Mystic Lamp",
+     "Hyosube"
+    ],
+    "ids": [
+     222,
+     386,
+     646
+    ]
+   },
+   {
+    "result": "Rare Fish",
+    "materials": [
+     "Fusionist",
+     "Enchanting Mermaid"
+    ],
+    "ids": [
+     229,
+     188,
+     250
+    ]
+   },
+   {
+    "result": "Mavelus",
+    "materials": [
+     "Tyhone",
+     "Wings of Wicked Flame"
+    ],
+    "ids": [
+     271,
+     12,
+     100
+    ]
+   },
+   {
+    "result": "Dragoness the Wicked Knight",
+    "materials": [
+     "Armaill",
+     "One-Eyed Shield Dragon"
+    ],
+    "ids": [
+     293,
+     171,
+     295
+    ]
+   },
+   {
+    "result": "Labyrinth Tank",
+    "materials": [
+     "Giga-Tech Wolf",
+     "Cannon Soldier"
+    ],
+    "ids": [
+     369,
+     411,
+     511
+    ]
+   },
+   {
+    "result": "Bickuribox",
+    "materials": [
+     "Crass Clown",
+     "Dream Clown"
+    ],
+    "ids": [
+     384,
+     94,
+     119
+    ]
+   },
+   {
+    "result": "Giltia the D. Knight",
+    "materials": [
+     "Guardian of the Labyrinth",
+     "Protector of the Throne"
+    ],
+    "ids": [
+     388,
+     235,
+     279
+    ]
+   },
+   {
+    "result": "Metal Dragon",
+    "materials": [
+     "Steel Ogre Grotto #1",
+     "Lesser Dragon"
+    ],
+    "ids": [
+     408,
+     556,
+     560
+    ]
+   },
+   {
+    "result": "Kaiser Dragon",
+    "materials": [
+     "Winged Dragon, Guardian of the Fortress #1",
+     "Fairy Dragon"
+    ],
+    "ids": [
+     426,
+     6,
+     602
+    ]
+   },
+   {
+    "result": "Deepsea Shark",
+    "materials": [
+     "Bottom Dweller",
+     "Tongyo"
+    ],
+    "ids": [
+     436,
+     438,
+     542
+    ]
+   },
+   {
+    "result": "Kaminari Attack",
+    "materials": [
+     "Ocubeam",
+     "Mega Thunderball"
+    ],
+    "ids": [
+     457,
+     395,
+     536
+    ]
+   },
+   {
+    "result": "Punished Eagle",
+    "materials": [
+     "Niwatori",
+     "Blue-Winged Crown"
+    ],
+    "ids": [
+     464,
+     537,
+     635
+    ]
+   },
+   {
+    "result": "Crimson Sunbird",
+    "materials": [
+     "Faith Bird",
+     "Skull Red Bird"
+    ],
+    "ids": [
+     466,
+     124,
+     465
+    ]
+   },
+   {
+    "result": "Soul Hunter",
+    "materials": [
+     "Lord of the Lamp",
+     "Invader from Another Dimension"
+    ],
+    "ids": [
+     470,
+     148,
+     559
+    ]
+   },
+   {
+    "result": "Vermillion Sparrow",
+    "materials": [
+     "Rhaimundos of the Red Sword",
+     "Fireyarou"
+    ],
+    "ids": [
+     472,
+     150,
+     290
+    ]
+   },
+   {
+    "result": "Pragtical",
+    "materials": [
+     "Trakadon",
+     "Flame Viper"
+    ],
+    "ids": [
+     481,
+     569,
+     643
+    ]
+   },
+   {
+    "result": "Flower Wolf",
+    "materials": [
+     "Silver Fang",
+     "Darkworld Thorns"
+    ],
+    "ids": [
+     486,
+     64,
+     566
+    ]
+   },
+   {
+    "result": "Musician King",
+    "materials": [
+     "Witch of the Black Forest",
+     "Lady of Faith"
+    ],
+    "ids": [
+     494,
+     573,
+     611
+    ]
+   },
+   {
+    "result": "Cyber Saurus",
+    "materials": [
+     "Two-Headed King Rex",
+     "Blast Juggler"
+    ],
+    "ids": [
+     507,
+     31,
+     416
+    ]
+   },
+   {
+    "result": "Bracchio-raidus",
+    "materials": [
+     "Two-Headed King Rex",
+     "Crawling Dragon #2"
+    ],
+    "ids": [
+     508,
+     31,
+     80
+    ]
+   },
+   {
+    "result": "Skullbird",
+    "materials": [
+     "Temple of Skulls",
+     "Takuhee"
+    ],
+    "ids": [
+     520,
+     145,
+     580
+    ]
+   },
+   {
+    "result": "Mystical Sand",
+    "materials": [
+     "Giant Soldier of Stone",
+     "Ancient Elf"
+    ],
+    "ids": [
+     530,
+     73,
+     432
+    ]
+   },
+   {
+    "result": "Kwagar Hercules",
+    "materials": [
+     "Hercules Beetle",
+     "Kuwagata Alpha"
+    ],
+    "ids": [
+     532,
+     51,
+     479
+    ]
+   },
+   {
+    "result": "Skelgon",
+    "materials": [
+     "Blackland Fire Dragon",
+     "The Snake Hair"
+    ],
+    "ids": [
+     544,
+     9,
+     35
+    ]
+   },
+   {
+    "result": "Great Mammoth of Goldfine",
+    "materials": [
+     "The Snake Hair",
+     "Dragon Zombie"
+    ],
+    "ids": [
+     563,
+     35,
+     96
+    ]
+   },
+   {
+    "result": "Empress Judge",
+    "materials": [
+     "Queen's Double",
+     "Hibikime"
+    ],
+    "ids": [
+     571,
+     634,
+     648
+    ]
+   },
+   {
+    "result": "Rose Spectre of Dunn",
+    "materials": [
+     "Feral Imp",
+     "Snakeyashi"
+    ],
+    "ids": [
+     593,
+     5,
+     619
+    ]
+   },
+   {
+    "result": "Twin-Headed Thunder Dragon",
+    "materials": [
+     "Thunder Dragon",
+     "Thunder Dragon"
+    ],
+    "ids": [
+     612,
+     424,
+     424
+    ]
+   },
+   {
+    "result": "Marine Beast",
+    "materials": [
+     "Water Magician",
+     "Behegon"
+    ],
+    "ids": [
+     616,
+     429,
+     549
+    ]
+   },
+   {
+    "result": "Warrior of Tradition",
+    "materials": [
+     "Beautiful Headhuntress",
+     "Sonic Maid"
+    ],
+    "ids": [
+     617,
+     233,
+     298
+    ]
+   },
+   {
+    "result": "Amphibious Bugroth",
+    "materials": [
+     "Ground Attacker Bugroth",
+     "Guardian of the Sea"
+    ],
+    "ids": [
+     638,
+     274,
+     444
+    ]
+   },
+   {
+    "result": "Skull Knight",
+    "materials": [
+     "Tainted Wisdom",
+     "Ancient Brain"
+    ],
+    "ids": [
+     706,
+     161,
+     174
+    ]
+   },
+   {
+    "result": "Meteor B. Dragon",
+    "materials": [
+     "Red-Eyes B. Dragon",
+     "Meteor Dragon"
+    ],
+    "ids": [
+     712,
+     81,
+     711
+    ]
+   },
+   {
+    "result": "Alligator's Sword Dragon",
+    "materials": [
+     "Baby Dragon",
+     "Alligator's Sword"
+    ],
+    "ids": [
+     812,
+     3,
+     760
+    ]
+   },
+   {
+    "result": "Chimera the Flying Mythical Beast",
+    "materials": [
+     "Gazelle the King of Mythical Beasts",
+     "Berfomet"
+    ],
+    "ids": [
+     1241,
+     746,
+     1240
+    ]
+   },
+   {
+    "result": "Thousand-Eyes Restrict",
+    "materials": [
+     "Relinquished",
+     "Thousand-Eyes Idol"
+    ],
+    "ids": [
+     1334,
+     730,
+     1333
+    ]
+   },
+   {
+    "result": "Humanoid Worm Drake",
+    "materials": [
+     "Worm Drake",
+     "Humanoid Slime"
+    ],
+    "ids": [
+     1404,
+     1403,
+     1402
+    ]
+   },
+   {
+    "result": "St. Joan",
+    "materials": [
+     "The Forgiving Maiden",
+     "Marie the Fallen One"
+    ],
+    "ids": [
+     1445,
+     1444,
+     1446
+    ]
+   },
+   {
+    "result": "The Last Warrior from Another Planet",
+    "materials": [
+     "Zombyra the Dark",
+     "Maryokutai"
+    ],
+    "ids": [
+     1526,
+     1523,
+     1525
+    ]
+   },
+   {
+    "result": "Blue-Eyes Ultimate Dragon",
+    "materials": [
+     "Blue-Eyes White Dragon",
+     "Blue-Eyes White Dragon"
+    ],
+    "ids": [
+     379,
+     0,
+     0
+    ]
+   }
+  ],
+  "ritual": [
+   {
+    "monster": "Super War-Lion",
+    "spell": "War-Lion Ritual",
+    "tribute_levels": 7,
+    "ids": [
+     355,
+     672
+    ]
+   },
+   {
+    "monster": "Zera The Mant",
+    "spell": "Zera Ritual",
+    "tribute_levels": 8,
+    "ids": [
+     359,
+     670
+    ]
+   },
+   {
+    "monster": "Black Luster Soldier",
+    "spell": "Black Luster Ritual",
+    "tribute_levels": 8,
+    "ids": [
+     363,
+     669
+    ]
+   },
+   {
+    "monster": "Fiend's Mirror",
+    "spell": "Beastly Mirror Ritual",
+    "tribute_levels": 6,
+    "ids": [
+     364,
+     673
+    ]
+   },
+   {
+    "monster": "Performance of Sword",
+    "spell": "Commencement Dance",
+    "tribute_levels": 6,
+    "ids": [
+     700,
+     675
+    ]
+   },
+   {
+    "monster": "Hungry Burger",
+    "spell": "Hamburger Recipe",
+    "tribute_levels": 6,
+    "ids": [
+     701,
+     676
+    ]
+   },
+   {
+    "monster": "Skull Guardian",
+    "spell": "Novox's Prayer",
+    "tribute_levels": 7,
+    "ids": [
+     703,
+     678
+    ]
+   },
+   {
+    "monster": "Chakra",
+    "spell": "Resurrection of Chakra",
+    "tribute_levels": 7,
+    "ids": [
+     708,
+     693
+    ]
+   },
+   {
+    "monster": "Crab Turtle",
+    "spell": "Turtle Oath",
+    "tribute_levels": 8,
+    "ids": [
+     709,
+     691
+    ]
+   },
+   {
+    "monster": "Garma Sword",
+    "spell": "Garma Sword Oath",
+    "tribute_levels": 7,
+    "ids": [
+     715,
+     696
+    ]
+   },
+   {
+    "monster": "Javelin Beetle",
+    "spell": "Javelin Beetle Pact",
+    "tribute_levels": 8,
+    "ids": [
+     716,
+     695
+    ]
+   },
+   {
+    "monster": "Fortress Whale",
+    "spell": "Fortress Whale's Oath",
+    "tribute_levels": 7,
+    "ids": [
+     717,
+     699
+    ]
+   },
+   {
+    "monster": "Dokurorider",
+    "spell": "Revival of Dokurorider",
+    "tribute_levels": 6,
+    "ids": [
+     718,
+     698
+    ]
+   },
+   {
+    "monster": "Magician of Black Chaos",
+    "spell": "Dark Magic Ritual",
+    "tribute_levels": 8,
+    "ids": [
+     721,
+     720
+    ]
+   },
+   {
+    "monster": "Relinquished",
+    "spell": "Black Illusion Ritual",
+    "tribute_levels": 1,
+    "ids": [
+     730,
+     958
+    ]
+   },
+   {
+    "monster": "The Masked Beast",
+    "spell": "Curse of the Masked Beast",
+    "tribute_levels": 8,
+    "ids": [
+     1411,
+     1416
+    ]
+   }
+  ],
+  "limits": [
+   {
+    "card": "Cyber Jar",
+    "max": 0,
+    "id": 1106
+   },
+   {
+    "card": "Delinquent Duo",
+    "max": 0,
+    "id": 1071
+   },
+   {
+    "card": "Painful Choice",
+    "max": 0,
+    "id": 1081
+   },
+   {
+    "card": "Change of Heart",
+    "max": 0,
+    "id": 1027
+   },
+   {
+    "card": "Raigeki",
+    "max": 0,
+    "id": 336
+   },
+   {
+    "card": "Harpie's Feather Duster",
+    "max": 0,
+    "id": 671
+   },
+   {
+    "card": "Imperial Order",
+    "max": 0,
+    "id": 1154
+   },
+   {
+    "card": "Sinister Serpent",
+    "max": 1,
+    "id": 474
+   },
+   {
+    "card": "Sangan",
+    "max": 1,
+    "id": 47
+   },
+   {
+    "card": "Witch of the Black Forest",
+    "max": 1,
+    "id": 573
+   },
+   {
+    "card": "Jinzo",
+    "max": 1,
+    "id": 751
+   },
+   {
+    "card": "Exodia the Forbidden One",
+    "max": 1,
+    "id": 20
+   },
+   {
+    "card": "Left Leg of the Forbidden One",
+    "max": 1,
+    "id": 17
+   },
+   {
+    "card": "Left Arm of the Forbidden One",
+    "max": 1,
+    "id": 19
+   },
+   {
+    "card": "Right Leg of the Forbidden One",
+    "max": 1,
+    "id": 16
+   },
+   {
+    "card": "Right Arm of the Forbidden One",
+    "max": 1,
+    "id": 18
+   },
+   {
+    "card": "Confiscation",
+    "max": 1,
+    "id": 1070
+   },
+   {
+    "card": "Heavy Storm",
+    "max": 1,
+    "id": 1061
+   },
+   {
+    "card": "The Forceful Sentry",
+    "max": 1,
+    "id": 1077
+   },
+   {
+    "card": "Snatch Steal",
+    "max": 1,
+    "id": 1068
+   },
+   {
+    "card": "Pot of Greed",
+    "max": 1,
+    "id": 1010
+   },
+   {
+    "card": "Monster Reborn",
+    "max": 1,
+    "id": 1008
+   },
+   {
+    "card": "United We Stand",
+    "max": 1,
+    "id": 1449
+   },
+   {
+    "card": "Card Destruction",
+    "max": 1,
+    "id": 1221
+   },
+   {
+    "card": "Graceful Charity",
+    "max": 1,
+    "id": 968
+   },
+   {
+    "card": "Upstart Goblin",
+    "max": 1,
+    "id": 1065
+   },
+   {
+    "card": "Premature Burial",
+    "max": 1,
+    "id": 1160
+   },
+   {
+    "card": "Swords of Revealing Light",
+    "max": 1,
+    "id": 347
+   },
+   {
+    "card": "Dark Hole",
+    "max": 1,
+    "id": 335
+   },
+   {
+    "card": "Mage Power",
+    "max": 1,
+    "id": 1450
+   },
+   {
+    "card": "Mirror Force",
+    "max": 1,
+    "id": 1056
+   },
+   {
+    "card": "Ceasefire",
+    "max": 1,
+    "id": 1150
+   },
+   {
+    "card": "Ring of Destruction",
+    "max": 1,
+    "id": 939
+   },
+   {
+    "card": "Magic Cylinder",
+    "max": 1,
+    "id": 1214
+   },
+   {
+    "card": "Call Of The Haunted",
+    "max": 1,
+    "id": 1095
+   },
+   {
+    "card": "Morphing Jar #2",
+    "max": 2,
+    "id": 1163
+   },
+   {
+    "card": "Morphing Jar",
+    "max": 2,
+    "id": 590
+   },
+   {
+    "card": "Nobleman of Crossout",
+    "max": 2,
+    "id": 1157
+   }
+  ],
+  "attribute_boosts": [
+   {
+    "card": "Hoshiningen",
+    "id": 491,
+    "atk_by_attribute": {
+     "LIGHT": 500,
+     "DARK": -400,
+     "WATER": 0,
+     "FIRE": 0,
+     "EARTH": 0,
+     "WIND": 0
+    }
+   },
+   {
+    "card": "Witch's Apprentice",
+    "id": 627,
+    "atk_by_attribute": {
+     "LIGHT": -400,
+     "DARK": 500,
+     "WATER": 0,
+     "FIRE": 0,
+     "EARTH": 0,
+     "WIND": 0
+    }
+   },
+   {
+    "card": "Star Boy",
+    "id": 523,
+    "atk_by_attribute": {
+     "LIGHT": 0,
+     "DARK": 0,
+     "WATER": 500,
+     "FIRE": -400,
+     "EARTH": 0,
+     "WIND": 0
+    }
+   },
+   {
+    "card": "Little Chimera",
+    "id": 597,
+    "atk_by_attribute": {
+     "LIGHT": 0,
+     "DARK": 0,
+     "WATER": -400,
+     "FIRE": 500,
+     "EARTH": 0,
+     "WIND": 0
+    }
+   },
+   {
+    "card": "Milus Radiant",
+    "id": 526,
+    "atk_by_attribute": {
+     "LIGHT": 0,
+     "DARK": 0,
+     "WATER": 0,
+     "FIRE": 0,
+     "EARTH": 500,
+     "WIND": -400
+    }
+   },
+   {
+    "card": "Bladefly",
+    "id": 608,
+    "atk_by_attribute": {
+     "LIGHT": 0,
+     "DARK": 0,
+     "WATER": 0,
+     "FIRE": 0,
+     "EARTH": -400,
+     "WIND": 500
+    }
+   }
+  ]
+ }
+}

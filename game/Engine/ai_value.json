@@ -1,0 +1,1731 @@
+{
+  "Weights": {
+    "turn": -0.0084,
+    "lp": 0.1722,
+    "hand": 0.0747,
+    "exodia": -0.0364,
+    "monsters": 0.0813,
+    "atk": 0.1222,
+    "def": -0.0022,
+    "sets": 0.0102,
+    "cont": 0.2422,
+    "threat": 0.2655,
+    "kills": 0.2657,
+    "lethal": 0.578,
+    "lowdeck": -3.1184
+  },
+  "Uses": {
+    "7 Completed": [
+      12879,
+      8.75
+    ],
+    "A Legendary Ocean": [
+      1342,
+      2
+    ],
+    "A Rival Appears!": [
+      6590,
+      3
+    ],
+    "Acid Trap Hole": [
+      15258,
+      16.625
+    ],
+    "Alchemy Cycle": [
+      3273,
+      2
+    ],
+    "Ancient Gear Drill": [
+      728,
+      1
+    ],
+    "Ancient Gear Explosive": [
+      6000,
+      1
+    ],
+    "Ancient Gear Tank": [
+      1222,
+      3
+    ],
+    "Anti Raigeki": [
+      1500,
+      0.25
+    ],
+    "Anti-Spell Fragrance": [
+      9025,
+      6.25
+    ],
+    "Appropriate": [
+      1159,
+      3.875
+    ],
+    "Aqua Chorus": [
+      22140,
+      15.25
+    ],
+    "Attack and Receive": [
+      4788,
+      13.75
+    ],
+    "Attack Guidance Armor": [
+      5499,
+      1
+    ],
+    "Attack Reflector Unit": [
+      1603,
+      2
+    ],
+    "Axe of Despair": [
+      93594,
+      57.25
+    ],
+    "Backup Soldier": [
+      48,
+      27.875
+    ],
+    "Bait Doll": [
+      17032,
+      9.5
+    ],
+    "Beast Fangs": [
+      346,
+      0.875
+    ],
+    "Black Illusion Ritual": [
+      932,
+      1.25
+    ],
+    "Black Pendant": [
+      21967,
+      19.75
+    ],
+    "Blind Destruction": [
+      0,
+      39.75
+    ],
+    "Block Attack": [
+      51088,
+      35.75
+    ],
+    "Blue Medicine": [
+      -200,
+      2.375
+    ],
+    "Bonfire": [
+      696,
+      1
+    ],
+    "Book of Life": [
+      2335,
+      1
+    ],
+    "Book of Moon": [
+      4603,
+      5
+    ],
+    "Book of Secret Arts": [
+      832,
+      4.125
+    ],
+    "Bottomless Trap Hole": [
+      27762,
+      8
+    ],
+    "Brain Control": [
+      88035,
+      20
+    ],
+    "Bubble Blaster": [
+      775,
+      1
+    ],
+    "Burden of the Mighty": [
+      4837,
+      4
+    ],
+    "Burning Land": [
+      9938,
+      12.875
+    ],
+    "Burning Spear": [
+      144,
+      1.5
+    ],
+    "Burst Breath": [
+      2109,
+      1
+    ],
+    "Butterfly Dagger - Elma": [
+      1346,
+      1
+    ],
+    "Call of the Earthbound": [
+      1706,
+      1
+    ],
+    "Call of the Grave": [
+      2027,
+      1.25
+    ],
+    "Call Of The Haunted": [
+      6982,
+      198.5
+    ],
+    "Card Destruction": [
+      68026,
+      29.875
+    ],
+    "Card of Safe Return": [
+      16465,
+      42.625
+    ],
+    "Castle Walls": [
+      24222,
+      6.5
+    ],
+    "Ceasefire": [
+      32816,
+      25
+    ],
+    "Celestial Sword - Eatos": [
+      224,
+      1
+    ],
+    "Cemetary Bomb": [
+      2987,
+      4
+    ],
+    "Chain Destruction": [
+      588,
+      2.125
+    ],
+    "Chain Disappearance": [
+      3721,
+      2
+    ],
+    "Chain Energy": [
+      3863,
+      10.75
+    ],
+    "Change of Heart": [
+      1317736,
+      264.375
+    ],
+    "Chaos Burst": [
+      21336,
+      6
+    ],
+    "Chorus of Sanctuary": [
+      4818,
+      10
+    ],
+    "Chosen One": [
+      3090,
+      1.375
+    ],
+    "Chthonian Blast": [
+      1337,
+      1
+    ],
+    "Clockwork Night": [
+      2290,
+      1
+    ],
+    "Coffin Seller": [
+      236,
+      1
+    ],
+    "Cold Wave": [
+      52,
+      0.125
+    ],
+    "Collected Power": [
+      11435,
+      3.5
+    ],
+    "Common Soul": [
+      788,
+      1
+    ],
+    "Compulsory Evacuation Device": [
+      9866,
+      8
+    ],
+    "Confiscation": [
+      9678,
+      9.375
+    ],
+    "Contract with Exodia": [
+      6000,
+      1
+    ],
+    "Creature Swap": [
+      3133,
+      1
+    ],
+    "Cross Counter": [
+      1231,
+      1
+    ],
+    "Crush Card": [
+      45752,
+      15.5
+    ],
+    "Cup of Ace": [
+      4103,
+      6
+    ],
+    "Curse of Anubis": [
+      7098,
+      2
+    ],
+    "Curse of the Masked Beast": [
+      11422,
+      4.375
+    ],
+    "Cursed Seal of the Forbidden Spell": [
+      552,
+      1
+    ],
+    "Cyber Shadow Gardna": [
+      7526,
+      3
+    ],
+    "Cyber Shield": [
+      700,
+      2
+    ],
+    "Cyber Summon Blaster": [
+      500,
+      1
+    ],
+    "Cybernetic Hidden Technology": [
+      251,
+      1
+    ],
+    "Cyclon Laser": [
+      476,
+      0.625
+    ],
+    "D - Chain": [
+      328,
+      1
+    ],
+    "D - Shield": [
+      6000,
+      1
+    ],
+    "Dark Calling": [
+      10156,
+      3
+    ],
+    "Dark Energy": [
+      306,
+      2.125
+    ],
+    "Dark Factory of Mass Production": [
+      872,
+      1
+    ],
+    "Dark Fusion": [
+      276,
+      1
+    ],
+    "Dark Hole": [
+      277867,
+      73.25
+    ],
+    "Dark Magic Curtain": [
+      7165,
+      5
+    ],
+    "Dark Magic Ritual": [
+      8494,
+      3.625
+    ],
+    "Dark Spirit of the Silent": [
+      16884,
+      5.5
+    ],
+    "Dark-Piercing Light": [
+      986,
+      0.875
+    ],
+    "Darkness Approaches": [
+      1306,
+      2.125
+    ],
+    "De-Fusion": [
+      4460,
+      1
+    ],
+    "De-Spell": [
+      10208,
+      8.125
+    ],
+    "Deal of Phantom": [
+      35379,
+      21.125
+    ],
+    "Delinquent Duo": [
+      46794,
+      39.125
+    ],
+    "Des Counterblow": [
+      7057,
+      2
+    ],
+    "Destiny Board": [
+      0,
+      64.5
+    ],
+    "Destiny Draw": [
+      6273,
+      7
+    ],
+    "Destiny Signal": [
+      11926,
+      3
+    ],
+    "Destruction Punch": [
+      3486,
+      2
+    ],
+    "Dian Keto the Cure Master": [
+      4500,
+      9.75
+    ],
+    "Dimension Fusion": [
+      4773,
+      1
+    ],
+    "Dimensional Prison": [
+      10418,
+      3
+    ],
+    "Dimensionhole": [
+      2027,
+      1
+    ],
+    "DNA Surgery": [
+      75207,
+      50.375
+    ],
+    "Doble Passe": [
+      1302,
+      2
+    ],
+    "Doll Hammer": [
+      5803,
+      3
+    ],
+    "Double Magical Arm Bind": [
+      5549,
+      2
+    ],
+    "Double Snare": [
+      2335,
+      1
+    ],
+    "Dragon Capture Jar": [
+      12715,
+      10.75
+    ],
+    "Dragon Nails": [
+      1222,
+      3
+    ],
+    "Dragon Treasure": [
+      738,
+      2.625
+    ],
+    "Dragonic Attack": [
+      -42,
+      1.625
+    ],
+    "Draining Shield": [
+      7903,
+      5
+    ],
+    "Driving Snow": [
+      214,
+      0.5
+    ],
+    "Drop Off": [
+      104,
+      1
+    ],
+    "Dust Tornado": [
+      46188,
+      52.125
+    ],
+    "E - Emergency Call": [
+      769,
+      2
+    ],
+    "Earthquake": [
+      860,
+      1
+    ],
+    "Earthshaker": [
+      87840,
+      28.75
+    ],
+    "Eatgaboon": [
+      429,
+      0.625
+    ],
+    "Ekibyo Drakmord": [
+      6225,
+      3.25
+    ],
+    "Elf\u0027s Light": [
+      3908,
+      2.375
+    ],
+    "Embodiment of Apophis": [
+      33969,
+      16
+    ],
+    "Emergency Provisions": [
+      3357,
+      3
+    ],
+    "Enchanted Javelin": [
+      16736,
+      8.625
+    ],
+    "Enchanting Fitting Room": [
+      4923,
+      5
+    ],
+    "Enemy Controller": [
+      18970,
+      14
+    ],
+    "Energy Drain": [
+      9516,
+      4
+    ],
+    "Eternal Rest": [
+      10069,
+      2.625
+    ],
+    "Exchange": [
+      16966,
+      6
+    ],
+    "Exile of the Wicked": [
+      9582,
+      3.25
+    ],
+    "Fairy Box": [
+      0,
+      161
+    ],
+    "Fairy Meteor Crush": [
+      4627,
+      5.375
+    ],
+    "Fairy\u0027s Hand Mirror": [
+      6088,
+      1.875
+    ],
+    "Fake Trap": [
+      1516,
+      2.5
+    ],
+    "Fatal Abacus": [
+      2259,
+      1
+    ],
+    "Fiend\u0027s Sanctuary": [
+      777,
+      1
+    ],
+    "Final Attack Orders": [
+      8693,
+      5
+    ],
+    "Final Destiny": [
+      11880,
+      3
+    ],
+    "Final Flame": [
+      4466,
+      23.75
+    ],
+    "Fire Recovery": [
+      2008,
+      1
+    ],
+    "Fissure": [
+      99685,
+      32.75
+    ],
+    "Follow Wind": [
+      1822,
+      1.75
+    ],
+    "Forced Requisition": [
+      570,
+      1.5
+    ],
+    "Forest": [
+      16716,
+      16.25
+    ],
+    "Fortress Whale\u0027s Oath": [
+      2180,
+      1
+    ],
+    "Fossil Excavation": [
+      2414,
+      2
+    ],
+    "Fulfillment of the Contract": [
+      2769,
+      2
+    ],
+    "Fusion Gate": [
+      103568,
+      79
+    ],
+    "Fusion Recovery": [
+      2541,
+      1
+    ],
+    "Fusion Sage": [
+      7386,
+      4.25
+    ],
+    "Gaia Power": [
+      5068,
+      7.625
+    ],
+    "Gamble": [
+      2282,
+      9
+    ],
+    "Giant Trunade": [
+      20192,
+      9.375
+    ],
+    "Gift of The Mystical Elf": [
+      7574,
+      22.875
+    ],
+    "Glass Slippers": [
+      2285,
+      2
+    ],
+    "Goblin Fan": [
+      8647,
+      5.125
+    ],
+    "Goblin\u0027s Secret Remedy": [
+      2208,
+      11.625
+    ],
+    "Graceful Charity": [
+      156773,
+      118.125
+    ],
+    "Graceful Dice": [
+      99568,
+      105.625
+    ],
+    "Gravekeeper\u0027s Servant": [
+      10721,
+      30.25
+    ],
+    "Graverobber": [
+      116761,
+      95.375
+    ],
+    "Graverobber\u0027s Retribution": [
+      12710,
+      10.75
+    ],
+    "Gravity Bind": [
+      0,
+      56
+    ],
+    "Ground Collapse": [
+      7023,
+      18.625
+    ],
+    "Gryphon Wing": [
+      1228,
+      0.625
+    ],
+    "Guard Penalty": [
+      577,
+      1
+    ],
+    "Gust": [
+      133,
+      0.625
+    ],
+    "Gust Fan": [
+      1391,
+      1.625
+    ],
+    "H - Heated Heart": [
+      2768,
+      9
+    ],
+    "Hallowed Life Barrier": [
+      11162,
+      7
+    ],
+    "Hammer Shot": [
+      8200,
+      3
+    ],
+    "Harpie\u0027s Feather Duster": [
+      182406,
+      85.375
+    ],
+    "Heavy Storm": [
+      77531,
+      30.875
+    ],
+    "Hero Barrier": [
+      9878,
+      3
+    ],
+    "Hero Signal": [
+      17110,
+      10
+    ],
+    "Hero\u0027s Rule 1: Five Freedoms": [
+      5201,
+      2
+    ],
+    "Hidden Soldiers": [
+      595,
+      1
+    ],
+    "Hinotama": [
+      93,
+      10.625
+    ],
+    "Horn of Heaven": [
+      24195,
+      10.625
+    ],
+    "Horn of Light": [
+      396,
+      0.375
+    ],
+    "Horn of the Unicorn": [
+      25757,
+      21.125
+    ],
+    "House of Adhesive Tape": [
+      11355,
+      3
+    ],
+    "Icarus Attack": [
+      1377,
+      1
+    ],
+    "Illusion Gate": [
+      5103,
+      4
+    ],
+    "Imperial Order": [
+      98698,
+      42.125
+    ],
+    "Infinite Cards": [
+      3003,
+      8.375
+    ],
+    "Infinite Dismissal": [
+      3892,
+      5.5
+    ],
+    "Insect Armor with Laser Cannon": [
+      1420,
+      0.75
+    ],
+    "Insect Barrier": [
+      6813,
+      14.875
+    ],
+    "Insect Imitation": [
+      11674,
+      8.625
+    ],
+    "Inspection": [
+      5843,
+      15.25
+    ],
+    "Instant Fusion": [
+      2763,
+      2
+    ],
+    "Interdimensional Matter Transporter": [
+      2072,
+      1
+    ],
+    "Invigoration": [
+      1540,
+      2.875
+    ],
+    "Jam Breeding Machine": [
+      5141,
+      15
+    ],
+    "Jam Defender": [
+      3222,
+      4.375
+    ],
+    "Jar of Greed": [
+      0,
+      88.5
+    ],
+    "Jurassic World": [
+      1724,
+      3
+    ],
+    "Justi-Break": [
+      4202,
+      1
+    ],
+    "Kunai with Chain": [
+      105620,
+      79
+    ],
+    "Laser Cannon Armor": [
+      740,
+      4.625
+    ],
+    "Last Resort": [
+      0,
+      1
+    ],
+    "Last Will": [
+      78,
+      1
+    ],
+    "Left Arm Offering": [
+      451,
+      1
+    ],
+    "Legendary Sword": [
+      1964,
+      3.5
+    ],
+    "Life Absorbing Machine": [
+      848,
+      1
+    ],
+    "Light of Intervention": [
+      0,
+      26.125
+    ],
+    "Lightforce Sword": [
+      33785,
+      34.375
+    ],
+    "Lightning Blade": [
+      9454,
+      3.25
+    ],
+    "Limit Reverse": [
+      7855,
+      7
+    ],
+    "Limiter Removal": [
+      57138,
+      16.25
+    ],
+    "Living Fossil": [
+      795,
+      3
+    ],
+    "Luminous Spark": [
+      39734,
+      23.375
+    ],
+    "Machine Angel Ritual": [
+      4732,
+      2
+    ],
+    "Machine Conversion Factory": [
+      1130,
+      1.25
+    ],
+    "Macro Cosmos": [
+      3491,
+      1
+    ],
+    "Mage Power": [
+      100441,
+      67.5
+    ],
+    "Magic Cylinder": [
+      345396,
+      97.5
+    ],
+    "Magic Drain": [
+      42146,
+      16.875
+    ],
+    "Magic Jammer": [
+      268147,
+      86.75
+    ],
+    "Magic Thorn": [
+      24785,
+      18.125
+    ],
+    "Magic-Arm Shield": [
+      330061,
+      61.75
+    ],
+    "Magical Dimension": [
+      6000,
+      1
+    ],
+    "Magical Hats": [
+      65202,
+      28.75
+    ],
+    "Magical Trick Mirror": [
+      1507,
+      2
+    ],
+    "Makiu": [
+      1900,
+      2
+    ],
+    "Malevolent Catastrophe": [
+      6000,
+      1
+    ],
+    "Malevolent Nuzzler": [
+      20168,
+      16.5
+    ],
+    "Malfunction": [
+      409,
+      1
+    ],
+    "Mask of Brutality": [
+      19211,
+      12.25
+    ],
+    "Mask of Dispel": [
+      5324,
+      12.5
+    ],
+    "Mask of Restrict": [
+      11773,
+      9.125
+    ],
+    "Mask of the Accursed": [
+      486,
+      1.125
+    ],
+    "Mask of Weakness": [
+      57404,
+      12.875
+    ],
+    "Megamorph": [
+      162160,
+      69.125
+    ],
+    "Mesmeric Control": [
+      270,
+      0.75
+    ],
+    "Messenger of Peace": [
+      1754,
+      3.25
+    ],
+    "Metal Reflect Slime": [
+      22335,
+      13
+    ],
+    "Metalmorph": [
+      155171,
+      84.5
+    ],
+    "Metamorphosis": [
+      4488,
+      2
+    ],
+    "Meteor of Destruction": [
+      2136,
+      7
+    ],
+    "Meteorain": [
+      719,
+      2
+    ],
+    "Michizure": [
+      83713,
+      26.75
+    ],
+    "Micro Ray": [
+      466,
+      1
+    ],
+    "Mind Control": [
+      46444,
+      9
+    ],
+    "Minor Goblin Official": [
+      13335,
+      7.375
+    ],
+    "Miracle Fusion": [
+      3924,
+      3
+    ],
+    "Mirage Tube": [
+      2046,
+      5
+    ],
+    "Mirror Force": [
+      956904,
+      187.375
+    ],
+    "Mirror Gate": [
+      7678,
+      2
+    ],
+    "Mirror Wall": [
+      0,
+      16.75
+    ],
+    "Mischief of the Time Goddess": [
+      736,
+      1
+    ],
+    "Misfortune": [
+      771,
+      4
+    ],
+    "Molten Destruction": [
+      3246,
+      8.5
+    ],
+    "Monster Gate": [
+      2237,
+      2
+    ],
+    "Monster Reborn": [
+      1110239,
+      358.125
+    ],
+    "Monster Recovery": [
+      16085,
+      6
+    ],
+    "Mountain": [
+      8136,
+      13.125
+    ],
+    "Multiplication of Ants": [
+      838,
+      1
+    ],
+    "Multiply": [
+      1483,
+      1.25
+    ],
+    "Mystic Box": [
+      10090,
+      4.875
+    ],
+    "Mystic Plasma Zone": [
+      8368,
+      9.25
+    ],
+    "Mystical Moon": [
+      6,
+      0.125
+    ],
+    "Mystical Space Typhoon": [
+      402804,
+      252.75
+    ],
+    "Mystik Wok": [
+      3604,
+      4
+    ],
+    "Natural Disaster": [
+      2782,
+      1
+    ],
+    "Necrovalley": [
+      2287,
+      1
+    ],
+    "Negate Attack": [
+      188648,
+      79.5
+    ],
+    "Nightmare Wheel": [
+      8471,
+      6
+    ],
+    "Nightmare\u0027s Steelcage": [
+      16860,
+      29.625
+    ],
+    "No Entry!!": [
+      1014,
+      2
+    ],
+    "Nobleman of Crossout": [
+      96993,
+      46.875
+    ],
+    "Nobleman of Extermination": [
+      29135,
+      20.875
+    ],
+    "Numinous Healer": [
+      24353,
+      37.625
+    ],
+    "O - Oversoul": [
+      1554,
+      1
+    ],
+    "Offerings to the Doomed": [
+      121448,
+      38.875
+    ],
+    "Ojama Trio": [
+      275,
+      1
+    ],
+    "Ookazi": [
+      3011,
+      15.375
+    ],
+    "Over Destiny": [
+      9840,
+      4
+    ],
+    "Over Limit": [
+      6535,
+      2
+    ],
+    "Painful Choice": [
+      18652,
+      11.25
+    ],
+    "Paralyzing Potion": [
+      79,
+      0.75
+    ],
+    "Polymerization": [
+      53629,
+      15.625
+    ],
+    "Pot of Avarice": [
+      695,
+      1
+    ],
+    "Pot of Greed": [
+      546867,
+      355.125
+    ],
+    "Power Bond": [
+      1380,
+      1
+    ],
+    "Power of Kaishin": [
+      1427,
+      2
+    ],
+    "Power Wall": [
+      9,
+      1
+    ],
+    "Premature Burial": [
+      337503,
+      110.625
+    ],
+    "Prima Light": [
+      904,
+      2
+    ],
+    "Prohibition": [
+      1262,
+      2.875
+    ],
+    "Question": [
+      5335,
+      6
+    ],
+    "Quick Summon": [
+      695,
+      1
+    ],
+    "R - Righteous Justice": [
+      442,
+      1
+    ],
+    "Raigeki": [
+      634249,
+      169.125
+    ],
+    "Raimei": [
+      2874,
+      1.625
+    ],
+    "Rain of Mercy": [
+      6015,
+      3.875
+    ],
+    "Rainbow Life": [
+      913,
+      3
+    ],
+    "Raise Body Heat": [
+      336,
+      0.25
+    ],
+    "Rare Metalmorph": [
+      612,
+      2
+    ],
+    "Rebellion": [
+      35135,
+      8
+    ],
+    "Red Medicine": [
+      -53,
+      1.5
+    ],
+    "Reinforcement of the Army": [
+      696,
+      1
+    ],
+    "Reinforcements": [
+      41283,
+      28
+    ],
+    "Relay Soul": [
+      6039,
+      5
+    ],
+    "Relieve Monster": [
+      1693,
+      3
+    ],
+    "Reload": [
+      21436,
+      17
+    ],
+    "Remove Trap": [
+      1074,
+      2.25
+    ],
+    "Respect Play": [
+      13155,
+      13.125
+    ],
+    "Restructer Revolution": [
+      5694,
+      15
+    ],
+    "Reversal Quiz": [
+      5569,
+      1
+    ],
+    "Reverse Trap": [
+      18947,
+      7.125
+    ],
+    "Ring of Defense": [
+      913,
+      1
+    ],
+    "Ring of Destruction": [
+      600393,
+      163
+    ],
+    "Ring of Magnetism": [
+      84,
+      0.25
+    ],
+    "Riryoku": [
+      1167,
+      2.625
+    ],
+    "Riryoku Field": [
+      2116,
+      1.375
+    ],
+    "Rising Air Current": [
+      9603,
+      12.125
+    ],
+    "Rite of Spirit": [
+      1493,
+      1
+    ],
+    "Rivalry of Warlords": [
+      14466,
+      7
+    ],
+    "Robbin\u0027 Goblin": [
+      53473,
+      45
+    ],
+    "Rope of Life": [
+      4314,
+      2
+    ],
+    "Roulette Spider": [
+      2324,
+      2
+    ],
+    "Royal Command": [
+      6693,
+      8
+    ],
+    "Royal Decree": [
+      29178,
+      18
+    ],
+    "Royal Tribute": [
+      1390,
+      1
+    ],
+    "Rush Recklessly": [
+      33250,
+      17.5
+    ],
+    "Sakuretsu Armor": [
+      25070,
+      6
+    ],
+    "Salamandra": [
+      1378,
+      3.25
+    ],
+    "Salvage": [
+      2084,
+      3
+    ],
+    "Scapegoat": [
+      407405,
+      160.375
+    ],
+    "Scroll of Bewitchment": [
+      51,
+      0.25
+    ],
+    "Seal of the Ancients": [
+      200,
+      0.125
+    ],
+    "Sebek\u0027s Blessing": [
+      10187,
+      11.5
+    ],
+    "Seven Tools of the Bandit": [
+      78348,
+      22.125
+    ],
+    "Shadow of Eyes": [
+      1402,
+      0.75
+    ],
+    "Share the Pain": [
+      59528,
+      23.625
+    ],
+    "Shield \u0026 Sword": [
+      89086,
+      35.875
+    ],
+    "Shield Crush": [
+      7909,
+      5
+    ],
+    "Shift": [
+      9970,
+      3.375
+    ],
+    "Shrink": [
+      11479,
+      10
+    ],
+    "Silent Doom": [
+      5694,
+      4
+    ],
+    "Silver Bow and Arrow": [
+      607,
+      1.25
+    ],
+    "Skill Drain": [
+      348,
+      1
+    ],
+    "Skull Dice": [
+      76708,
+      144.875
+    ],
+    "Skull Invitation": [
+      23494,
+      20
+    ],
+    "Skull Lair": [
+      13966,
+      11.375
+    ],
+    "Slash Draw": [
+      1952,
+      1
+    ],
+    "Snake Fang": [
+      2892,
+      2.625
+    ],
+    "Snatch Steal": [
+      614522,
+      120.125
+    ],
+    "Sogen": [
+      9493,
+      16.875
+    ],
+    "Solemn Judgment": [
+      43265,
+      15
+    ],
+    "Solemn Wishes": [
+      57633,
+      54.375
+    ],
+    "Solomon\u0027s Lawbook": [
+      4865,
+      3.375
+    ],
+    "Soul Charge": [
+      2579,
+      2
+    ],
+    "Soul Demolition": [
+      1714,
+      1
+    ],
+    "Soul of the Pure": [
+      907,
+      5.25
+    ],
+    "Soul Release": [
+      78,
+      0.25
+    ],
+    "Soul Resurrection": [
+      6221,
+      7
+    ],
+    "Soul Taker": [
+      15919,
+      7
+    ],
+    "Sparks": [
+      372,
+      0.75
+    ],
+    "Special Hurricane": [
+      432,
+      1
+    ],
+    "Spell Shield Type-8": [
+      205,
+      1
+    ],
+    "Spellbinding Circle": [
+      82833,
+      81.875
+    ],
+    "Spiritual Water Art - Aoi": [
+      667,
+      1
+    ],
+    "Spiritualism": [
+      13178,
+      5.625
+    ],
+    "Stamping Destruction": [
+      396,
+      1
+    ],
+    "Staunch Defender": [
+      3991,
+      1
+    ],
+    "Steel Shell": [
+      12450,
+      9.875
+    ],
+    "Stim-Pack": [
+      24741,
+      19.875
+    ],
+    "Stop Defense": [
+      8724,
+      4
+    ],
+    "Stray Lambs": [
+      1603,
+      3
+    ],
+    "Stronghold the Moving Fortress": [
+      7238,
+      7
+    ],
+    "Subspace Battle": [
+      5779,
+      2
+    ],
+    "Summon Dice": [
+      1507,
+      1
+    ],
+    "Super Junior Confrontation": [
+      1443,
+      2
+    ],
+    "Swing of Memories": [
+      2721,
+      3
+    ],
+    "Sword of Dark Destruction": [
+      5483,
+      6.75
+    ],
+    "Sword of Deep-Seated": [
+      50586,
+      32
+    ],
+    "Sword of Dragon\u0027s Soul": [
+      3723,
+      4.375
+    ],
+    "Swords of Revealing Light": [
+      42951,
+      53.75
+    ],
+    "Tailor of the Fickle": [
+      12296,
+      4.5
+    ],
+    "Taunt": [
+      1096,
+      1
+    ],
+    "The A. Forces": [
+      2225,
+      1
+    ],
+    "The Dark Door": [
+      7864,
+      21.5
+    ],
+    "The Emperor\u0027s Holiday": [
+      32084,
+      18.5
+    ],
+    "The Eye of Truth": [
+      9408,
+      8.875
+    ],
+    "The First Sarcophagus": [
+      1043,
+      1
+    ],
+    "The Flute of Summoning Dragon": [
+      10714,
+      3
+    ],
+    "The Forceful Sentry": [
+      57476,
+      39.375
+    ],
+    "The Grave of Enkindling": [
+      699,
+      2
+    ],
+    "The Regulation of Tribe": [
+      26016,
+      20.25
+    ],
+    "The Reliable Guardian": [
+      16458,
+      5.125
+    ],
+    "The Seal of Orichalcos": [
+      1489,
+      2
+    ],
+    "The Shallow Grave": [
+      4993,
+      4.625
+    ],
+    "Thousand Knives": [
+      10910,
+      4
+    ],
+    "Threatening Roar": [
+      13549,
+      9
+    ],
+    "Time Machine": [
+      38798,
+      18
+    ],
+    "Time Seal": [
+      23663,
+      23.125
+    ],
+    "Toll": [
+      3778,
+      10.375
+    ],
+    "Toon Briefcase": [
+      4243,
+      2
+    ],
+    "Toon Table of Contents": [
+      309,
+      1
+    ],
+    "Toon World": [
+      1452,
+      2.5
+    ],
+    "Tornado Wall": [
+      1897,
+      15.75
+    ],
+    "Torrential Tribute": [
+      184048,
+      50
+    ],
+    "Trap Hole": [
+      696951,
+      204.5
+    ],
+    "Tremendous Fire": [
+      293,
+      9.5
+    ],
+    "Tribute to The Doomed": [
+      154141,
+      53.375
+    ],
+    "Two-Pronged Attack": [
+      51606,
+      31.75
+    ],
+    "Type Zero Magic Crusher": [
+      15040,
+      9.125
+    ],
+    "Tyrant Wing": [
+      6000,
+      1
+    ],
+    "Ultimate Offering": [
+      8599,
+      8.75
+    ],
+    "Umi": [
+      38600,
+      48.625
+    ],
+    "Umiiruka": [
+      7268,
+      12.875
+    ],
+    "United We Stand": [
+      205603,
+      131.375
+    ],
+    "Upstart Goblin": [
+      39112,
+      44.125
+    ],
+    "Vengeful Bog Spirit": [
+      3765,
+      10.375
+    ],
+    "Venom Swamp": [
+      591,
+      1
+    ],
+    "Vicious Claw": [
+      351,
+      1
+    ],
+    "Vile Germs": [
+      122,
+      0.625
+    ],
+    "Violet Crystal": [
+      6,
+      0.125
+    ],
+    "Virus Cannon": [
+      6000,
+      1
+    ],
+    "Waboku": [
+      61337,
+      47.375
+    ],
+    "Wasteland": [
+      7202,
+      13.5
+    ],
+    "Water of Life": [
+      1599,
+      1
+    ],
+    "White Hole": [
+      2316,
+      0.5
+    ],
+    "Wicked-Breaking Flamberge - Baou": [
+      1001,
+      1
+    ],
+    "Widespread Ruin": [
+      53615,
+      10.625
+    ],
+    "Windstorm of Etaqua": [
+      45599,
+      19.875
+    ],
+    "Yami": [
+      28369,
+      38.625
+    ],
+    "Zero Gravity": [
+      4867,
+      3
+    ],
+    "Zoma the Spirit": [
+      15580,
+      11
+    ]
+  }
+}

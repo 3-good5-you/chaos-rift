@@ -1,0 +1,670 @@
+{
+ "_derived_from": "yugi_pc.exe. Live tracing of every engine/AI function while a CPU duel was played (tools/poc_trace.py + data/duel_logs/yugi_duel_c_779_traced.txt) located the CPU-only code; Ghidra decompile (yugi_ai*.c) gives the logic. 'conf': seen = confirmed in trace/decompile, inferred = reading of the code not checked in play.",
+ "model": "Rule-based script, no search or lookahead. Each CPU turn walks 7 fixed stages; each stage repeatedly issues one command and returns 'not done' until it has nothing left, then the next stage runs. Choices come from hard-coded priority lists with per-card conditions plus a 'simulate the board and score it' helper for monster plays.",
+ "entry": {
+  "addr": "0x579210",
+  "what": "stage runner: calls stage[DAT_00a094f1] from the table at 0x5a33ac; a stage returning nonzero advances the index and clears the per-stage scratch bytes 0xa094f2..0xa094fa"
+ },
+ "stages": [
+  {
+   "i": 0,
+   "addr": "0x577870",
+   "what": "turn start: clears AI scratch, issues Main Phase 1 (op 0x52); if 0x579270 says nothing to do, jumps to the end",
+   "conf": "seen"
+  },
+  {
+   "i": 1,
+   "addr": "0x577cd0",
+   "what": "use cards from the 'first' list (0x594420): heal, burn, and spell/trap removal. Each card has a condition, e.g. burn/Ookazi only when the opponent is under ~1000 LP or the AI is ahead by 500 LP, removal only when the opponent has a set/face-up Spell or Trap. A matching card already Set is flipped (op 0x91); one in hand is activated or Set (op 0xc5).",
+   "conf": "seen (decompile), conditions inferred"
+  },
+  {
+   "i": 2,
+   "addr": "0x578570",
+   "what": "Main Phase plan (sub-state 0xa094fa): 0 summon a monster, 2 activate face-up monster effects (list 0x5a33a0), 3 special combo step, 4 spell planner 0x576740, 10 normal summon/set from hand via 0x577090",
+   "conf": "seen"
+  },
+  {
+   "i": 3,
+   "addr": "0x578bc0",
+   "what": "for each of its 5 monster zones: decide Attack/Defense position and flip face-down monsters, using the comparator 0x5777c0 against the opponent's strongest monster",
+   "conf": "seen"
+  },
+  {
+   "i": 4,
+   "addr": "0x5791a0",
+   "what": "Battle Phase: if any monster can attack (0x567a80) and 0x574c90 finds a profitable attack, enter battle and run the attack executor 0x56b550",
+   "conf": "seen"
+  },
+  {
+   "i": 5,
+   "addr": "0x578570",
+   "what": "Main Phase 2: same planner again",
+   "conf": "seen"
+  },
+  {
+   "i": 6,
+   "addr": "0x5778e0",
+   "what": "end of turn: Set Spell/Trap cards from hand (op 0xc5). Traps are always set; Spells are set only when useful as a set card, and some only when the opponent has a target (e.g. 0x3fb/0x3fe/0x402 check the opponent's field)",
+   "conf": "seen (decompile)"
+  }
+ ],
+ "monster_choice": {
+  "normal_summon": "0x577090 checks fixed priorities first: Sangan/Witch/Mystic Tomato in 'searcher' mode, then Man-Eater Bug, Hane-Hane and similar flip monsters when the opponent has monsters. Otherwise it picks the monster with the highest relevant stat (ATK if ATK > DEF, else DEF) that at least matches the opponent's best monster, then any level 1-4 monster.",
+  "tribute_summon": "0x574cc0 / 0x574f60 try each hand monster on a copy of the board, score the result with 0x574b80 and keep the best. Ties are broken by how many opponent monsters it out-classes.",
+  "tribute_pick": "0x572fc0: first a monster marked as tribute fodder by an effect (0x403 check), then Sangan, then Witch of the Black Forest, then the lowest DEF + 2*ATK. Some ids are never tributed in specific field states (0xa07470).",
+  "position": "0x5777c0(ATK, DEF) of the CPU monster vs oppBest = the opponent's highest ATK on the field. Returns 1 = Defense/face-down when: DEF > ATK and DEF > 1500 and DEF is at least the CPU's best ATK/DEF on the field; or ATK >= DEF but oppBest beats ATK by 1000 or more. Returns -1 (weaker than oppBest by under 1000, or DEF > ATK while the opponent has monsters) and 0 (no threat): the caller then plays it face-up in Attack. If the opponent has no monsters and the CPU field is full enough, always 0.",
+  "conf": "seen (decompile), thresholds read from code",
+  "board_score": {
+   "addr": "0x574b80 (+0x574840, 0x574640, 0x574550)",
+   "formula": "On a saved copy of the board (0x5749d0/0x5749f0 save/restore), simulate the CPU's whole Battle Phase: attackers sorted by ATK ascending (except ids 0x226/0x2e8/0x2f9); each attacks directly if it can (score += ATK), else picks the target it beats with the largest margin (ties -> higher-DEF target). Attack-position target: damage = ATK - target ATK, target removed; defense target: removed if ATK > DEF, no damage. Score = total damage; it also counts monsters destroyed per side (bits of 0xa0b088) for tie-breaks.",
+   "quirk": "a face-down defender's DEF is estimated as DEF * (turn + 5) / 20 while turn < 15 (turn = (0xa07470 >> 1) & 0x1f), so the CPU underestimates set monsters early in the duel",
+   "conf": "seen in code"
+  }
+ },
+ "randomness": {
+  "where": "0x5760d0 (spell activation): 'skip this activation' roll with CRT rand(): 1 in 8 normally, or 3 in 4 when AI flag bit0 is set, only while the opponent controls the card 0x405 (Magic Jammer)",
+  "note": "the rest of the AI is deterministic for a given board. Card draws use the shuffle seeded by op 0x60",
+  "conf": "seen in code; meaning of the condition inferred"
+ },
+ "ai_flags": {
+  "addr": "0xa0e924 (u16, cleared at duel start 0x531b20, set through a struct copy; writer not found)",
+  "bit0": "cautious/handicapped spell use (see randomness)",
+  "bit9 (0x200)": "'searcher' mode: plays and tributes Sangan / Witch of the Black Forest / Mystic Tomato first",
+  "conf": "inferred",
+  "observed": "hardware write-watch over 4 normal duel starts (tools/poc_watch.py): 0xa0e924 only ever written 0 (reset 0x531b20), 0xa0b08c only 0 (cleared every CPU turn by stage 0 via 0x536650 over 0xa09500..0xa0b090)",
+  "conclusion": "normal CPU duels always run with flags 0 and no combo script; the flag bits and the 9 deck combo scripts belong to scripted modes (tutorial / demo / Kaiba trials) - inferred, the setter for those modes was not caught"
+ },
+ "lists": {
+  "stage1_first_use (0x594420)": [
+   {
+    "id": 337,
+    "name": "Mooyan Curry"
+   },
+   {
+    "id": 338,
+    "name": "Red Medicine"
+   },
+   {
+    "id": 339,
+    "name": "Goblin's Secret Remedy"
+   },
+   {
+    "id": 340,
+    "name": "Soul of the Pure"
+   },
+   {
+    "id": 341,
+    "name": "Dian Keto the Cure Master"
+   },
+   {
+    "id": 1006,
+    "name": "Blue Medicine"
+   },
+   {
+    "id": 346,
+    "name": "Tremendous Fire"
+   },
+   {
+    "id": 345,
+    "name": "Ookazi"
+   },
+   {
+    "id": 344,
+    "name": "Final Flame"
+   },
+   {
+    "id": 342,
+    "name": "Sparks"
+   },
+   {
+    "id": 343,
+    "name": "Hinotama"
+   },
+   {
+    "id": 1007,
+    "name": "Raimei"
+   },
+   {
+    "id": 1009,
+    "name": "De-Spell"
+   },
+   {
+    "id": 1004,
+    "name": "Remove Trap"
+   },
+   {
+    "id": 1079,
+    "name": "Mystical Space Typhoon"
+   },
+   {
+    "id": 671,
+    "name": "Harpie's Feather Duster"
+   },
+   {
+    "id": 1080,
+    "name": "Giant Trunade"
+   },
+   {
+    "id": 1061,
+    "name": "Heavy Storm"
+   },
+   {
+    "id": 1063,
+    "name": "Gravekeeper's Servant"
+   },
+   {
+    "id": 1071,
+    "name": "Delinquent Duo"
+   }
+  ],
+  "spell_activation_order (0x594368)": [
+   {
+    "id": 1010,
+    "name": "Pot of Greed"
+   },
+   {
+    "id": 968,
+    "name": "Graceful Charity"
+   },
+   {
+    "id": 1040,
+    "name": "Fusion Sage"
+   },
+   {
+    "id": 1065,
+    "name": "Upstart Goblin"
+   },
+   {
+    "id": 349,
+    "name": "Dark-Piercing Light"
+   },
+   {
+    "id": 329,
+    "name": "Forest"
+   },
+   {
+    "id": 330,
+    "name": "Wasteland"
+   },
+   {
+    "id": 331,
+    "name": "Mountain"
+   },
+   {
+    "id": 332,
+    "name": "Sogen"
+   },
+   {
+    "id": 333,
+    "name": "Umi"
+   },
+   {
+    "id": 334,
+    "name": "Yami"
+   },
+   {
+    "id": 1069,
+    "name": "Chorus of Sanctuary"
+   },
+   {
+    "id": 1125,
+    "name": "Gaia Power"
+   },
+   {
+    "id": 1126,
+    "name": "Umiiruka"
+   },
+   {
+    "id": 1127,
+    "name": "Molten Destruction"
+   },
+   {
+    "id": 1128,
+    "name": "Rising Air Current"
+   },
+   {
+    "id": 1129,
+    "name": "Luminous Spark"
+   },
+   {
+    "id": 1130,
+    "name": "Mystic Plasma Zone"
+   },
+   {
+    "id": 337,
+    "name": "Mooyan Curry"
+   },
+   {
+    "id": 338,
+    "name": "Red Medicine"
+   },
+   {
+    "id": 339,
+    "name": "Goblin's Secret Remedy"
+   },
+   {
+    "id": 340,
+    "name": "Soul of the Pure"
+   },
+   {
+    "id": 341,
+    "name": "Dian Keto the Cure Master"
+   },
+   {
+    "id": 1006,
+    "name": "Blue Medicine"
+   },
+   {
+    "id": 345,
+    "name": "Ookazi"
+   },
+   {
+    "id": 344,
+    "name": "Final Flame"
+   },
+   {
+    "id": 342,
+    "name": "Sparks"
+   },
+   {
+    "id": 343,
+    "name": "Hinotama"
+   },
+   {
+    "id": 1007,
+    "name": "Raimei"
+   },
+   {
+    "id": 347,
+    "name": "Swords of Revealing Light"
+   },
+   {
+    "id": 1230,
+    "name": "Nightmare's Steelcage"
+   },
+   {
+    "id": 1063,
+    "name": "Gravekeeper's Servant"
+   },
+   {
+    "id": 1071,
+    "name": "Delinquent Duo"
+   },
+   {
+    "id": 1078,
+    "name": "Chain Energy"
+   },
+   {
+    "id": 1003,
+    "name": "Polymerization"
+   },
+   {
+    "id": 1034,
+    "name": "Polymerization"
+   },
+   {
+    "id": 672,
+    "name": "War-Lion Ritual"
+   },
+   {
+    "id": 670,
+    "name": "Zera Ritual"
+   },
+   {
+    "id": 669,
+    "name": "Black Luster Ritual"
+   },
+   {
+    "id": 673,
+    "name": "Beastly Mirror Ritual"
+   },
+   {
+    "id": 675,
+    "name": "Commencement Dance"
+   },
+   {
+    "id": 676,
+    "name": "Hamburger Recipe"
+   },
+   {
+    "id": 678,
+    "name": "Novox's Prayer"
+   },
+   {
+    "id": 693,
+    "name": "Resurrection of Chakra"
+   },
+   {
+    "id": 691,
+    "name": "Turtle Oath"
+   },
+   {
+    "id": 696,
+    "name": "Garma Sword Oath"
+   },
+   {
+    "id": 695,
+    "name": "Javelin Beetle Pact"
+   },
+   {
+    "id": 699,
+    "name": "Fortress Whale's Oath"
+   },
+   {
+    "id": 698,
+    "name": "Revival of Dokurorider"
+   },
+   {
+    "id": 720,
+    "name": "Dark Magic Ritual"
+   },
+   {
+    "id": 958,
+    "name": "Black Illusion Ritual"
+   },
+   {
+    "id": 1426,
+    "name": "Jam Breeding Machine"
+   },
+   {
+    "id": 1427,
+    "name": "Infinite Cards"
+   }
+  ],
+  "equip_order_when_monster_on_field (0x5943d8)": [
+   {
+    "id": 300,
+    "name": "Legendary Sword"
+   },
+   {
+    "id": 301,
+    "name": "Sword of Dark Destruction"
+   },
+   {
+    "id": 302,
+    "name": "Dark Energy"
+   },
+   {
+    "id": 303,
+    "name": "Axe of Despair"
+   },
+   {
+    "id": 304,
+    "name": "Laser Cannon Armor"
+   },
+   {
+    "id": 305,
+    "name": "Insect Armor with Laser Cannon"
+   },
+   {
+    "id": 306,
+    "name": "Elf's Light"
+   },
+   {
+    "id": 307,
+    "name": "Beast Fangs"
+   },
+   {
+    "id": 308,
+    "name": "Steel Shell"
+   },
+   {
+    "id": 309,
+    "name": "Vile Germs"
+   },
+   {
+    "id": 310,
+    "name": "Black Pendant"
+   },
+   {
+    "id": 311,
+    "name": "Silver Bow and Arrow"
+   },
+   {
+    "id": 312,
+    "name": "Horn of Light"
+   },
+   {
+    "id": 313,
+    "name": "Horn of the Unicorn"
+   },
+   {
+    "id": 314,
+    "name": "Dragon Treasure"
+   },
+   {
+    "id": 315,
+    "name": "Electro-Whip"
+   },
+   {
+    "id": 316,
+    "name": "Cyber Shield"
+   },
+   {
+    "id": 318,
+    "name": "Mystical Moon"
+   },
+   {
+    "id": 320,
+    "name": "Malevolent Nuzzler"
+   },
+   {
+    "id": 321,
+    "name": "Violet Crystal"
+   },
+   {
+    "id": 322,
+    "name": "Book of Secret Arts"
+   },
+   {
+    "id": 323,
+    "name": "Invigoration"
+   },
+   {
+    "id": 324,
+    "name": "Machine Conversion Factory"
+   },
+   {
+    "id": 325,
+    "name": "Raise Body Heat"
+   },
+   {
+    "id": 326,
+    "name": "Follow Wind"
+   },
+   {
+    "id": 327,
+    "name": "Power of Kaishin"
+   },
+   {
+    "id": 651,
+    "name": "Magical Labyrinth"
+   },
+   {
+    "id": 653,
+    "name": "Salamandra"
+   },
+   {
+    "id": 667,
+    "name": "Bright Castle"
+   },
+   {
+    "id": 1012,
+    "name": "Burning Spear"
+   },
+   {
+    "id": 1013,
+    "name": "Gust Fan"
+   },
+   {
+    "id": 1042,
+    "name": "Sword of Deep-Seated"
+   },
+   {
+    "id": 1182,
+    "name": "Sword of Dragon's Soul"
+   },
+   {
+    "id": 1203,
+    "name": "Graceful Dice"
+   },
+   {
+    "id": 1420,
+    "name": "Mask of Brutality"
+   }
+  ],
+  "monster_effects_to_activate (0x5a33a0)": [
+   {
+    "id": 15,
+    "name": "Time Wizard"
+   },
+   {
+    "id": 511,
+    "name": "Cannon Soldier"
+   },
+   {
+    "id": 730,
+    "name": "Relinquished"
+   },
+   {
+    "id": 1334,
+    "name": "Thousand-Eyes Restrict"
+   },
+   {
+    "id": 742,
+    "name": "Barrel Dragon"
+   }
+  ],
+  "high_value_targets (0x5a3350, used by target picker 0x573b40)": [
+   {
+    "id": 336,
+    "name": "Raigeki"
+   },
+   {
+    "id": 335,
+    "name": "Dark Hole"
+   },
+   {
+    "id": 1027,
+    "name": "Change of Heart"
+   },
+   {
+    "id": 1010,
+    "name": "Pot of Greed"
+   },
+   {
+    "id": 671,
+    "name": "Harpie's Feather Duster"
+   },
+   {
+    "id": 1008,
+    "name": "Monster Reborn"
+   },
+   {
+    "id": 1068,
+    "name": "Snatch Steal"
+   },
+   {
+    "id": 968,
+    "name": "Graceful Charity"
+   },
+   {
+    "id": 1056,
+    "name": "Mirror Force"
+   },
+   {
+    "id": 1029,
+    "name": "Magic Jammer"
+   },
+   {
+    "id": 1030,
+    "name": "Seven Tools of the Bandit"
+   },
+   {
+    "id": 347,
+    "name": "Swords of Revealing Light"
+   },
+   {
+    "id": 1061,
+    "name": "Heavy Storm"
+   }
+  ]
+ },
+ "not_yet_decoded": [
+  "setter of the AI flags / strategy byte in scripted modes, and the card logic of the 9 combo scripts (only matter for tutorial/demo/trial duels)"
+ ],
+ "deck_combo_scripts": {
+  "dispatcher": "0x57a440 (not a Ghidra function; switch at 0x57a455, table 0x57a4c4)",
+  "selector": "(DAT_00a0b08c >> 1) & 0x7f, values 0..8 = strategy of the CPU's deck; writer not found yet (likely loaded with the deck)",
+  "routines": {
+   "0": "0x579280",
+   "1": "0x5795c0",
+   "2": "0x5799a0",
+   "3": "0x579b80",
+   "4": "0x579d90",
+   "5": "0x579270 (no-op)",
+   "6": "0x579e60",
+   "7": "0x57a040",
+   "8": "0x57a220"
+  },
+  "what": "deck-specific combo plans (e.g. specific card pairs activated in order via 0x5760d0/0x572820); they then hand over to the normal 7-stage script (sets stage index 1)",
+  "conf": "seen in code; none fired in the traced duel; per-routine card logic not decoded yet",
+  "used_in": "not in normal duels (see ai_flags.observed); scripted modes only (inferred)"
+ },
+ "responses": {
+  "where": "response-window state machine 0x55f890 (state DAT_00a0c714). When the CPU is asked (state bit 0x1000), it jumps to state 200 (or state 100 = forward the question to a link-play opponent, message 0xf051, when DAT_00a0e920 byte1 bit0 is set).",
+  "rule": "state 200 scans the CPU's Spell/Trap zones 5..9 in order and activates the FIRST face-down card that (a) has spell speed >= 2 (Trap 2, Counter Trap 3, Quick-Play 2; 0x5484f0), (b) is legal now (0x55f170 -> card condition check 0x5485a0), and (c) passes the per-card approval 0x575100. Then state 201 flips it (op 0x91) and puts it on the chain. If none qualifies, it passes.",
+  "seen_in_play": [
+   "duel A: Trap Hole on the human's summon",
+   "duel B: Spellbinding Circle on the human's attack declaration",
+   "duel B: Kuriboh discarded from hand during battle damage (separate hand-trap path)",
+   "duel C: none (CPU held no qualifying card)"
+  ],
+  "approval_rules (0x575100)": {
+   "always": [
+    "Trap Hole",
+    "Mesmeric Control",
+    "Magic-Arm Shield",
+    "Negate Attack",
+    "Widespread Ruin",
+    "House of Adhesive Tape",
+    "Eatgaboon",
+    "Enchanted Javelin",
+    "Mirror Wall",
+    "Call Of The Haunted",
+    "Gravity Bind",
+    "Numinous Healer",
+    "Appropriate",
+    "Backup Soldier",
+    "Light of Intervention",
+    "Graceful Dice",
+    "Skull Dice",
+    "Gamble",
+    "Attack and Receive",
+    "Shadow of Eyes",
+    "Mask of Weakness",
+    "Tornado Wall",
+    "Fairy Box",
+    "Jar of Greed",
+    "Destiny Board",
+    "Blind Destruction"
+   ],
+   "Two-Pronged Attack": "only if the human has a face-up monster stronger than the CPU's best ATK/DEF",
+   "Spellbinding Circle": "on the human's turn, when the attacking monster is the human's strongest, or if the CPU already has one",
+   "Ring of Destruction": "if the target's ATK would finish the human (ATK > human LP) while the CPU survives it",
+   "Reinforcements": "when its battle would be lost by under 500 points and +500 turns it",
+   "Just Desserts": "if 500 x human monsters >= human LP (lethal), else random: rand()%3+1 < human monster count",
+   "Magic Thorn": "if the CPU holds Card Destruction or Delinquent Duo",
+   "Mirror Force / Waboku": "if the attack would deal damage >= CPU LP, or the CPU has no monsters and the human has 2+, or the attack total would kill / the CPU is behind",
+   "Gift of The Mystical Elf": "if there are 3+ monsters on the field in total",
+   "Ceasefire": "if 500 x effect monsters >= human LP, or the human has 2+ more effect monsters than the CPU",
+   "Aqua Chorus": "if the CPU has a face-up monster with a duplicate",
+   "Magic Cylinder": "if the attacker's ATK >= half of human LP, or >= CPU LP, or would take the CPU below 0, or the human has exactly 1 monster",
+   "Torrential Tribute": "if the human has any monster",
+   "otherwise": "pass"
+  },
+  "lp_addresses": "player 0 LP u16 at 0xa07924, player 1 (CPU) LP at 0xa086bc (= +0xd98)",
+  "conf": "seen in code; three activations matched in recorded duels"
+ }
+}

@@ -1,0 +1,5043 @@
+{
+ "_note": "Build remake/data/effects.json: card effects as the original game implements them. See tools/poc_effects.py for the source of each entry.",
+ "cards": {
+  "329 Forest": {
+   "trig": "field spell",
+   "src": "table",
+   "code": [
+    "0053bf10",
+    "005940f0"
+   ],
+   "does": "monsters of these races gain/lose the value on both ATK and DEF",
+   "values": {
+    "Insect": 200,
+    "Beast": 200,
+    "Beast-Warrior": 200,
+    "Plant": 200
+   }
+  },
+  "330 Wasteland": {
+   "trig": "field spell",
+   "src": "table",
+   "code": [
+    "0053bf10",
+    "005940f0"
+   ],
+   "does": "monsters of these races gain/lose the value on both ATK and DEF",
+   "values": {
+    "Zombie": 200,
+    "Rock": 200,
+    "Dinosaur": 200
+   }
+  },
+  "331 Mountain": {
+   "trig": "field spell",
+   "src": "table",
+   "code": [
+    "0053bf10",
+    "005940f0"
+   ],
+   "does": "monsters of these races gain/lose the value on both ATK and DEF",
+   "values": {
+    "Dragon": 200,
+    "Winged Beast": 200,
+    "Thunder": 200
+   }
+  },
+  "332 Sogen": {
+   "trig": "field spell",
+   "src": "table",
+   "code": [
+    "0053bf10",
+    "005940f0"
+   ],
+   "does": "monsters of these races gain/lose the value on both ATK and DEF",
+   "values": {
+    "Beast-Warrior": 200,
+    "Warrior": 200
+   }
+  },
+  "333 Umi": {
+   "trig": "field spell",
+   "src": "table",
+   "code": [
+    "0053bf10",
+    "005940f0"
+   ],
+   "does": "monsters of these races gain/lose the value on both ATK and DEF",
+   "values": {
+    "Pyro": -200,
+    "Sea Serpent": 200,
+    "Machine": -200,
+    "Fish": 200,
+    "Aqua": 200,
+    "Thunder": 200
+   }
+  },
+  "334 Yami": {
+   "trig": "field spell",
+   "src": "table",
+   "code": [
+    "0053bf10",
+    "005940f0"
+   ],
+   "does": "monsters of these races gain/lose the value on both ATK and DEF",
+   "values": {
+    "Fiend": 200,
+    "Fairy": -200,
+    "Spellcaster": 200
+   }
+  },
+  "300 Legendary Sword": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Warrior only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Warrior",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "301 Sword of Dark Destruction": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped DARK only: ATK +400, DEF -200",
+   "values": {
+    "applies_to": "DARK",
+    "atk": 400,
+    "def": -200
+   }
+  },
+  "302 Dark Energy": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Fiend only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Fiend",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "303 Axe of Despair": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped monster: ATK +1000, DEF +0",
+   "values": {
+    "applies_to": null,
+    "atk": 1000,
+    "def": 0
+   },
+   "quirk": "Axe of Despair: +1000 ATK only (no DEF change)"
+  },
+  "304 Laser Cannon Armor": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Insect only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Insect",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "305 Insect Armor with Laser Cannon": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Insect only: ATK +700, DEF +0",
+   "values": {
+    "applies_to": "Insect",
+    "atk": 700,
+    "def": 0
+   },
+   "quirk": "Insect Armor with Laser Cannon: +700 ATK only, Insects only"
+  },
+  "306 Elf's Light": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped LIGHT only: ATK +400, DEF -200",
+   "values": {
+    "applies_to": "LIGHT",
+    "atk": 400,
+    "def": -200
+   }
+  },
+  "307 Beast Fangs": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Beast only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Beast",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "308 Steel Shell": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped WATER only: ATK +400, DEF -200",
+   "values": {
+    "applies_to": "WATER",
+    "atk": 400,
+    "def": -200
+   }
+  },
+  "309 Vile Germs": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Plant only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Plant",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "310 Black Pendant": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped monster: ATK +500, DEF +0",
+   "values": {
+    "applies_to": null,
+    "atk": 500,
+    "def": 0
+   },
+   "quirk": "Black Pendant: +500 ATK (its 500-damage-when-sent-to-Graveyard part is handled elsewhere)"
+  },
+  "311 Silver Bow and Arrow": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Fairy only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Fairy",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "312 Horn of Light": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped monster: ATK +0, DEF +800",
+   "values": {
+    "applies_to": null,
+    "atk": 0,
+    "def": 800
+   },
+   "quirk": "Horn of Light: +800 DEF only"
+  },
+  "313 Horn of the Unicorn": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped monster: ATK +700, DEF +700",
+   "values": {
+    "applies_to": null,
+    "atk": 700,
+    "def": 700
+   }
+  },
+  "314 Dragon Treasure": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Dragon only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Dragon",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "315 Electro-Whip": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Thunder only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Thunder",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "318 Mystical Moon": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Beast-Warrior only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Beast-Warrior",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "320 Malevolent Nuzzler": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped monster: ATK +700, DEF +0",
+   "values": {
+    "applies_to": null,
+    "atk": 700,
+    "def": 0
+   },
+   "quirk": "Malevolent Nuzzler: +700 ATK only"
+  },
+  "321 Violet Crystal": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Zombie only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Zombie",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "322 Book of Secret Arts": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Spellcaster only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Spellcaster",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "323 Invigoration": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped EARTH only: ATK +400, DEF -200",
+   "values": {
+    "applies_to": "EARTH",
+    "atk": 400,
+    "def": -200
+   }
+  },
+  "324 Machine Conversion Factory": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Machine only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Machine",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "325 Raise Body Heat": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Dinosaur only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Dinosaur",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "326 Follow Wind": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Winged Beast only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Winged Beast",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "327 Power of Kaishin": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "equipped Aqua only: ATK +300, DEF +300",
+   "values": {
+    "applies_to": "Aqua",
+    "atk": 300,
+    "def": 300
+   }
+  },
+  "316 Cyber Shield": {
+   "trig": "equip spell",
+   "src": "code",
+   "code": [
+    "0053bf10"
+   ],
+   "does": "Cyber Shield: +500 ATK, only on Harpie Lady / Harpie Lady Sisters / Cyber Harpie (ids 0x3d, 0x3e, 0x4e1)",
+   "values": {
+    "applies_to": "Harpie Lady / Harpie Lady Sisters / Cyber Harpie",
+    "atk": 500,
+    "def": 0
+   }
+  },
+  "491 Hoshiningen": {
+   "trig": "continuous (monster)",
+   "src": "table",
+   "code": [
+    "rule_tables.json attribute_boosts"
+   ],
+   "does": "all face-up monsters of these attributes gain/lose ATK",
+   "values": {
+    "LIGHT": 500,
+    "DARK": -400
+   }
+  },
+  "627 Witch's Apprentice": {
+   "trig": "continuous (monster)",
+   "src": "table",
+   "code": [
+    "rule_tables.json attribute_boosts"
+   ],
+   "does": "all face-up monsters of these attributes gain/lose ATK",
+   "values": {
+    "LIGHT": -400,
+    "DARK": 500
+   }
+  },
+  "523 Star Boy": {
+   "trig": "continuous (monster)",
+   "src": "table",
+   "code": [
+    "rule_tables.json attribute_boosts"
+   ],
+   "does": "all face-up monsters of these attributes gain/lose ATK",
+   "values": {
+    "WATER": 500,
+    "FIRE": -400
+   }
+  },
+  "597 Little Chimera": {
+   "trig": "continuous (monster)",
+   "src": "table",
+   "code": [
+    "rule_tables.json attribute_boosts"
+   ],
+   "does": "all face-up monsters of these attributes gain/lose ATK",
+   "values": {
+    "WATER": -400,
+    "FIRE": 500
+   }
+  },
+  "526 Milus Radiant": {
+   "trig": "continuous (monster)",
+   "src": "table",
+   "code": [
+    "rule_tables.json attribute_boosts"
+   ],
+   "does": "all face-up monsters of these attributes gain/lose ATK",
+   "values": {
+    "EARTH": 500,
+    "WIND": -400
+   }
+  },
+  "608 Bladefly": {
+   "trig": "continuous (monster)",
+   "src": "table",
+   "code": [
+    "rule_tables.json attribute_boosts"
+   ],
+   "does": "all face-up monsters of these attributes gain/lose ATK",
+   "values": {
+    "EARTH": -400,
+    "WIND": 500
+   }
+  },
+  "342 Sparks": {
+   "trig": "activate",
+   "does": "deal 200 damage to the opponent",
+   "code": [
+    "0054d330"
+   ],
+   "src": "code"
+  },
+  "343 Hinotama": {
+   "trig": "activate",
+   "does": "deal 500 damage to the opponent",
+   "code": [
+    "0054d330"
+   ],
+   "src": "code"
+  },
+  "344 Final Flame": {
+   "trig": "activate",
+   "does": "deal 600 damage to the opponent",
+   "code": [
+    "0054d330"
+   ],
+   "src": "code"
+  },
+  "345 Ookazi": {
+   "trig": "activate",
+   "does": "deal 800 damage to the opponent",
+   "code": [
+    "0054d330"
+   ],
+   "src": "code"
+  },
+  "346 Tremendous Fire": {
+   "trig": "activate",
+   "does": "deal 1000 damage to the opponent and 500 to yourself",
+   "code": [
+    "0054d330"
+   ],
+   "src": "code"
+  },
+  "1007 Raimei": {
+   "trig": "activate",
+   "does": "deal 300 damage to the opponent",
+   "code": [
+    "0054d330"
+   ],
+   "src": "code"
+  },
+  "1039 Restructer Revolution": {
+   "trig": "activate",
+   "does": "deal 200 x (cards in the opponent's hand) damage to the opponent",
+   "code": [
+    "0054d330"
+   ],
+   "src": "code"
+  },
+  "337 Mooyan Curry": {
+   "trig": "activate",
+   "does": "a player of your choice gains 200 LP",
+   "quirk": "PoC lets you pick either player as the target",
+   "code": [
+    "0054d1f0"
+   ],
+   "src": "code"
+  },
+  "339 Goblin's Secret Remedy": {
+   "trig": "activate",
+   "does": "a player of your choice gains 600 LP",
+   "quirk": "PoC lets you pick either player as the target",
+   "code": [
+    "0054d1f0"
+   ],
+   "src": "code"
+  },
+  "340 Soul of the Pure": {
+   "trig": "activate",
+   "does": "a player of your choice gains 800 LP",
+   "quirk": "PoC lets you pick either player as the target",
+   "code": [
+    "0054d1f0"
+   ],
+   "src": "code"
+  },
+  "1006 Blue Medicine": {
+   "trig": "activate",
+   "does": "a player of your choice gains 400 LP",
+   "quirk": "PoC lets you pick either player as the target",
+   "code": [
+    "0054d1f0"
+   ],
+   "src": "code"
+  },
+  "338 Red Medicine": {
+   "trig": "activate",
+   "does": "gain 500 LP",
+   "code": [
+    "0054d290"
+   ],
+   "src": "code"
+  },
+  "341 Dian Keto the Cure Master": {
+   "trig": "activate",
+   "does": "gain 1000 LP",
+   "code": [
+    "0054d290"
+   ],
+   "src": "code"
+  },
+  "1315 Rain of Mercy": {
+   "trig": "activate",
+   "does": "both players gain 1000 LP",
+   "code": [
+    "0054d290"
+   ],
+   "src": "code"
+  },
+  "1010 Pot of Greed": {
+   "trig": "activate",
+   "does": "draw 2 cards",
+   "code": [
+    "005508e0"
+   ],
+   "src": "code"
+  },
+  "539 Skelengel": {
+   "trig": "flip",
+   "does": "draw 1 card",
+   "code": [
+    "005508e0"
+   ],
+   "src": "code"
+  },
+  "1447 Jar of Greed": {
+   "trig": "activate",
+   "does": "draw 1 card",
+   "code": [
+    "005508e0"
+   ],
+   "src": "code"
+  },
+  "968 Graceful Charity": {
+   "trig": "activate",
+   "does": "draw 3 cards, then discard 2 cards from your hand",
+   "code": [
+    "005501b0"
+   ],
+   "src": "code"
+  },
+  "1221 Card Destruction": {
+   "trig": "activate",
+   "does": "each player discards their whole hand, then draws the same number of cards",
+   "code": [
+    "005562d0"
+   ],
+   "src": "code"
+  },
+  "1002 Trap Hole": {
+   "trig": "trap: opponent summons a monster with 1000 or more ATK (summon kinds 5/6 in the engine, i.e. Normal/Flip; not Special)",
+   "does": "destroy that monster",
+   "code": [
+    "005505c0"
+   ],
+   "src": "code"
+  },
+  "680 House of Adhesive Tape": {
+   "trig": "trap: opponent summons a monster with 500 or less DEF",
+   "does": "destroy that monster",
+   "code": [
+    "005505c0"
+   ],
+   "src": "code"
+  },
+  "681 Eatgaboon": {
+   "trig": "trap: opponent summons a monster with 500 or less ATK",
+   "does": "destroy that monster",
+   "code": [
+    "005505c0"
+   ],
+   "src": "code"
+  },
+  "1056 Mirror Force": {
+   "trig": "trap: an opponent's monster declares an attack",
+   "does": "destroy every Attack Position monster the opponent controls",
+   "code": [
+    "00552130"
+   ],
+   "src": "code"
+  },
+  "1214 Magic Cylinder": {
+   "trig": "trap: an opponent's monster declares an attack",
+   "does": "negate the attack and deal damage equal to the attacker's ATK to the opponent",
+   "code": [
+    "00552130"
+   ],
+   "src": "code"
+  },
+  "1098 Enchanted Javelin": {
+   "trig": "trap: an opponent's monster declares an attack",
+   "does": "gain LP equal to the attacker's ATK",
+   "code": [
+    "00552130"
+   ],
+   "src": "code"
+  },
+  "685 Widespread Ruin": {
+   "trig": "trap: an opponent's monster declares an attack",
+   "does": "destroy the opponent's Attack Position monster with the highest ATK",
+   "quirk": "if several share the highest ATK, the human picks; the CPU takes the first",
+   "code": [
+    "00552130"
+   ],
+   "src": "code"
+  },
+  "1001 Fissure": {
+   "trig": "activate",
+   "does": "destroy the opponent's face-up monster with the lowest ATK",
+   "quirk": "ties go to the leftmost zone; face-down monsters are ignored",
+   "code": [
+    "00550490"
+   ],
+   "src": "code"
+  },
+  "1005 Two-Pronged Attack": {
+   "trig": "trap",
+   "does": "destroy 2 of your monsters and 1 of the opponent's monsters",
+   "code": [
+    "00550740"
+   ],
+   "src": "code"
+  },
+  "335 Dark Hole": {
+   "trig": "activate",
+   "does": "destroy all monsters on the field",
+   "code": [
+    "00551150"
+   ],
+   "src": "code"
+  },
+  "336 Raigeki": {
+   "trig": "activate",
+   "does": "destroy all monsters the opponent controls",
+   "code": [
+    "00551150"
+   ],
+   "src": "code"
+  },
+  "1019 White Hole": {
+   "trig": "trap: the opponent activates Dark Hole",
+   "does": "negate Dark Hole and destroy all monsters the Dark Hole player controls",
+   "quirk": "printed text only protects your monsters; PoC destroys the activator's monsters",
+   "code": [
+    "00551150"
+   ],
+   "src": "code"
+  },
+  "1022 Anti Raigeki": {
+   "trig": "trap: the opponent activates Raigeki",
+   "does": "negate Raigeki and destroy all monsters the Raigeki player controls",
+   "code": [
+    "00551150"
+   ],
+   "src": "code"
+  },
+  "1021 Call of the Grave": {
+   "trig": "trap: the opponent activates Monster Reborn",
+   "does": "negate it",
+   "code": [
+    "00551150"
+   ],
+   "src": "code"
+  },
+  "1029 Magic Jammer": {
+   "trig": "counter trap: the opponent activates a Spell card",
+   "does": "negate the activation",
+   "cost": "discard 1 card (per card text; the cost is paid outside this routine)",
+   "code": [
+    "00551150"
+   ],
+   "src": "code"
+  },
+  "1009 De-Spell": {
+   "trig": "activate",
+   "does": "destroy 1 Spell card on the field",
+   "quirk": "if the chosen card is a face-down Trap it is revealed and stays (wasted)",
+   "code": [
+    "0054db00"
+   ],
+   "src": "code"
+  },
+  "1004 Remove Trap": {
+   "trig": "activate",
+   "does": "destroy 1 face-up Trap card on the field",
+   "code": [
+    "005506c0"
+   ],
+   "src": "code"
+  },
+  "1027 Change of Heart": {
+   "trig": "activate",
+   "does": "take control of 1 opponent monster until the End Phase",
+   "quirk": "special case for id 0x4b1 when it is face-down: it is flipped instead",
+   "code": [
+    "00551ab0"
+   ],
+   "src": "code"
+  },
+  "1008 Monster Reborn": {
+   "trig": "activate",
+   "does": "Special Summon 1 monster from either Graveyard",
+   "quirk": "cannot be activated while Call of the Dark (0x402) is face-up on either side",
+   "code": [
+    "005507e0"
+   ],
+   "src": "code"
+  },
+  "1015 Reinforcements": {
+   "trig": "trap",
+   "does": "1 face-up monster gains 500 ATK until the End Phase",
+   "code": [
+    "00550ba0",
+    "0053bf10"
+   ],
+   "src": "code"
+  },
+  "1016 Castle Walls": {
+   "trig": "trap",
+   "does": "1 face-up monster gains 500 DEF until the End Phase",
+   "code": [
+    "00550ba0",
+    "0053bf10"
+   ],
+   "src": "code"
+  },
+  "1055 Waboku": {
+   "trig": "trap (opponent's turn only)",
+   "does": "no battle damage this turn and your monsters are not destroyed by battle",
+   "code": [
+    "005520f0"
+   ],
+   "src": "code"
+  },
+  "688 Reverse Trap": {
+   "trig": "trap",
+   "does": "ATK/DEF increases and decreases are reversed until the End Phase",
+   "code": [
+    "0054eac0"
+   ],
+   "src": "code"
+  },
+  "319 Stop Defense": {
+   "trig": "activate",
+   "does": "change 1 opponent Defense Position monster to Attack Position",
+   "src": "text",
+   "code": [
+    "0054b320"
+   ]
+  },
+  "347 Swords of Revealing Light": {
+   "trig": "activate",
+   "does": "flip all opponent monsters face-up; the opponent cannot attack for 3 of their turns",
+   "src": "text",
+   "code": [
+    "0054e0c0"
+   ]
+  },
+  "348 Spellbinding Circle": {
+   "trig": "continuous trap",
+   "does": "1 opponent monster cannot attack or change position",
+   "code": [
+    "0055b5a0",
+    "0053bb40"
+   ],
+   "src": "code"
+  },
+  "328 Dragon Capture Jar": {
+   "trig": "continuous trap",
+   "does": "all Dragons on the field are changed to Defense Position and cannot change position",
+   "code": [
+    "0054c060"
+   ],
+   "src": "code"
+  },
+  "500 Man-Eater Bug": {
+   "trig": "flip",
+   "does": "destroy 1 monster on the field",
+   "code": [
+    "0055bf50"
+   ],
+   "src": "code"
+  },
+  "540 Hane-Hane": {
+   "trig": "flip",
+   "does": "return 1 monster on the field to its owner's hand",
+   "code": [
+    "0055bf50"
+   ],
+   "src": "code"
+  },
+  "1049 Wall of Illusion": {
+   "trig": "continuous",
+   "does": "a monster that attacks this card is returned to its owner's hand after damage",
+   "code": [
+    "00551fd0"
+   ],
+   "src": "code"
+  },
+  "1048 The Stern Mystic": {
+   "trig": "flip",
+   "does": "all face-down cards on the field are shown to both players, then turned back",
+   "code": [
+    "00551e30"
+   ],
+   "src": "code"
+  },
+  "83 Reaper of the Cards": {
+   "trig": "flip",
+   "does": "destroy 1 Trap card on the field",
+   "src": "text",
+   "code": [
+    "005491b0",
+    "0054eb00"
+   ]
+  },
+  "223 Trap Master": {
+   "trig": "flip",
+   "does": "destroy 1 Trap card on the field",
+   "src": "text",
+   "code": [
+    "005491b0",
+    "0054eb00"
+   ]
+  },
+  "468 Armed Ninja": {
+   "trig": "flip",
+   "does": "destroy 1 Spell card on the field",
+   "src": "text",
+   "code": [
+    "00551150 (probable)"
+   ]
+  },
+  "57 Kuriboh": {
+   "trig": "hand, during damage calculation",
+   "does": "discard this card: the battle damage to you becomes 0",
+   "src": "text",
+   "code": [
+    "00548290"
+   ]
+  },
+  "20 Exodia the Forbidden One": {
+   "trig": "hand",
+   "does": "Exodia the Forbidden One + its 4 limbs in your hand win the duel",
+   "src": "text",
+   "code": [
+    "0056bb60"
+   ]
+  },
+  "1003 Polymerization": {
+   "trig": "activate",
+   "does": "Fusion Summon using materials from hand/field (recipes: rule_tables.json fusion)",
+   "code": [
+    "0055a5a0"
+   ],
+   "src": "code"
+  },
+  "11 Swamp Battleguard": {
+   "trig": "continuous",
+   "does": "+500 ATK for each Lava Battleguard on your side of the field",
+   "code": [
+    "00548b50 (stat calculator, id 0xb)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "15 Time Wizard": {
+   "trig": "ignition, once per turn on your own turn",
+   "does": "toss a coin and call it: right = destroy all opponent monsters; wrong = destroy all your monsters and take damage equal to half their total ATK",
+   "src": "text",
+   "code": [],
+   "exe": "kaiba"
+  },
+  "39 Dragon Piper": {
+   "trig": "flip",
+   "does": "destroy all Dragon Capture Jar cards and change all face-up Dragon monsters to Attack Position",
+   "src": "text",
+   "code": [],
+   "exe": "kaiba"
+  },
+  "47 Sangan": {
+   "trig": "when sent from the field to the Graveyard",
+   "does": "add 1 monster with 1500 or less ATK from your Deck to your hand, then shuffle",
+   "code": [
+    "0054f630",
+    "005504e0",
+    "00551130",
+    "0056e1f0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "55 Larvae Moth": {
+   "trig": "summon condition",
+   "does": "can only be Special Summoned by Tributing Petit Moth on your 2nd turn after it was equipped with Cocoon of Evolution",
+   "code": [
+    "00544830",
+    "00552150",
+    "0057cc90"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "56 Great Moth": {
+   "trig": "summon condition",
+   "does": "can only be Special Summoned by Tributing Petit Moth on your 4th turn after it was equipped with Cocoon of Evolution",
+   "src": "text",
+   "code": [
+    "00544830",
+    "00552150",
+    "0057cc90"
+   ],
+   "exe": "kaiba"
+  },
+  "62 Harpie Lady Sisters": {
+   "trig": "summon condition",
+   "does": "can only be Special Summoned by Elegant Egotist",
+   "code": [
+    "00544830",
+    "00558af0",
+    "0057cc90"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "71 Cocoon of Evolution": {
+   "trig": "equip (as an Equip Spell on a face-up Petit Moth)",
+   "does": "Petit Moth's ATK/DEF become 0/2000 (Cocoon's)",
+   "src": "text",
+   "code": [],
+   "exe": "kaiba"
+  },
+  "82 Castle of Dark Illusions": {
+   "trig": "flip, then continuous while face-up",
+   "does": "all Zombie monsters: ATK/DEF +200, and +200 more in each of your Standby Phases",
+   "quirk": "the bonus is capped at 5 steps (+1000)",
+   "code": [
+    "00548b50 (stat calculator, id 0x52)",
+    "00579e70",
+    "004085a0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "88 Catapult Turtle": {
+   "trig": "ignition",
+   "cost": "Tribute 1 monster you control",
+   "does": "deal damage equal to half the Tributed monster's ATK to the opponent",
+   "code": [
+    "005582e0",
+    "00556af0",
+    "00561d70"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "94 Crass Clown": {
+   "trig": "when changed from Defense to Attack Position",
+   "does": "return 1 opponent monster to the hand",
+   "quirk": "probably also triggers when Flip Summoned (same id handled in the flip-summon path)",
+   "code": [
+    "0054fb00",
+    "00567ba0",
+    "0057dee0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "98 Pumpking the King of Ghosts": {
+   "trig": "continuous",
+   "does": "while Castle of Dark Illusions is face-up: +100 ATK/DEF, and +100 more in each of your Standby Phases, up to your 4th turn",
+   "quirk": "counter capped at 4 steps (+400)",
+   "code": [
+    "00548b50 (stat calculator)",
+    "00403060"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "101 Mask of Darkness": {
+   "trig": "flip",
+   "does": "add 1 Trap from your Graveyard to your hand",
+   "quirk": "the CPU picks from a fixed priority list (0x5b0348)",
+   "code": [
+    "0056e1f0 (list builder, id 0x65)",
+    "0057fac0",
+    "00575300",
+    "00579e70"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "108 Goddess with the Third Eye": {
+   "trig": "fusion",
+   "does": "can substitute for any 1 Fusion Material monster",
+   "src": "text",
+   "code": [
+    "00404860 (probable)",
+    "004337f0 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "113 White Magical Hat": {
+   "trig": "when this card deals battle damage to the opponent",
+   "does": "discard 1 random card from the opponent's hand",
+   "code": [
+    "00576c20 (damage step, id 0x71)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "119 Dream Clown": {
+   "trig": "when changed from Attack to Defense Position",
+   "does": "destroy 1 opponent monster",
+   "code": [
+    "0054fb00",
+    "00557ea0",
+    "00567ba0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "161 Tainted Wisdom": {
+   "trig": "when changed from Attack to Defense Position",
+   "does": "shuffle your Deck",
+   "code": [
+    "0054fb00"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "170 Big Eye": {
+   "trig": "flip",
+   "does": "look at the top 5 cards of your Deck and put them back in any order",
+   "src": "text",
+   "code": [
+    "0056e1f0 (list builder, id 0xaa)"
+   ],
+   "exe": "kaiba"
+  },
+  "198 Penguin Knight": {
+   "trig": "when sent from your Deck to the Graveyard by an opponent's card effect",
+   "does": "shuffle your Graveyard back into your Deck",
+   "code": [
+    "00551bb0 (deck-mill routine, id 0xc6)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "219 Masked Sorcerer": {
+   "trig": "when this card deals battle damage to the opponent",
+   "does": "draw 1 card",
+   "code": [
+    "00576c20"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "234 Wodan the Resident of the Forest": {
+   "trig": "continuous",
+   "does": "+100 ATK for each face-up Plant monster on the field (both sides)",
+   "code": [
+    "00548b50 (stat calculator, id 0xea)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "257 Beastking of the Swamps": {
+   "trig": "fusion",
+   "does": "can substitute for any 1 Fusion Material monster",
+   "src": "text",
+   "code": [
+    "005662b0 (probable)",
+    "0056c0b0 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "261 The Little Swordsman of Aile": {
+   "trig": "ignition (your Main Phase)",
+   "cost": "Tribute 1 other monster you control",
+   "does": "this card gains 700 ATK until the End Phase",
+   "quirk": "stacks: each use adds another 700 (stat calculator counts uses)",
+   "code": [
+    "00548b50",
+    "00556af0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "265 Princess of Tsurugi": {
+   "trig": "flip",
+   "does": "deal 500 damage to the opponent for each Spell and Trap card they control",
+   "src": "text",
+   "code": [
+    "00544380 (probable)",
+    "00583d10 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "268 Versago the Destroyer": {
+   "trig": "fusion",
+   "does": "can substitute for any 1 Fusion Material monster",
+   "src": "text",
+   "code": [
+    "005662b0 (probable)",
+    "00577520 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "317 Elegant Egotist": {
+   "trig": "activate",
+   "does": "Special Summon 1 Harpie Lady or Harpie Lady Sisters from your hand or Deck",
+   "cond": "a Harpie Lady is on the field",
+   "code": [
+    "0056e1f0 (list builder, id 0x13d)",
+    "00558af0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "349 Dark-Piercing Light": {
+   "trig": "activate",
+   "does": "flip all opponent face-down monsters face-up; their flip effects activate",
+   "src": "text",
+   "code": [],
+   "exe": "kaiba"
+  },
+  "366 Jirai Gumo": {
+   "trig": "when this card attacks",
+   "does": "toss a coin and call it: right = attack normally, wrong = your LP is halved before the attack",
+   "src": "text",
+   "code": [],
+   "exe": "kaiba"
+  },
+  "367 Shadow Ghoul": {
+   "trig": "continuous",
+   "does": "+100 ATK for each monster in your own Graveyard",
+   "code": [
+    "00548b50 (stat calculator, id 0x16f)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "370 Sanga of the Thunder": {
+   "trig": "when an opponent monster attacks this card (once per duel, owner chooses)",
+   "does": "the attacking monster's ATK becomes 0",
+   "src": "text",
+   "code": [
+    "00575ef0 (probable)",
+    "0057cc90 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "371 Kazejin": {
+   "trig": "when an opponent monster attacks this card (once per duel, owner chooses)",
+   "does": "the attacking monster's ATK becomes 0",
+   "src": "text",
+   "code": [
+    "00569070 (probable)",
+    "0057cc90 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "372 Suijin": {
+   "trig": "when an opponent monster attacks this card (once per duel, owner chooses)",
+   "does": "the attacking monster's ATK becomes 0",
+   "src": "text",
+   "code": [
+    "0057cc90 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "373 Gate Guardian": {
+   "trig": "summon condition",
+   "does": "can only be Special Summoned by Tributing Sanga of the Thunder, Kazejin and Suijin from your field",
+   "code": [
+    "00544830",
+    "0057cc90",
+    "00570ee0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "391 Metalzoa": {
+   "trig": "summon condition",
+   "does": "can only be Special Summoned from the Deck by Tributing Zoa equipped with Metalmorph",
+   "src": "text",
+   "code": [
+    "0056e1f0",
+    "0057cc90"
+   ],
+   "exe": "kaiba"
+  },
+  "393 Steel Scorpion": {
+   "trig": "when a non-Machine monster attacks this card",
+   "does": "the attacker is destroyed at the End Phase of the opponent's 2nd turn after the attack",
+   "quirk": "not applied when the attacker is a Machine (race check)",
+   "code": [
+    "00577520 (battle, id 0x189)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "396 Leghul": {
+   "trig": "continuous",
+   "does": "this card can attack the opponent directly",
+   "code": [
+    "00573e00 (direct-attack list, id 0x18c)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "397 Ooguchi": {
+   "trig": "continuous",
+   "does": "this card can attack the opponent directly",
+   "code": [
+    "00573e00 (direct-attack list, id 0x18d)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "416 Blast Juggler": {
+   "trig": "ignition, your Standby Phase, while face-up",
+   "cost": "Tribute this card",
+   "does": "destroy 2 face-up monsters with 1000 or less ATK",
+   "code": [
+    "0053caf0",
+    "00573050",
+    "005734b0",
+    "00579840"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "421 Jinzo #7": {
+   "trig": "continuous",
+   "does": "this card can attack the opponent directly",
+   "code": [
+    "00573e00 (direct-attack list, id 0x1a5)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "424 Thunder Dragon": {
+   "trig": "ignition from hand (Main Phase)",
+   "cost": "discard this card",
+   "does": "add up to 2 Thunder Dragon from your Deck to your hand, then shuffle",
+   "code": [
+    "0056e1f0",
+    "00572c50"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "427 Magician of Faith": {
+   "trig": "flip",
+   "does": "add 1 Spell card from your Graveyard to your hand",
+   "src": "text",
+   "code": [
+    "0056e1f0 (list builder)"
+   ],
+   "exe": "kaiba"
+  },
+  "428 Goddess of Whim": {
+   "trig": "ignition",
+   "does": "toss a coin and call it; right: ATK doubled this turn, wrong: ATK halved this turn",
+   "code": [
+    "00548b50 (stat calculator)",
+    "0054e190"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "462 Electric Snake": {
+   "trig": "when sent from your hand to the Graveyard by an opponent's card effect",
+   "does": "draw 2 cards",
+   "code": [
+    "00550010"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "478 Cockroach Knight": {
+   "trig": "when sent to the Graveyard",
+   "does": "return this card to the top of your Deck",
+   "src": "text",
+   "code": [
+    "0054f630",
+    "005504e0",
+    "00551130"
+   ],
+   "exe": "kaiba"
+  },
+  "483 Ameba": {
+   "trig": "when control of this face-up card passes to the opponent",
+   "does": "the new controller takes 2000 damage",
+   "cond": "once while face-up",
+   "code": [
+    "0054fc50",
+    "0054fda0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "487 Rainbow Flower": {
+   "trig": "continuous",
+   "does": "this card can attack the opponent directly",
+   "code": [
+    "00573e00 (direct-attack list, id 0x1e7)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "492 Maha Vailo": {
+   "trig": "continuous",
+   "does": "+500 ATK for each Equip card equipped to it (on top of the equips' own effects)",
+   "code": [
+    "00548b50 (stat calculator, id 0x1ec)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "496 Yado Karu": {
+   "trig": "when changed from Attack to Defense Position",
+   "does": "you may put any number of cards from your hand on the bottom of your Deck in any order",
+   "code": [
+    "0054fb00 (position change, id 0x1f0)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "499 Dragon Seeker": {
+   "trig": "when Normal Summoned (not Special Summon)",
+   "does": "destroy 1 face-up Dragon monster on the field",
+   "code": [
+    "0057d4a0",
+    "0057d940",
+    "0057dee0",
+    "00582290"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "511 Cannon Soldier": {
+   "trig": "ignition",
+   "cost": "Tribute 1 monster you control",
+   "does": "deal 500 damage to the opponent",
+   "code": [
+    "005582e0",
+    "00556af0",
+    "00561d70"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "515 Muka Muka": {
+   "trig": "continuous",
+   "does": "+300 ATK and DEF for each card in your hand",
+   "code": [
+    "00548b50 (stat calculator, id 0x203)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "522 The Bistro Butcher": {
+   "trig": "when this card deals battle damage to the opponent",
+   "does": "the opponent draws 2 cards",
+   "code": [
+    "00576c20 (damage step, id 0x20a)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "533 Minar": {
+   "trig": "when sent from your hand to the Graveyard by an opponent's card effect",
+   "does": "deal 1000 damage to the opponent",
+   "code": [
+    "00550010"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "546 Griggle": {
+   "trig": "when control of this face-up card passes to the opponent",
+   "does": "its original owner gains 3000 LP",
+   "cond": "once while face-up",
+   "code": [
+    "0054fc50",
+    "0054fda0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "550 Dark Elf": {
+   "trig": "when this card attacks",
+   "cost": "pay 1000 LP",
+   "does": "cost for each attack",
+   "cond": "cannot attack with less than 1000 LP",
+   "quirk": "the CPU never puts it first in its attack order",
+   "code": [
+    "00574010",
+    "00575300",
+    "00580ed0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "552 Mushroom Man #2": {
+   "trig": "continuous",
+   "does": "its controller loses 300 LP in each of their Standby Phases; at your End Phase you may pay 500 LP to give control of it to the opponent",
+   "cond": "the control switch needs 500 or more LP and a free zone on the opponent's side",
+   "code": [
+    "005798d0",
+    "005787f0",
+    "0054edc0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "553 Lava Battleguard": {
+   "trig": "continuous",
+   "does": "+500 ATK for each Swamp Battleguard on your side of the field",
+   "code": [
+    "00548b50 (stat calculator, id 0x229)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "561 Needle Worm": {
+   "trig": "flip",
+   "does": "send the top 5 cards of the opponent's Deck to the Graveyard",
+   "src": "text",
+   "code": [
+    "00583d10 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "573 Witch of the Black Forest": {
+   "trig": "when sent from the field to the Graveyard",
+   "does": "add 1 monster with 1500 or less DEF from your Deck to your hand, then shuffle",
+   "code": [
+    "0054f630",
+    "005504e0",
+    "00551130",
+    "0056e1f0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "582 Weather Report": {
+   "trig": "flip",
+   "does": "destroy all opponent face-up Swords of Revealing Light; if one was destroyed you get two Battle Phases",
+   "src": "text",
+   "code": [
+    "004613d0 (probable)",
+    "00583d10 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "590 Morphing Jar": {
+   "trig": "flip",
+   "does": "both players discard their whole hand and draw 5 cards",
+   "src": "text",
+   "code": [
+    "00584920 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "609 Electric Lizard": {
+   "trig": "when a non-Zombie monster attacks this card",
+   "does": "the attacker cannot attack during its controller's next turn",
+   "code": [
+    "00577520 (battle, id 0x261)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "610 Hiro's Shadow Scout": {
+   "trig": "flip",
+   "does": "opponent draws 3 cards; Spell cards among them are discarded",
+   "src": "text",
+   "code": [],
+   "exe": "kaiba"
+  },
+  "634 Queen's Double": {
+   "trig": "continuous",
+   "does": "this card can attack the opponent directly",
+   "code": [
+    "00573e00 (direct-attack list, id 0x27a)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "640 Invader of the Throne": {
+   "trig": "flip (not during the Battle Phase)",
+   "does": "switch control of this card and 1 opponent monster",
+   "src": "text",
+   "code": [
+    "0054edc0",
+    "00568bb0"
+   ],
+   "exe": "kaiba"
+  },
+  "641 Mystical Sheep #1": {
+   "trig": "fusion",
+   "does": "can substitute for any 1 Fusion Material monster",
+   "src": "text",
+   "code": [
+    "005662b0 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "655 Eternal Rest": {
+   "trig": "activate",
+   "does": "destroy all monsters equipped with an Equip card",
+   "src": "text",
+   "code": [],
+   "exe": "kaiba"
+  },
+  "656 Megamorph": {
+   "trig": "equip spell",
+   "does": "if your LP is lower than the opponent's, the equipped monster's original ATK is doubled; if higher, halved; equal: no change",
+   "code": [
+    "00548b50 (stat calculator)",
+    "00552370",
+    "00567cf0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "657 Metalmorph": {
+   "trig": "trap, then becomes an Equip card on a face-up monster",
+   "does": "equipped monster: ATK +300, DEF +300; when it attacks, it gains ATK equal to half the attack target's ATK",
+   "values": {
+    "atk": 300,
+    "def": 300
+   },
+   "src": "text",
+   "code": [
+    "00548780 (equip calculator, id 0x291)",
+    "00552370",
+    "00575ef0",
+    "00582b00"
+   ],
+   "exe": "kaiba"
+  },
+  "660 Crush Card": {
+   "trig": "trap",
+   "cost": "Tribute 1 DARK monster with 1000 or less ATK",
+   "does": "destroy all opponent monsters with 1500+ ATK on the field and in hand, and those they draw during their next 3 turns",
+   "src": "text",
+   "code": [
+    "00401e40 (probable)",
+    "00551830 (probable)",
+    "00582290 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "671 Harpie's Feather Duster": {
+   "trig": "activate",
+   "does": "destroy all Spell and Trap cards the opponent controls",
+   "quirk": "the CPU only plays it when the opponent has a Spell/Trap on the field",
+   "code": [
+    "00554eb0",
+    "005557e0",
+    "0055d1f0",
+    "00582290"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "684 Acid Trap Hole": {
+   "trig": "trap",
+   "does": "flip 1 face-down Defense Position monster face-up; destroy it if its DEF is 2000 or less, otherwise turn it face-down again",
+   "src": "text",
+   "code": [
+    "00557040 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "686 Goblin Fan": {
+   "trig": "continuous trap",
+   "does": "destroy every Level 2 or lower monster that is Flip Summoned; its flip effect does not activate",
+   "src": "text",
+   "code": [
+    "0057dee0 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "689 Fake Trap": {
+   "trig": "trap: an opponent card would destroy your Trap card(s)",
+   "does": "destroy this card instead; your other Traps survive",
+   "quirk": "only reacts to a fixed list of opponent destroyers (Harpie's Feather Duster, Heavy Storm-type mass destroyers and certain single-target Spell/Trap removal); Normal Traps that are already face-up are not protected",
+   "code": [
+    "0055ac10",
+    "00554eb0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "731 Jigen Bakudan": {
+   "trig": "ignition, your Standby Phase, after it was flipped face-up",
+   "cost": "Tribute this card",
+   "does": "destroy all monsters on your side; the opponent takes damage equal to half the total ATK of your monsters",
+   "quirk": "the ATK total is taken before destruction and includes Jigen Bakudan's own 200 ATK",
+   "code": [
+    "0055b110",
+    "005550d0",
+    "00553af0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "741 Red-Eyes Black Metal Dragon": {
+   "trig": "summon condition",
+   "does": "can only be Special Summoned from the Deck by Tributing Red-Eyes B. Dragon equipped with Metalmorph, then shuffle",
+   "src": "text",
+   "code": [
+    "00544830",
+    "0056e1f0",
+    "0057cc90"
+   ],
+   "exe": "kaiba"
+  },
+  "742 Barrel Dragon": {
+   "trig": "ignition, once per turn on your own turn",
+   "does": "toss 3 coins; with 2 or more heads destroy 1 opponent monster",
+   "code": [
+    "00561ac0",
+    "00552310",
+    "00555160",
+    "00567ba0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "939 Ring of Destruction": {
+   "trig": "trap",
+   "does": "destroy 1 face-up monster; both players take damage equal to its ATK",
+   "quirk": "the CPU only uses it when the damage would not finish itself off first",
+   "code": [
+    "0055b680",
+    "00552f70",
+    "00568f80",
+    "00581820"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "960 Negate Attack": {
+   "trig": "counter trap: an opponent's monster attacks",
+   "does": "negate the attack and end the opponent's Battle Phase",
+   "code": [
+    "0055bd60",
+    "00555e00"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "970 Mesmeric Control": {
+   "trig": "activate",
+   "does": "the opponent cannot change battle positions during their next turn",
+   "code": [
+    "0055c350"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1011 Gravedigger Ghoul": {
+   "trig": "activate",
+   "does": "banish up to 2 monsters from the opponent's Graveyard",
+   "cond": "the opponent has a monster in their Graveyard; not while the opponent has card id 0x5e7 on the field",
+   "code": [
+    "0055ca10",
+    "00555680",
+    "0056e1f0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1023 Tribute to The Doomed": {
+   "trig": "activate",
+   "cost": "discard 1 card",
+   "does": "destroy 1 monster on the field",
+   "code": [
+    "00559dd0",
+    "00552ca0",
+    "00555970",
+    "00553c90",
+    "00568560"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1025 The Cheerful Coffin": {
+   "trig": "activate",
+   "does": "discard up to 3 monsters from your hand",
+   "cond": "at least 1 monster in your hand",
+   "code": [
+    "0055d5a0",
+    "005559f0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1028 Solemn Judgment": {
+   "trig": "counter trap: the opponent activates a Spell/Trap or summons a monster",
+   "cost": "pay half your LP",
+   "does": "negate it and destroy that card",
+   "code": [
+    "0055d8c0",
+    "00555ac0",
+    "00553920"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1030 Seven Tools of the Bandit": {
+   "trig": "counter trap: a Trap card is activated",
+   "cost": "pay 1000 LP",
+   "does": "negate the Trap's activation and destroy it",
+   "cond": "your LP must exceed 1000",
+   "code": [
+    "0055d1f0",
+    "00555c10",
+    "00553a80",
+    "00553920"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1031 Horn of Heaven": {
+   "trig": "counter trap: a monster would be summoned (including Special Summon)",
+   "cost": "Tribute 1 monster you control",
+   "does": "negate the summon and destroy that monster",
+   "src": "text",
+   "code": [],
+   "exe": "kaiba"
+  },
+  "1033 Royal Decree": {
+   "trig": "continuous trap",
+   "does": "negate the effects of all other Trap cards on the field",
+   "code": [
+    "0055b230",
+    "0056d150"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1037 Exile of the Wicked": {
+   "trig": "activate",
+   "does": "destroy all face-up Fiend monsters on the field (both sides)",
+   "code": [
+    "0055a6d0",
+    "00552d50"
+   ],
+   "quirk": "shares the race-wipe routine 0x552d50 with the other race-elimination cards",
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1042 Sword of Deep-Seated": {
+   "trig": "equip spell",
+   "does": "equipped monster: ATK +500, DEF +500; when this card goes to the Graveyard it is placed on top of your Deck",
+   "values": {
+    "atk": 500,
+    "def": 500
+   },
+   "code": [
+    "00548b50 (stat calculator, id 0x412)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1043 Block Attack": {
+   "trig": "activate",
+   "does": "change 1 opponent Attack Position monster to Defense Position",
+   "quirk": "the CPU targets the opponent's highest-ATK attacker",
+   "code": [
+    "0055db70",
+    "00553190",
+    "005697d0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1044 The Unhappy Maiden": {
+   "trig": "when sent to the Graveyard by battle",
+   "does": "end the Battle Phase",
+   "code": [
+    "0055bdb0",
+    "0054f630"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1045 Robbin' Goblin": {
+   "trig": "continuous trap",
+   "does": "each time your monster deals battle damage to the opponent, discard 1 random card from their hand",
+   "src": "text",
+   "quirk": "its effect-table routine is empty; the effect is applied in the damage step code",
+   "code": [
+    "00570cd0"
+   ],
+   "exe": "kaiba"
+  },
+  "1046 Germ Infection": {
+   "trig": "equip spell (non-Machine)",
+   "does": "equipped monster loses 300 ATK in each of its controller's Standby Phases (cumulative)",
+   "code": [
+    "005586b0",
+    "00552370",
+    "00567cf0",
+    "00548b50",
+    "00579e70"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1047 Paralyzing Potion": {
+   "trig": "equip spell (non-Machine)",
+   "does": "the equipped monster cannot attack",
+   "src": "text",
+   "code": [],
+   "exe": "kaiba"
+  },
+  "1058 Ring of Magnetism": {
+   "trig": "equip spell (your monster only)",
+   "does": "equipped monster: ATK -500, DEF -500; opponent monsters that attack must attack it",
+   "values": {
+    "atk": -500,
+    "def": -500
+   },
+   "code": [
+    "00548b50 (stat calculator, id 0x422)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1059 Share the Pain": {
+   "trig": "activate",
+   "cost": "Tribute 1 monster you control",
+   "does": "the opponent Tributes 1 monster they control",
+   "cond": "both players must control a monster",
+   "code": [
+    "0055e230",
+    "00555fd0",
+    "00553d60"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1060 Stim-Pack": {
+   "trig": "equip spell",
+   "does": "equipped monster: ATK +700, then -200 in each of its controller's Standby Phases (cumulative)",
+   "values": {
+    "atk": 700,
+    "per_standby_atk": -200
+   },
+   "code": [
+    "005586b0",
+    "00552370",
+    "00567cf0",
+    "00548b50 (stat calculator, id 0x424)",
+    "00579e70"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1061 Heavy Storm": {
+   "trig": "activate",
+   "does": "destroy all Spell and Trap cards on the field (opponent's side first, then yours)",
+   "code": [
+    "0055e280",
+    "00553370"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1063 Gravekeeper's Servant": {
+   "trig": "continuous spell",
+   "does": "each time the opponent attacks, they send the top card of their Deck to the Graveyard",
+   "src": "text",
+   "code": [
+    "00570cd0"
+   ],
+   "exe": "kaiba"
+  },
+  "1064 Curse of Fiend": {
+   "trig": "activate (your Standby Phase only)",
+   "does": "switch every monster on the field between Attack and Defense Position (face-down ones are flipped face-up into Attack); positions cannot be changed by the players for the rest of the turn",
+   "cond": "at least one monster on the field",
+   "code": [
+    "0055e360",
+    "00556010"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1065 Upstart Goblin": {
+   "trig": "activate",
+   "does": "draw 1 card; the opponent gains 1000 LP",
+   "code": [
+    "0055e420"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1066 Toll": {
+   "trig": "continuous spell",
+   "cost": "500 LP per attacking monster",
+   "does": "both players must pay 500 LP for each attack",
+   "src": "text",
+   "code": [
+    "00570cd0"
+   ],
+   "exe": "kaiba"
+  },
+  "1067 Final Destiny": {
+   "trig": "activate",
+   "cost": "discard 5 cards",
+   "does": "destroy all cards on the field",
+   "cond": "5 other cards in hand and at least one card on the field",
+   "code": [
+    "0055e470",
+    "00556060",
+    "00553c90"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1068 Snatch Steal": {
+   "trig": "equip spell",
+   "does": "take control of 1 opponent face-up monster while equipped; the opponent gains 1000 LP in each of their Standby Phases",
+   "code": [
+    "0055e570",
+    "00552370",
+    "00555a80",
+    "00568bb0",
+    "005798d0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1069 Chorus of Sanctuary": {
+   "trig": "field spell",
+   "does": "all Defense Position monsters: DEF +500",
+   "values": {
+    "defense_position": {
+     "def": 500
+    }
+   },
+   "quirk": "activating it destroys the opponent's face-up Field spell",
+   "code": [
+    "00558f90",
+    "00548b50 (stat calculator, id 0x42d)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1070 Confiscation": {
+   "trig": "activate",
+   "cost": "pay 1000 LP",
+   "does": "look at the opponent's hand and discard 1 card from it",
+   "cond": "your LP must exceed 1000 and the opponent must have cards in hand",
+   "code": [
+    "0055e670",
+    "005560f0",
+    "00553a80",
+    "00553920"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1071 Delinquent Duo": {
+   "trig": "activate",
+   "cost": "pay 1000 LP",
+   "does": "discard 1 random card from the opponent's hand, then the opponent discards 1 card of their choice",
+   "cond": "your LP must exceed the cost and the opponent must have cards in hand",
+   "code": [
+    "0055e6e0",
+    "005560f0",
+    "00553a80",
+    "00553920"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1072 Darkness Approaches": {
+   "trig": "activate",
+   "cost": "discard 2 cards",
+   "does": "flip 1 face-up monster face-down without changing its battle position",
+   "quirk": "cannot target card ids 0x780-0x7cf (the Egyptian God range)",
+   "code": [
+    "0055e750",
+    "00552fd0",
+    "005560c0",
+    "00553c90",
+    "00569980"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1073 Fairy's Hand Mirror": {
+   "trig": "trap: the opponent activates a Spell that targets 1 monster",
+   "does": "redirect that Spell to another valid monster target",
+   "code": [
+    "0055e7a0",
+    "00556150",
+    "00569a50"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1074 Tailor of the Fickle": {
+   "trig": "quick-play",
+   "does": "move 1 equipped Equip card to another monster it can legally equip",
+   "cond": "the equip card must have at least one other legal target",
+   "code": [
+    "0055e7f0",
+    "00553200",
+    "00569bc0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1075 Rush Recklessly": {
+   "trig": "quick-play",
+   "does": "1 monster gains 700 ATK until end of turn",
+   "values": {
+    "atk": 700
+   },
+   "quirk": "the CPU plays it during battle to win a fight",
+   "code": [
+    "0055cc50",
+    "00552f70",
+    "00569660",
+    "00548b50 (stat calculator, id 0x433)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1076 The Reliable Guardian": {
+   "trig": "quick-play",
+   "does": "1 monster gains 700 DEF until end of turn",
+   "values": {
+    "def": 700
+   },
+   "quirk": "the CPU plays it during battle to save a monster",
+   "code": [
+    "0055cc50",
+    "00552f70",
+    "00569660",
+    "00548b50 (stat calculator, id 0x434)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1077 The Forceful Sentry": {
+   "trig": "activate",
+   "does": "look at the opponent's hand, return 1 card from it to their Deck, shuffle",
+   "cond": "the opponent has a card in hand",
+   "code": [
+    "0055e8f0",
+    "00555d20"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1078 Chain Energy": {
+   "trig": "continuous spell",
+   "cost": "500 LP per card",
+   "does": "both players pay 500 LP to play or Set each card from their hand",
+   "src": "text",
+   "code": [
+    "00570cd0"
+   ],
+   "exe": "kaiba"
+  },
+  "1079 Mystical Space Typhoon": {
+   "trig": "quick-play",
+   "does": "destroy 1 Spell or Trap card on the field",
+   "quirk": "if the target is a face-down id 0x4b1 card it is flipped face-up instead of destroyed (same special case as Change of Heart)",
+   "code": [
+    "00559dd0",
+    "00553370",
+    "00569e90"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1080 Giant Trunade": {
+   "trig": "activate",
+   "does": "return all Spell and Trap cards on the field to their owners' hands (opponent's side first)",
+   "code": [
+    "0055e990",
+    "00553370"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1081 Painful Choice": {
+   "trig": "activate",
+   "does": "pick 5 cards from your Deck; the opponent picks 1 of them for your hand; the other 4 go to the Graveyard",
+   "cond": "you need at least 5 cards in your Deck",
+   "code": [
+    "0055ea10",
+    "005561b0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1082 Snake Fang": {
+   "trig": "trap",
+   "does": "1 monster loses 500 DEF until end of turn",
+   "values": {
+    "def": -500
+   },
+   "code": [
+    "0055cc50",
+    "00552f70",
+    "00569660",
+    "00548b50 (stat calculator, id 0x43a)"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1106 Cyber Jar": {
+   "trig": "flip",
+   "does": "destroy all monsters on the field; each player takes the top 5 cards of their Deck, Special Summons the Level 4 or lower monsters among them (Attack or face-down Defense) and adds the rest to hand",
+   "code": [
+    "0055f2e0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1108 Giant Rat": {
+   "trig": "when sent to the Graveyard by battle",
+   "does": "Special Summon 1 EARTH monster with 1500 or less ATK from your Deck, then shuffle",
+   "quirk": "Ritual and Fusion monsters are excluded from the Deck search",
+   "code": [
+    "0055f750",
+    "0056e1f0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1109 Senju of the Thousand Hands": {
+   "trig": "when Normal or Flip Summoned (not Special Summon)",
+   "does": "you may add 1 Ritual Monster from your Deck to your hand, then shuffle",
+   "quirk": "the CPU picks automatically; the human gets a prompt",
+   "code": [
+    "0055f920",
+    "0056e1f0",
+    "0057fac0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1110 UFO Turtle": {
+   "trig": "when sent to the Graveyard by battle",
+   "does": "Special Summon 1 FIRE monster with 1500 or less ATK from your Deck in face-up Attack Position, then shuffle",
+   "quirk": "Ritual and Fusion monsters are excluded from the Deck search",
+   "code": [
+    "0055f750",
+    "0056e1f0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1114 Giant Germ": {
+   "trig": "when sent to the Graveyard by battle",
+   "does": "deal 500 damage to the opponent; you may Special Summon any copies of Giant Germ from your Deck in face-up Attack Position, then shuffle",
+   "code": [
+    "0055fb50"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1115 Nimble Momonga": {
+   "trig": "when sent to the Graveyard by battle",
+   "does": "gain 1000 LP; you may Special Summon any copies of Nimble Momonga from your Deck in face-down Defense Position, then shuffle",
+   "code": [
+    "0055fb50"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1117 Shining Angel": {
+   "trig": "when sent to the Graveyard by battle",
+   "does": "Special Summon 1 LIGHT monster with 1500 or less ATK from your Deck in face-up Attack Position, then shuffle",
+   "quirk": "Ritual and Fusion monsters are excluded from the Deck search",
+   "code": [
+    "0055f750",
+    "0056e1f0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1119 Mother Grizzly": {
+   "trig": "when sent to the Graveyard by battle",
+   "does": "Special Summon 1 WATER monster with 1500 or less ATK from your Deck in face-up Attack Position, then shuffle",
+   "quirk": "Ritual and Fusion monsters are excluded from the Deck search",
+   "code": [
+    "0055f750",
+    "0056e1f0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1120 Flying Kamakiri #1": {
+   "trig": "when sent to the Graveyard by battle",
+   "does": "Special Summon 1 WIND monster with 1500 or less ATK from your Deck in face-up Attack Position, then shuffle",
+   "quirk": "Ritual and Fusion monsters are excluded from the Deck search",
+   "code": [
+    "0055f750",
+    "0056e1f0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1122 Sonic Bird": {
+   "trig": "when Normal or Flip Summoned (not Special Summon)",
+   "does": "you may add 1 Ritual Spell from your Deck to your hand, then shuffle",
+   "quirk": "the CPU picks automatically; the human gets a prompt",
+   "code": [
+    "0055f920",
+    "0056e1f0",
+    "0057fac0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1123 Mystic Tomato": {
+   "trig": "when sent to the Graveyard by battle",
+   "does": "Special Summon 1 DARK monster with 1500 or less ATK from your Deck, then shuffle",
+   "quirk": "Ritual and Fusion monsters are excluded from the Deck search",
+   "code": [
+    "0055f750",
+    "0056e1f0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1125 Gaia Power": {
+   "trig": "field spell",
+   "does": "all EARTH monsters: ATK +500, DEF -400",
+   "values": {
+    "EARTH": {
+     "atk": 500,
+     "def": -400
+    }
+   },
+   "quirk": "activating it destroys the opponent's face-up Field spell",
+   "code": [
+    "00558f90"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1126 Umiiruka": {
+   "trig": "field spell",
+   "does": "all WATER monsters: ATK +500, DEF -400",
+   "values": {
+    "WATER": {
+     "atk": 500,
+     "def": -400
+    }
+   },
+   "quirk": "activating any Field spell destroys the opponent's face-up Field spell (one Field on the board)",
+   "code": [
+    "00558f90",
+    "yugi 0053bf10 table 0x594210"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1127 Molten Destruction": {
+   "trig": "field spell",
+   "does": "all FIRE monsters: ATK +500, DEF -400",
+   "values": {
+    "FIRE": {
+     "atk": 500,
+     "def": -400
+    }
+   },
+   "quirk": "activating it destroys the opponent's face-up Field spell",
+   "code": [
+    "00558f90"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1128 Rising Air Current": {
+   "trig": "field spell",
+   "does": "all WIND monsters: ATK +500, DEF -400",
+   "values": {
+    "WIND": {
+     "atk": 500,
+     "def": -400
+    }
+   },
+   "quirk": "activating it destroys the opponent's face-up Field spell",
+   "code": [
+    "00558f90"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1129 Luminous Spark": {
+   "trig": "field spell",
+   "does": "all LIGHT monsters: ATK +500, DEF -400",
+   "values": {
+    "LIGHT": {
+     "atk": 500,
+     "def": -400
+    }
+   },
+   "quirk": "activating it destroys the opponent's face-up Field spell",
+   "code": [
+    "00558f90"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1130 Mystic Plasma Zone": {
+   "trig": "field spell",
+   "does": "all DARK monsters: ATK +500, DEF -400",
+   "values": {
+    "DARK": {
+     "atk": 500,
+     "def": -400
+    }
+   },
+   "quirk": "activating it destroys the opponent's face-up Field spell",
+   "code": [
+    "00558f90"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1154 Imperial Order": {
+   "trig": "continuous trap",
+   "does": "negate the effects of all Spell cards; pay 700 LP each of your Standby Phases or destroy this card",
+   "code": [
+    "0055b230",
+    "00579e70"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1157 Nobleman of Crossout": {
+   "trig": "activate",
+   "does": "destroy 1 face-down monster and banish it; if it has a Flip effect, both players banish all copies of it from their Decks, then shuffle",
+   "code": [
+    "00560700",
+    "005533d0",
+    "0056a1c0",
+    "00551e40"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1158 Nobleman of Extermination": {
+   "trig": "activate",
+   "does": "destroy 1 face-down Spell/Trap and banish it; if it was a Trap, both players banish all copies of it from their Decks, then shuffle",
+   "code": [
+    "00560700",
+    "00553410",
+    "0056a2a0",
+    "00551e40"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1159 The Shallow Grave": {
+   "trig": "activate",
+   "does": "each player Special Summons 1 monster from their own Graveyard in face-down Defense Position (opponent picks first)",
+   "cond": "only activatable if BOTH Graveyards contain a monster that can be summoned",
+   "code": [
+    "0055ff10",
+    "00556760"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1160 Premature Burial": {
+   "trig": "activate",
+   "cost": "pay 800 LP",
+   "does": "Special Summon 1 monster from your Graveyard in face-up Attack Position and equip it with this card; if this card is destroyed, the monster is destroyed",
+   "cond": "LP 801 or more, a free monster zone and a monster in your Graveyard",
+   "code": [
+    "0055ef70",
+    "005567c0",
+    "00553a80",
+    "00567810",
+    "005504e0",
+    "00553920"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1177 Windstorm of Etaqua": {
+   "trig": "trap",
+   "does": "change the battle position of every face-up monster the opponent controls",
+   "quirk": "while Dragon Capture Jar is on the field, face-up Defense Position Dragons are skipped",
+   "code": [
+    "00560eb0",
+    "005530e0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1180 Anti-Spell Fragrance": {
+   "trig": "continuous trap",
+   "does": "Spells must be Set first and cannot be activated until their controller's next turn",
+   "src": "text",
+   "code": [
+    "00570cd0"
+   ],
+   "exe": "kaiba"
+  },
+  "1205 Exchange": {
+   "trig": "activate",
+   "does": "both players reveal hands; each takes 1 card of their choice from the other's hand (cards go to their owner's Graveyard later)",
+   "cond": "opponent has a card in hand and you have at least one other card in hand",
+   "code": [
+    "005612b0",
+    "00556950"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1211 Thousand Knives": {
+   "trig": "activate",
+   "does": "destroy 1 opponent monster",
+   "cond": "you control Dark Magician (any of its 3 art ids 0x22, 0x4ba, 0x7f2)",
+   "code": [
+    "00559dd0",
+    "00553480",
+    "005569a0",
+    "00568560"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1220 Soul Exchange": {
+   "trig": "activate (Main Phase 1 only)",
+   "does": "this turn you may Tribute 1 opponent monster instead of one of yours; you skip your Battle Phase",
+   "cond": "opponent controls a monster; and you have a Level 5+ monster in hand you could then summon, or (human player only) you control Catapult Turtle, The Little Swordsman of Aile or Cannon Soldier; not while Messenger of Peace (0x58a) is face-up",
+   "code": [
+    "00561d70",
+    "00552310",
+    "00556af0",
+    "0056a6a0"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1243 Ancient Lamp": {
+   "trig": "when attacked while face-down in Defense Position",
+   "does": "you may redirect the attack to another opponent monster; while on the field you may Special Summon La Jinn the Mystical Genie of the Lamp from your hand",
+   "cond": "redirect needs the attacker's side to have 2 or more monsters",
+   "code": [
+    "00575ef0",
+    "0057ad00",
+    "00572c50",
+    "00584460"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1316 Monster Recovery": {
+   "trig": "quick-play",
+   "does": "shuffle 1 of your monsters and your whole hand into your Deck, then draw as many cards as you had in hand",
+   "src": "text",
+   "code": [
+    "00557040",
+    "00569070"
+   ],
+   "exe": "kaiba"
+  },
+  "1332 Invitation to a Dark Sleep": {
+   "trig": "when Normal Summoned",
+   "does": "choose 1 opponent monster; it cannot attack while this card is face-up",
+   "src": "text",
+   "code": [
+    "004085a0",
+    "0057d4a0"
+   ],
+   "exe": "kaiba"
+  },
+  "1350 The Fiend Megacyber": {
+   "trig": "summon rule",
+   "does": "can be Normal Summoned without Tributes if the opponent controls at least 2 more monsters than you",
+   "code": [
+    "00570ee0",
+    "00572c50",
+    "0057cc90",
+    "0057e850"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "1528 Destiny Board": {
+   "trig": "continuous trap",
+   "does": "at the end of each opponent turn place 1 Spirit Message from hand or Deck; with I, N, A, L all on the field you win",
+   "quirk": "if Destiny Board or any Spirit Message leaves the field, all of them are sent to the Graveyard (0x550930)",
+   "src": "text",
+   "code": [
+    "00550930",
+    "00578b50"
+   ],
+   "exe": "kaiba"
+  },
+  "1541 Spirit Message \"I\"": {
+   "trig": "continuous spell",
+   "does": "can only be placed while Destiny Board is active (letter I)",
+   "src": "text",
+   "code": [
+    "0053fd90 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "1542 Spirit Message \"N\"": {
+   "trig": "continuous spell",
+   "does": "can only be placed while Destiny Board is active (letter N)",
+   "src": "text",
+   "code": [
+    "0053fd90 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "1543 Spirit Message \"A\"": {
+   "trig": "continuous spell",
+   "does": "can only be placed while Destiny Board is active (letter A)",
+   "src": "text",
+   "code": [
+    "0053fd90 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "1544 Spirit Message \"L\"": {
+   "trig": "continuous spell",
+   "does": "can only be placed while Destiny Board is active (letter L)",
+   "src": "text",
+   "code": [
+    "0053fd90 (probable)"
+   ],
+   "exe": "kaiba"
+  },
+  "1901 Kuriboh": {
+   "trig": "hand, during the opponent's damage step when one of their monsters would deal battle damage to you",
+   "cost": "discard this card",
+   "does": "that battle damage becomes 0",
+   "quirk": "the game checks both Kuriboh art ids (0x39, 0x76d) in hand and pauses the damage step to ask",
+   "code": [
+    "00576c20",
+    "00553e30",
+    "0057ad00"
+   ],
+   "src": "code",
+   "exe": "kaiba"
+  },
+  "22 The Wicked Worm Beast": {
+   "trig": "your End Phase",
+   "does": "return this card to your hand",
+   "src": "text",
+   "code": [],
+   "exe": "joey"
+  },
+  "66 Perfectly Ultimate Great Moth": {
+   "trig": "summon condition",
+   "does": "can only be Special Summoned by Tributing Petit Moth on your 6th turn after it was equipped with Cocoon of Evolution",
+   "code": [
+    "00567a00",
+    "00579a00",
+    "0059df40",
+    "005aae00"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "165 Mysterious Puppeteer": {
+   "trig": "continuous",
+   "does": "its controller gains 500 LP each time any monster is Normal or Flip Summoned (not Special Summoned)",
+   "src": "text",
+   "code": [
+    "005b9170 (command log hook)"
+   ],
+   "exe": "joey"
+  },
+  "255 Dimensional Warrior": {
+   "trig": "when this card attacks or is attacked",
+   "does": "banish both this card and the opposing monster after the battle",
+   "code": [
+    "0058cc00"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "368 Wall Shadow": {
+   "trig": "summon condition",
+   "does": "cannot be Normal Summoned; Special Summoned only by Tributing Labyrinth Wall equipped with Magical Labyrinth",
+   "src": "text",
+   "code": [
+    "00567a00"
+   ],
+   "exe": "joey"
+  },
+  "385 Harpie's Pet Dragon": {
+   "trig": "continuous",
+   "does": "+300 ATK and DEF for each face-up Harpie Lady on the field",
+   "src": "text",
+   "code": [
+    "0056dd30"
+   ],
+   "exe": "joey"
+  },
+  "386 Mystic Lamp": {
+   "trig": "continuous",
+   "does": "this card can attack the opponent directly",
+   "code": [
+    "0056bfd0 (direct-attack check)"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "406 Machine King": {
+   "trig": "continuous",
+   "does": "+100 ATK for each face-up Machine monster on the field",
+   "code": [
+    "0056dd30 (stat calculator, id 0x196)"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "419 Cyber-Stein": {
+   "trig": "ignition",
+   "cost": "pay 5000 LP",
+   "does": "Special Summon 1 Fusion Monster from your Fusion Deck in face-up Attack Position",
+   "cond": "you have a card in your Fusion Deck and a free monster zone",
+   "code": [
+    "00585420",
+    "0057f8d0",
+    "0057c5c0",
+    "0057c450"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "461 The Immortal of Thunder": {
+   "trig": "flip",
+   "does": "gain 3000 LP; once flipped, if it is sent from the field to the Graveyard you lose 5000 LP",
+   "code": [
+    "00585970",
+    "00581040",
+    "0057c5f0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "474 Sinister Serpent": {
+   "trig": "your Standby Phase, while in the Graveyard",
+   "does": "you may return this card to your hand",
+   "code": [
+    "005a7100",
+    "005af370"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "477 Insect Soldiers of the Sky": {
+   "trig": "when this card attacks a WIND monster",
+   "does": "it gains 1000 ATK for that battle",
+   "src": "text",
+   "code": [
+    "005b0f40",
+    "005b7c50"
+   ],
+   "exe": "joey"
+  },
+  "579 Patrol Robo": {
+   "trig": "your Standby Phase, while face-up",
+   "does": "look at 1 face-down card the opponent has Set",
+   "code": [
+    "00585e70",
+    "0057aa30",
+    "0057f9f0",
+    "00594b70"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "585 Greenkappa": {
+   "trig": "flip",
+   "does": "destroy 2 face-down Spell/Trap cards on the field",
+   "code": [
+    "00586040",
+    "0057ac40",
+    "0057fa90",
+    "00593f80"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "601 Penguin Soldier": {
+   "trig": "flip",
+   "does": "you may return up to 2 monsters on the field to their owners' hands",
+   "code": [
+    "005861f0",
+    "0057a930",
+    "00594200"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "650 Kunai with Chain": {
+   "trig": "trap: an opponent monster attacks",
+   "does": "choose one: change the attacker to Defense Position, or equip this card to one of your monsters for +500 ATK",
+   "values": {
+    "atk": 500
+   },
+   "code": [
+    "0058cca0",
+    "0057a470",
+    "0057fae0",
+    "00594520",
+    "0056fd40 (equip calculator, id 0x28a)"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "651 Magical Labyrinth": {
+   "trig": "equip spell (Labyrinth Wall only)",
+   "does": "you may Tribute the equipped Labyrinth Wall to Special Summon Wall Shadow from your Deck",
+   "code": [
+    "00586500",
+    "0057a470",
+    "0057fb70",
+    "00594780",
+    "00583f40"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "653 Salamandra": {
+   "trig": "equip spell (FIRE only)",
+   "does": "equipped monster: ATK +700",
+   "values": {
+    "atk": 700
+   },
+   "code": [
+    "00584500",
+    "0057a470",
+    "00593a20"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "726 Manga Ryu-Ran": {
+   "trig": "toon rules",
+   "cost": "pay 500 LP per attack",
+   "does": "same Toon rules as Toon Summoned Skull",
+   "src": "text",
+   "code": [
+    "0056b7d0",
+    "0056bfd0",
+    "005ab820"
+   ],
+   "exe": "joey"
+  },
+  "727 Toon Mermaid": {
+   "trig": "toon rules",
+   "cost": "pay 500 LP per attack",
+   "does": "same Toon rules as Toon Summoned Skull",
+   "src": "text",
+   "code": [
+    "0056b7d0",
+    "0056bfd0",
+    "005ab820"
+   ],
+   "exe": "joey"
+  },
+  "728 Toon Summoned Skull": {
+   "trig": "toon rules",
+   "cost": "pay 500 LP per attack",
+   "does": "summoned only while Toon World is on the field; cannot attack the turn it is summoned; destroyed when Toon World leaves; attacks directly unless the opponent has a Toon, which it must then attack",
+   "src": "text",
+   "code": [
+    "0056b7d0",
+    "0056bfd0",
+    "005ab820"
+   ],
+   "exe": "joey"
+  },
+  "729 Dark-Eyes Illusionist": {
+   "trig": "flip",
+   "does": "1 opponent monster cannot attack while this card is on the field",
+   "code": [
+    "00586ef0",
+    "00579c40",
+    "00593970"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "735 Blast Sphere": {
+   "trig": "when attacked while face-down in Defense Position",
+   "does": "no damage calculation; this card equips to the attacker. At the opponent's next Standby Phase both are destroyed and the opponent takes damage equal to that monster's ATK",
+   "code": [
+    "0058cdf0",
+    "00582140",
+    "005a22c0",
+    "005ae220"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "740 Lord of D.": {
+   "trig": "continuous",
+   "does": "Dragons cannot be targeted by Spells, Traps or effects while this card is face-up",
+   "src": "text",
+   "code": [
+    "0056c510 (probable)",
+    "00580360 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "744 Panther Warrior": {
+   "trig": "continuous",
+   "cost": "Tribute 1 other monster to attack",
+   "does": "this card cannot attack unless you Tribute 1 of your monsters",
+   "code": [
+    "0056b7d0",
+    "005a1a00",
+    "005b05a0",
+    "005b0b90"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "751 Jinzo": {
+   "trig": "continuous",
+   "does": "Trap cards cannot be activated and the effects of face-up Traps are negated while this card is face-up",
+   "code": [
+    "005872b0",
+    "005ab820"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "759 Dark Magician Girl": {
+   "trig": "continuous",
+   "does": "+300 ATK for each Dark Magician or Magician of Black Chaos in either Graveyard",
+   "src": "text",
+   "code": [
+    "0056dd30"
+   ],
+   "exe": "joey"
+  },
+  "761 Insect Queen": {
+   "trig": "continuous",
+   "cost": "Tribute 1 other monster to attack",
+   "does": "+200 ATK for each Insect monster on the field; when it destroys a monster by battle, you get a 100/100 Insect Monster Token at the end of your turn",
+   "code": [
+    "0056dd30 (stat calculator, id 0x2f9)",
+    "0056b7d0",
+    "005a1a00",
+    "005a31a0",
+    "005b05a0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "762 Parasite Paracide": {
+   "trig": "flip",
+   "does": "shuffle this card face-up into the opponent's Deck; when they draw it, it is Special Summoned to their side in face-up Defense Position and deals 1000 damage to them; while it is face-up, all their face-up monsters become Insect-Type",
+   "code": [
+    "005875a0",
+    "005800a0",
+    "0057ccc0",
+    "0056f6f0",
+    "00578860"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "766 Blue-Eyes Toon Dragon": {
+   "trig": "toon rules",
+   "cost": "pay 500 LP per attack",
+   "does": "same Toon rules as Toon Summoned Skull",
+   "src": "text",
+   "code": [
+    "0056b7d0",
+    "0056bfd0",
+    "005ab820"
+   ],
+   "exe": "joey"
+  },
+  "796 Total Defense Shogun": {
+   "trig": "continuous",
+   "does": "it is placed in Defense Position when Normal Summoned and can attack from Defense Position, using its DEF for damage calculation",
+   "src": "text",
+   "code": [
+    "0056b730",
+    "005abd00",
+    "005ac990"
+   ],
+   "exe": "joey"
+  },
+  "808 Buster Blader": {
+   "trig": "continuous",
+   "does": "+500 ATK for each Dragon on the opponent's field and in their Graveyard",
+   "src": "text",
+   "code": [
+    "0056dd30"
+   ],
+   "exe": "joey"
+  },
+  "845 Valkyrion the Magna Warrior": {
+   "trig": "summon condition / ignition",
+   "does": "Special Summoned only by Tributing Alpha, Beta and Gamma the Magnet Warrior from hand or field; you may Tribute this card to Special Summon Alpha, Beta and Gamma from your Graveyard",
+   "cond": "the revival needs all three in the Graveyard and enough free monster zones",
+   "code": [
+    "005877e0",
+    "00580100",
+    "0057cb50",
+    "005ab7a0",
+    "005aae00"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "945 Magical Hats": {
+   "trig": "trap, during the opponent's Battle Phase",
+   "does": "take 2 non-monster cards from your Deck and 1 of your monsters, shuffle the 3 and Set them face-down in Defense Position; the 2 extra cards act as 0/0 monsters and are destroyed at the end of the Battle Phase",
+   "code": [
+    "00587a90",
+    "0057bbf0",
+    "00581130"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "950 Time Machine": {
+   "trig": "trap: a monster is destroyed by battle",
+   "does": "Special Summon it back in the same battle position",
+   "cond": "a free monster zone on its owner's side",
+   "code": [
+    "0058ceb0",
+    "005801c0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "954 Toon World": {
+   "trig": "continuous spell",
+   "cost": "pay 1000 LP",
+   "does": "enables Toon monsters",
+   "cond": "your LP must exceed 1000",
+   "code": [
+    "00580330",
+    "0057c5c0",
+    "00576360",
+    "00577280"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "962 7 Completed": {
+   "trig": "equip spell (Machine only)",
+   "does": "the equipped monster gains 700 ATK or 700 DEF (chosen on activation, fixed afterwards)",
+   "values": {
+    "atk_or_def": 700
+   },
+   "code": [
+    "00584500",
+    "0057a470",
+    "005948b0",
+    "0056dd30"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "964 Lightforce Sword": {
+   "trig": "trap",
+   "does": "banish 1 random card from the opponent's hand face-down; it returns to their hand in the Standby Phase of their 4th turn",
+   "cond": "the opponent has a card in hand",
+   "code": [
+    "00587e80",
+    "00581000",
+    "005a7440"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "966 The Flute of Summoning Dragon": {
+   "trig": "activate",
+   "does": "Special Summon up to 2 Dragons from your hand",
+   "cond": "a face-up Lord of D. on the field",
+   "code": [
+    "00587f90",
+    "00580360"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "967 Shield & Sword": {
+   "trig": "activate",
+   "does": "swap the original ATK and DEF of every face-up monster until end of turn (monsters summoned later are not affected)",
+   "code": [
+    "005881d0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "969 Chain Destruction": {
+   "trig": "trap: a monster with 2000 or less ATK is summoned",
+   "does": "destroy all copies of that monster in its summoner's hand and Deck (the summoned one stays), then shuffle",
+   "code": [
+    "0058cfd0",
+    "0057b010",
+    "00580450",
+    "00594a10",
+    "005976f0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "990 Magic-Arm Shield": {
+   "trig": "trap: the opponent declares an attack",
+   "does": "take control of 1 opponent face-up monster and make it the attack target",
+   "code": [
+    "0058d220",
+    "0057b0e0",
+    "00581210",
+    "00594b70"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1012 Burning Spear": {
+   "trig": "equip spell (FIRE only)",
+   "does": "equipped monster: ATK +400, DEF -200",
+   "values": {
+    "atk": 400,
+    "def": -200
+   },
+   "code": [
+    "00584500",
+    "0057a470",
+    "00593a20",
+    "0056fd40"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1013 Gust Fan": {
+   "trig": "equip spell (WIND only)",
+   "does": "equipped monster: ATK +400, DEF -200",
+   "values": {
+    "atk": 400,
+    "def": -200
+   },
+   "code": [
+    "00584500",
+    "0057a470",
+    "00593a20",
+    "0056fd40"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1017 Ultimate Offering": {
+   "trig": "continuous trap",
+   "cost": "500 LP per extra summon",
+   "does": "a player may make additional Normal Summons or Sets for 500 LP each",
+   "code": [
+    "00588b70",
+    "00580870",
+    "0057d6a0",
+    "0057c450"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1024 Soul Release": {
+   "trig": "activate",
+   "does": "banish up to 5 cards from either Graveyard",
+   "code": [
+    "00588830",
+    "00580d60",
+    "00594f00"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1038 Magic Thorn": {
+   "trig": "continuous trap",
+   "does": "the opponent takes 500 damage per card discarded from their hand by a card effect",
+   "src": "text",
+   "quirk": "its effect-table routine is empty; the damage is applied in the discard code",
+   "code": [
+    "0059ce90",
+    "0059cf30"
+   ],
+   "exe": "joey"
+  },
+  "1040 Fusion Sage": {
+   "trig": "activate",
+   "does": "add 1 Polymerization from your Deck to your hand, then shuffle",
+   "quirk": "either Polymerization art id (0x3eb or 0x40a) counts",
+   "code": [
+    "005892d0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1054 Last Will": {
+   "trig": "activate (lasts this turn)",
+   "does": "once this turn, when your monster is sent from the field to the Graveyard, you may Special Summon 1 monster with 1500 or less ATK from your Deck, then shuffle",
+   "code": [
+    "00589610",
+    "00581050"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1062 Gryphon Wing": {
+   "trig": "trap: the opponent activates Harpie's Feather Duster",
+   "does": "the opponent's Spell and Trap cards are destroyed instead of yours",
+   "code": [
+    "00588d90",
+    "00580960"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1090 Time Seal": {
+   "trig": "trap",
+   "does": "the opponent skips their next Draw Phase",
+   "code": [
+    "0058a140"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1091 Graverobber": {
+   "trig": "trap",
+   "does": "take 1 Spell from the opponent's Graveyard; you may use it from your hand this turn, taking 2000 damage if you activate it",
+   "cond": "the opponent has a Spell in their Graveyard",
+   "code": [
+    "0058a170",
+    "00581630",
+    "00593530"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1092 Gift of The Mystical Elf": {
+   "trig": "trap",
+   "does": "gain 300 LP for each monster on the field",
+   "code": [
+    "0058a200"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1093 The Eye of Truth": {
+   "trig": "continuous trap",
+   "does": "the opponent plays with their hand revealed; they gain 1000 LP in each of their Standby Phases if they hold a Spell",
+   "code": [
+    "0058a250"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1094 Dust Tornado": {
+   "trig": "trap",
+   "does": "destroy 1 Spell/Trap the opponent controls; you may then Set 1 Spell/Trap from your hand",
+   "code": [
+    "0058a2c0",
+    "0057b4d0",
+    "00597570",
+    "005a9d20"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1095 Call Of The Haunted": {
+   "trig": "continuous trap",
+   "does": "Special Summon 1 monster from your Graveyard in face-up Attack Position; if this card leaves the field the monster is destroyed, and vice versa",
+   "quirk": "shares Premature Burial's resolve routine",
+   "code": [
+    "0058a4a0",
+    "005816e0",
+    "00593530",
+    "00574d10"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1096 Solomon's Lawbook": {
+   "trig": "activate",
+   "does": "skip your next Standby Phase",
+   "code": [
+    "0058a660"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1097 Earthshaker": {
+   "trig": "trap",
+   "does": "choose 2 Attributes; the opponent picks 1 and all face-up monsters of that Attribute are destroyed",
+   "code": [
+    "0058a690",
+    "00581740",
+    "0056f9e0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1099 Mirror Wall": {
+   "trig": "continuous trap",
+   "cost": "pay 2000 LP in each of your Standby Phases, or destroy this card",
+   "does": "opponent monsters that attack have their ATK halved",
+   "quirk": "the CPU only keeps paying while it has more than 6000 LP",
+   "code": [
+    "0058d860",
+    "005a1f30",
+    "005a8090",
+    "005b2640"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1107 Banisher of the Light": {
+   "trig": "continuous",
+   "does": "while face-up, any card sent to the Graveyard is banished instead",
+   "src": "text",
+   "code": [
+    "00575af0 (probable)",
+    "00577cf0 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1111 Flash Assailant": {
+   "trig": "continuous",
+   "does": "-400 ATK and DEF for each card in your hand",
+   "src": "text",
+   "code": [
+    "0056dd30"
+   ],
+   "exe": "joey"
+  },
+  "1112 Karate Man": {
+   "trig": "ignition, once per turn",
+   "does": "this card's original ATK is doubled; it is destroyed at the End Phase",
+   "code": [
+    "0058afe0",
+    "00580050",
+    "0056dd30 (stat calculator, id 0x458)",
+    "0056af90",
+    "005740e0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1113 Dark Zebra": {
+   "trig": "your Standby Phase",
+   "does": "if it is the only card you control it is changed to Defense Position and cannot change position that turn",
+   "src": "text",
+   "code": [
+    "005a6120 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1116 Spear Cretin": {
+   "trig": "flip, then when sent to the Graveyard",
+   "does": "each player Special Summons 1 monster from their own Graveyard in face-up Attack or face-down Defense Position (no Tribute needed)",
+   "code": [
+    "0058b3d0",
+    "00581040",
+    "0057c5f0",
+    "00595a90",
+    "0058b400"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1118 Boar Soldier": {
+   "trig": "summon rule / continuous",
+   "does": "destroyed if Normal Summoned (must be Flip Summoned); loses 1000 ATK while the opponent controls a monster",
+   "src": "text",
+   "code": [
+    "0056dd30",
+    "005abd00"
+   ],
+   "exe": "joey"
+  },
+  "1121 Ceremonial Bell": {
+   "trig": "continuous",
+   "does": "both players play with their hands revealed",
+   "src": "text",
+   "code": [
+    "0056d3f0 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1124 Kotodama": {
+   "trig": "continuous",
+   "does": "face-up monsters with the same name cannot coexist: a later summon of a duplicate is destroyed, and duplicates summoned together are all destroyed",
+   "code": [
+    "0059d090"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1131 Messenger of Peace": {
+   "trig": "continuous spell",
+   "cost": "pay 100 LP in each of your Standby Phases, or destroy this card",
+   "does": "monsters with 1500 or more ATK cannot attack",
+   "src": "text",
+   "quirk": "its effect-table routine is empty; the attack ban is checked in the battle code",
+   "code": [
+    "005a8090"
+   ],
+   "exe": "joey"
+  },
+  "1134 Gust": {
+   "trig": "trap: your Spell(s) are destroyed by an opponent's card effect",
+   "does": "destroy 1 Spell or Trap on the field",
+   "code": [
+    "00585c80",
+    "0057b530",
+    "00581790",
+    "00597570"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1135 Driving Snow": {
+   "trig": "trap: your Trap(s) are destroyed by an opponent's card effect",
+   "does": "destroy 1 Spell or Trap on the field",
+   "quirk": "uses the same routine as Gust",
+   "code": [
+    "00585c80",
+    "0057b530",
+    "00581790",
+    "00597570"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1136 Armored Glass": {
+   "trig": "trap: a monster is equipped with an Equip card",
+   "does": "negate the effects of all Equip cards on the field this turn",
+   "quirk": "monster cards used as equips (e.g. Beast of Gilfer) are negated too",
+   "code": [
+    "0058b5e0",
+    "005818c0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1137 World Suppression": {
+   "trig": "trap: a Field Spell is activated",
+   "does": "negate that Field Spell this turn",
+   "code": [
+    "0058b5e0",
+    "005818c0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1138 Mystic Probe": {
+   "trig": "trap: a Continuous Spell is activated",
+   "does": "negate all Continuous Spell cards this turn",
+   "code": [
+    "0058b5e0",
+    "005818c0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1139 Metal Detector": {
+   "trig": "trap: a Continuous Trap is activated",
+   "does": "negate all Continuous Trap cards this turn",
+   "code": [
+    "0058b5e0",
+    "005818c0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1140 Numinous Healer": {
+   "trig": "trap: you take damage",
+   "does": "gain 1000 LP, plus 500 for each Numinous Healer in your Graveyard",
+   "code": [
+    "0058b810",
+    "005818c0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1141 Appropriate": {
+   "trig": "continuous trap, activated when the opponent draws outside their Draw Phase",
+   "does": "each time the opponent draws outside their Draw Phase, you draw 2 cards",
+   "code": [
+    "0058b930",
+    "005818c0",
+    "00578860"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1142 Forced Requisition": {
+   "trig": "continuous trap, activated when you discard",
+   "does": "each time you discard, the opponent discards the same number of cards",
+   "code": [
+    "0058b9a0",
+    "005818c0",
+    "0059d240"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1145 DNA Surgery": {
+   "trig": "continuous trap",
+   "does": "declare a monster Type; all face-up monsters become that Type",
+   "quirk": "the CPU picks the Type the same way as The Regulation of Tribe",
+   "code": [
+    "00595ce0",
+    "0056f6f0 (type override)",
+    "005a9870"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1146 The Regulation of Tribe": {
+   "trig": "continuous trap",
+   "cost": "Tribute 1 monster in each of your Standby Phases, or this card is destroyed",
+   "does": "declare a monster Type; monsters of that Type cannot attack",
+   "quirk": "the CPU declares the Type of the opponent's strongest monster",
+   "code": [
+    "00595ce0",
+    "0056bce0",
+    "005a8090",
+    "005a9870"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1147 Backup Soldier": {
+   "trig": "trap",
+   "does": "add up to 3 non-Effect monsters with 1500 or less ATK from your Graveyard to your hand",
+   "cond": "5 or more monsters in your Graveyard",
+   "code": [
+    "0058ba80",
+    "00581b30",
+    "00595d60"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1149 Major Riot": {
+   "trig": "trap: 1 or more of your monsters return from the field to your hand",
+   "does": "return all monsters on the field to their owners' hands; each player may then Special Summon from hand as many monsters as they had on the field, in face-down Defense Position",
+   "quirk": "only Level 4 or lower monsters can be re-summoned",
+   "code": [
+    "0058bb10",
+    "00581790",
+    "005976f0",
+    "005a9d20"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1150 Ceasefire": {
+   "trig": "trap",
+   "does": "flip all face-down monsters face-up (no flip effects), then the opponent takes 500 damage per Effect Monster on the field",
+   "code": [
+    "0058bf40",
+    "00581b80"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1151 Light of Intervention": {
+   "trig": "continuous trap",
+   "does": "monsters cannot be Set face-down; Set monsters are placed face-up in Defense Position and count as summoned",
+   "src": "text",
+   "code": [],
+   "exe": "joey"
+  },
+  "1152 Respect Play": {
+   "trig": "continuous trap",
+   "does": "each player plays with their hand revealed during their own turn",
+   "src": "text",
+   "quirk": "its effect-table routine is empty; the effect is applied elsewhere",
+   "code": [
+    "00581210",
+    "005b2640"
+   ],
+   "exe": "joey"
+  },
+  "1161 Inspection": {
+   "trig": "continuous spell, the opponent's Standby Phase",
+   "cost": "pay 500 LP",
+   "does": "look at 1 random card in the opponent's hand",
+   "cond": "you have 501 or more LP and the opponent has a card in hand",
+   "code": [
+    "0058c2e0",
+    "00581cd0",
+    "0057d8b0",
+    "0057c450",
+    "005a7550"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1162 Prohibition": {
+   "trig": "continuous spell",
+   "does": "declare 1 card name; cards with that name cannot be played while this card is on the field (copies already on the field are unaffected)",
+   "quirk": "the CPU names a random card from the opponent's hand (a fixed default when the hand is empty)",
+   "code": [
+    "0058c430",
+    "00595f20",
+    "0056ad50",
+    "0056b440",
+    "0059d370"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1163 Morphing Jar #2": {
+   "trig": "flip",
+   "does": "all monsters on the field are shuffled into their owners' Decks; each player reveals cards from the top until they reach as many Level 4 or lower monsters as they lost, Special Summons those face-down in Defense Position and sends the rest to the Graveyard",
+   "code": [
+    "0058c490",
+    "005b6690",
+    "005b6e40"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1170 Kiseitai": {
+   "trig": "when attacked while face-down in Defense Position",
+   "does": "no damage calculation; this card equips to the attacker. In each of the opponent's Standby Phases you gain LP equal to half that monster's ATK",
+   "quirk": "uses the same equip-on-attack routine as Blast Sphere",
+   "code": [
+    "0058cdf0",
+    "00582140",
+    "005a22c0",
+    "005ae220"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1178 Aqua Chorus": {
+   "trig": "continuous trap",
+   "does": "monsters that share a name with another monster on the field gain 500 ATK and DEF",
+   "src": "text",
+   "quirk": "its effect-table routine is empty; the bonus is applied elsewhere",
+   "code": [
+    "005683f0"
+   ],
+   "exe": "joey"
+  },
+  "1179 Sebek's Blessing": {
+   "trig": "quick-play: your monster dealt direct damage to the opponent",
+   "does": "gain LP equal to that damage",
+   "code": [
+    "0058d930",
+    "00581d60"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1181 Riryoku": {
+   "trig": "activate, your turn",
+   "does": "halve the ATK of 1 face-up monster and add that amount to another face-up monster until end of turn",
+   "code": [
+    "0058c950",
+    "0057aec0",
+    "00581de0",
+    "005961c0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1182 Sword of Dragon's Soul": {
+   "trig": "equip spell (Warrior only)",
+   "does": "equipped monster: ATK +700; a Dragon that battles it is destroyed at the end of the Battle Phase",
+   "values": {
+    "atk": 700
+   },
+   "code": [
+    "00584500",
+    "0057a470",
+    "00593a20",
+    "0056fd40"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1183 Seal of the Ancients": {
+   "trig": "activate",
+   "cost": "pay 1000 LP",
+   "does": "reveal all the opponent's face-down cards, then turn them face-down again; no effects activate",
+   "cond": "your LP must exceed 1000 and the opponent has a face-down card",
+   "code": [
+    "00589480",
+    "00581e10",
+    "0057c5c0",
+    "0057c450"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1201 Big Shield Gardna": {
+   "trig": "continuous",
+   "does": "while face-down, a Spell that targets only this card is negated and this card turns face-up in Defense Position; after it is attacked it changes to Attack Position at the end of the Damage Step",
+   "src": "text",
+   "code": [
+    "00583510",
+    "005a22c0"
+   ],
+   "exe": "joey"
+  },
+  "1203 Graceful Dice": {
+   "trig": "quick-play",
+   "does": "roll a die; your monsters gain 100 x the roll in ATK and DEF until end of turn (monsters summoned later are not affected)",
+   "cond": "you control a monster",
+   "quirk": "the CPU values the roll as a fixed 400 when planning",
+   "code": [
+    "0058ca70",
+    "00581e80",
+    "0056dd30 (stat calculator, id 0x4b3)",
+    "005b2e60"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1204 Skull Dice": {
+   "trig": "trap",
+   "does": "roll a die; all opponent monsters lose 100 x the roll in ATK and DEF until the end of the turn (monsters summoned later are not affected)",
+   "cond": "the opponent controls a monster",
+   "quirk": "the CPU values the roll as a fixed 400 when planning and only uses it against 2 or more monsters",
+   "code": [
+    "0058ca70",
+    "00581eb0",
+    "0056dd30 (stat calculator, id 0x4b4)",
+    "005b2e60"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1212 Dark Magic Curtain": {
+   "trig": "activate",
+   "cost": "pay half your LP",
+   "does": "Special Summon 1 Dark Magician from your Deck; you cannot summon any other monster this turn",
+   "cond": "a free monster zone, you have not summoned this turn, and a Dark Magician is in your Deck",
+   "code": [
+    "0058dec0",
+    "00581fc0",
+    "0057c5c0",
+    "0057c450"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1213 Mystic Box": {
+   "trig": "activate",
+   "does": "destroy 1 opponent monster, then give control of 1 of your monsters to the opponent",
+   "cond": "both players control a monster",
+   "code": [
+    "0058dfe0",
+    "0057a930",
+    "00582040",
+    "005963e0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1230 Nightmare's Steelcage": {
+   "trig": "activate",
+   "does": "no monster can attack for the opponent's next 2 turns; this card is then destroyed",
+   "src": "text",
+   "code": [
+    "005a5120 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1231 Rocket Warrior": {
+   "trig": "continuous, your Battle Phase",
+   "does": "you take no battle damage from this card's battles; a monster it attacks loses 500 ATK until end of turn",
+   "src": "text",
+   "code": [
+    "0056dd30",
+    "005b0f40",
+    "005b8210"
+   ],
+   "exe": "joey"
+  },
+  "1232 Multiply": {
+   "trig": "quick-play",
+   "cost": "Tribute 1 face-up Kuriboh",
+   "does": "fill every free Monster Zone with a 300/200 Kuriboh Token in Defense Position; the tokens cannot be Tributed",
+   "code": [
+    "0058e2f0",
+    "0057b730",
+    "00582680",
+    "0057d8f0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1240 Berfomet": {
+   "trig": "when Normal Summoned (not Special Summon)",
+   "does": "you may add 1 Gazelle the King of Mythical Beasts from your Deck to your hand",
+   "code": [
+    "0058e3a0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1242 Beast of Gilfer": {
+   "trig": "when sent to the Graveyard",
+   "does": "you may equip it to a monster on the field as an Equip Spell; that monster loses 500 ATK",
+   "values": {
+    "atk": -500
+   },
+   "code": [
+    "0058e580",
+    "0057a470",
+    "005965e0",
+    "0056fd40 (equip calculator, id 0x4da)"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1246 Copycat": {
+   "trig": "when summoned (including Special Summon)",
+   "does": "its ATK and DEF become the original ATK and DEF of 1 opponent monster",
+   "src": "text",
+   "code": [
+    "005abd00",
+    "005ac990",
+    "005acf10",
+    "005ad350",
+    "005b3fa0"
+   ],
+   "exe": "joey"
+  },
+  "1248 Makiu": {
+   "trig": "activate",
+   "does": "choose Summoned Skull or a Thunder monster you control; destroy all opponent monsters whose DEF is lower than its ATK; skip your Battle Phase this turn",
+   "src": "text",
+   "code": [
+    "00567c90",
+    "00592bb0"
+   ],
+   "exe": "joey"
+  },
+  "1253 Kinetic Soldier": {
+   "trig": "during damage calculation against a Warrior",
+   "does": "this card gains 2000 ATK and DEF for that calculation",
+   "src": "text",
+   "code": [],
+   "exe": "joey"
+  },
+  "1254 Slate Warrior": {
+   "trig": "flip / when destroyed by battle",
+   "does": "flip: this card gains 500 ATK and DEF; the monster that destroys it loses 500 ATK and DEF",
+   "src": "text",
+   "code": [
+    "0056af90",
+    "0056dd30",
+    "005ae270"
+   ],
+   "exe": "joey"
+  },
+  "1255 Electromagnetic Bagworm": {
+   "trig": "flip / when destroyed by battle",
+   "does": "flip: take control of 1 opponent Machine monster until your next End Phase; the monster that destroys this card by battle loses 500 ATK and DEF",
+   "src": "text",
+   "code": [
+    "0056c210"
+   ],
+   "exe": "joey"
+  },
+  "1256 Rigras Leever": {
+   "trig": "flip / when destroyed by battle",
+   "does": "flip: each player picks 1 card from the other's hand and discards it; the monster that destroys this card loses 500 ATK and DEF",
+   "src": "text",
+   "code": [
+    "0056dd30"
+   ],
+   "exe": "joey"
+  },
+  "1301 Michizure": {
+   "trig": "trap: your monster is sent from the field to the Graveyard",
+   "does": "destroy 1 monster on the field",
+   "src": "text",
+   "code": [
+    "00567c90",
+    "005683f0",
+    "005976f0"
+   ],
+   "exe": "joey"
+  },
+  "1302 Minor Goblin Official": {
+   "trig": "continuous trap",
+   "does": "the opponent takes 500 damage in each of their Standby Phases",
+   "cond": "activate only while the opponent has 3000 or less LP",
+   "src": "text",
+   "code": [
+    "005a6cc0 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1303 Gamble": {
+   "trig": "trap",
+   "does": "toss a coin and call it: right = draw until you have 5 cards; wrong = skip your next turn",
+   "cond": "the opponent has 6 or more cards in hand and you have 2 or fewer",
+   "src": "text",
+   "code": [
+    "005a59b0 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1304 Attack and Receive": {
+   "trig": "trap: you take damage",
+   "does": "the opponent takes 700 damage, plus 300 for each Attack and Receive in your Graveyard",
+   "quirk": "shares Numinous Healer's resolve routine",
+   "code": [
+    "0058b810",
+    "005818c0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1305 Solemn Wishes": {
+   "trig": "continuous trap",
+   "does": "gain 500 LP each time you draw (once per draw, however many cards)",
+   "code": [
+    "0059d560",
+    "0059d5f0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1306 Skull Invitation": {
+   "trig": "continuous trap",
+   "does": "each time cards are sent to the Graveyard, their owner takes 300 damage per card",
+   "src": "text",
+   "code": [
+    "0059d6e0",
+    "0059d790"
+   ],
+   "exe": "joey"
+  },
+  "1307 Bubonic Vermin": {
+   "trig": "flip",
+   "does": "you may Special Summon 1 Bubonic Vermin from your Deck in face-down Defense Position, then shuffle",
+   "src": "text",
+   "code": [
+    "00567620 (flip list)",
+    "0058b040",
+    "00599e30"
+   ],
+   "exe": "joey"
+  },
+  "1311 Burning Land": {
+   "trig": "continuous spell",
+   "does": "destroy all Field Spells; each player takes 500 damage in their own Standby Phase",
+   "src": "text",
+   "code": [
+    "005a6760 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1312 Cold Wave": {
+   "trig": "activate at the start of your Main Phase 1",
+   "does": "until your next Draw Phase, neither player can activate or Set Spell/Trap cards",
+   "src": "text",
+   "code": [
+    "005685c0 (probable)",
+    "0057e490 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1313 Fairy Meteor Crush": {
+   "trig": "equip spell",
+   "does": "the equipped monster inflicts piercing battle damage against Defense Position monsters",
+   "src": "text",
+   "code": [
+    "00567b00",
+    "00579ce0"
+   ],
+   "exe": "joey"
+  },
+  "1314 Limiter Removal": {
+   "trig": "quick-play",
+   "does": "double the ATK of all your Machine monsters; destroy them at the End Phase",
+   "src": "text",
+   "code": [
+    "005683f0"
+   ],
+   "exe": "joey"
+  },
+  "1317 Shift": {
+   "trig": "trap: the opponent targets 1 of your monsters with a Spell, Trap or attack",
+   "does": "move that target to another of your monsters",
+   "src": "text",
+   "code": [
+    "00595360",
+    "005968f0",
+    "005b2640"
+   ],
+   "exe": "joey"
+  },
+  "1318 Insect Imitation": {
+   "trig": "activate",
+   "cost": "Tribute 1 monster you control",
+   "does": "Special Summon 1 Insect from your Deck whose Level is 1 higher than the Tributed monster (Attack or face-down Defense), then shuffle",
+   "src": "text",
+   "code": [
+    "00599e30"
+   ],
+   "exe": "joey"
+  },
+  "1319 Dimensionhole": {
+   "trig": "activate",
+   "does": "banish 1 of your monsters until your next Standby Phase; its zone stays occupied",
+   "src": "text",
+   "code": [
+    "005a5ea0",
+    "00567c90"
+   ],
+   "exe": "joey"
+  },
+  "1320 Ground Collapse": {
+   "trig": "continuous spell",
+   "does": "choose 2 empty Monster Zones; they cannot be used while this card is face-up",
+   "src": "text",
+   "code": [
+    "00569e10"
+   ],
+   "exe": "joey"
+  },
+  "1321 Magic Drain": {
+   "trig": "counter trap: the opponent activates a Spell",
+   "does": "unless they discard 1 Spell from their hand, negate the Spell and destroy it",
+   "src": "text",
+   "code": [
+    "005683f0",
+    "00580960"
+   ],
+   "exe": "joey"
+  },
+  "1322 Infinite Dismissal": {
+   "trig": "continuous trap",
+   "does": "Level 3 or lower monsters Normal or Flip Summoned this turn are destroyed at the End Phase",
+   "src": "text",
+   "code": [
+    "005a4560 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1323 Gravity Bind": {
+   "trig": "continuous trap",
+   "does": "monsters of Level 4 or higher cannot attack (positions can still change)",
+   "code": [
+    "005b2640 (id 0x52b)"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1324 Type Zero Magic Crusher": {
+   "trig": "continuous trap",
+   "does": "the opponent takes 500 damage for each Spell you discard from your hand",
+   "src": "text",
+   "code": [
+    "00584e60",
+    "00568030"
+   ],
+   "exe": "joey"
+  },
+  "1325 Shadow of Eyes": {
+   "trig": "trap: the opponent Sets a monster",
+   "does": "change it to face-up Attack Position; its flip effect does not activate",
+   "src": "text",
+   "code": [
+    "00567c90",
+    "005976f0"
+   ],
+   "exe": "joey"
+  },
+  "1326 The Legendary Fisherman": {
+   "trig": "continuous",
+   "does": "while Umi is face-up, this card is unaffected by Spells and cannot be attacked",
+   "src": "text",
+   "code": [
+    "0056bd80",
+    "0056bf20",
+    "0056c460",
+    "005ae270"
+   ],
+   "exe": "joey"
+  },
+  "1327 Sword Hunter": {
+   "trig": "when this card destroys a monster by battle",
+   "does": "equip that monster to this card as an Equip Spell; +200 ATK per equipped card, until this card leaves the field",
+   "src": "text",
+   "code": [
+    "005a31a0",
+    "005a3af0"
+   ],
+   "exe": "joey"
+  },
+  "1328 Drill Bug": {
+   "trig": "when this card deals battle damage to the opponent",
+   "does": "you may take 1 Parasite Paracide from your Deck, shuffle, and place it on top of your Deck",
+   "src": "text",
+   "code": [
+    "00578540",
+    "00599e30"
+   ],
+   "exe": "joey"
+  },
+  "1329 Deepsea Warrior": {
+   "trig": "continuous",
+   "does": "while Umi is face-up on the field, this card is unaffected by Spell cards",
+   "src": "text",
+   "code": [
+    "0056c460",
+    "005ae270"
+   ],
+   "exe": "joey"
+  },
+  "1330 Bite Shoes": {
+   "trig": "flip",
+   "does": "change the battle position of 1 face-up monster (it stays face-up)",
+   "src": "text",
+   "code": [
+    "00567620 (flip list)"
+   ],
+   "exe": "joey"
+  },
+  "1336 Hayabusa Knight": {
+   "trig": "continuous",
+   "does": "can attack twice in the same Battle Phase",
+   "src": "text",
+   "code": [
+    "0056c180",
+    "00570cf0"
+   ],
+   "exe": "joey"
+  },
+  "1337 Bombardment Beetle": {
+   "trig": "flip",
+   "does": "flip 1 opponent face-down Defense monster face-up; if it is an Effect Monster destroy it without activating its effect, otherwise turn it face-down again",
+   "src": "text",
+   "code": [
+    "00567620 (flip list)",
+    "00592bb0"
+   ],
+   "exe": "joey"
+  },
+  "1338 4-Starred Ladybug of Doom": {
+   "trig": "flip",
+   "does": "destroy all face-up Level 4 monsters the opponent controls",
+   "src": "text",
+   "code": [
+    "00567620 (flip list)",
+    "005b6690"
+   ],
+   "exe": "joey"
+  },
+  "1340 Red-Moon Baby": {
+   "trig": "when this card destroys a monster by battle",
+   "does": "at the end of the Battle Phase you may Special Summon that monster to your side in face-up Attack or Defense Position",
+   "src": "text",
+   "code": [
+    "005a31a0"
+   ],
+   "exe": "joey"
+  },
+  "1341 Mad Sword Beast": {
+   "trig": "continuous",
+   "does": "inflicts piercing battle damage against Defense Position monsters",
+   "src": "text",
+   "code": [
+    "005b0f40",
+    "005b8210"
+   ],
+   "exe": "joey"
+  },
+  "1344 Goblin Attack Force": {
+   "trig": "after it attacks",
+   "does": "it changes to Defense Position at the end of the Battle Phase and cannot change position during your next turn",
+   "code": [
+    "0056af90",
+    "005740e0",
+    "005a22c0",
+    "005b05a0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1351 Gearfried the Iron Knight": {
+   "trig": "continuous",
+   "does": "any Equip card equipped to this card is destroyed",
+   "src": "text",
+   "code": [
+    "00574480",
+    "005965e0",
+    "005b0150"
+   ],
+   "exe": "joey"
+  },
+  "1352 Insect Barrier": {
+   "trig": "continuous spell",
+   "does": "the opponent's Insect monsters cannot attack",
+   "src": "text",
+   "code": [
+    "0056b7d0 (probable)",
+    "005a9870 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1405 Revival Jam": {
+   "trig": "when destroyed by battle",
+   "cost": "pay 1000 LP (declared when it is destroyed)",
+   "does": "Special Summon it in face-up Defense Position at your next Standby Phase; it cannot change position that turn",
+   "src": "text",
+   "code": [
+    "00576f40",
+    "00577cf0",
+    "005ae8f0"
+   ],
+   "exe": "joey"
+  },
+  "1413 Nuvia the Wicked": {
+   "trig": "summon rule / continuous",
+   "does": "destroyed if Normal Summoned; loses 200 ATK for each opponent monster",
+   "src": "text",
+   "code": [
+    "0056dd30",
+    "005abd00",
+    "005ae220"
+   ],
+   "exe": "joey"
+  },
+  "1414 Chosen One": {
+   "trig": "activate",
+   "does": "choose 1 monster and 2 non-monsters from your hand; the opponent picks 1 at random. Monster: Special Summon it (Attack or Defense) and send the other 2 to the Graveyard; otherwise send all 3 to the Graveyard",
+   "quirk": "when the CPU is the picker it chooses uniformly at random",
+   "code": [
+    "00599e30 (list builder, id 0x586)",
+    "005aa020"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1415 Mask of Weakness": {
+   "trig": "trap, Battle Phase only",
+   "does": "1 attacking monster loses 700 ATK until end of turn",
+   "values": {
+    "atk": -700
+   },
+   "src": "text",
+   "code": [
+    "0056dd30",
+    "0058d660",
+    "005b2e60"
+   ],
+   "exe": "joey"
+  },
+  "1417 Mask of Dispel": {
+   "trig": "continuous spell",
+   "does": "choose 1 face-up Spell; its controller takes 500 damage in each of their Standby Phases; this card is destroyed when that Spell leaves the field",
+   "src": "text",
+   "code": [
+    "00574d10",
+    "00576360",
+    "00577280"
+   ],
+   "exe": "joey"
+  },
+  "1418 Mask of Restrict": {
+   "trig": "continuous trap",
+   "does": "neither player can Tribute monsters",
+   "src": "text",
+   "code": [
+    "00567b00 (probable)",
+    "0056a290 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1419 Mask of the Accursed": {
+   "trig": "equip spell",
+   "does": "the equipped monster cannot attack; its controller takes 500 damage in each of your Standby Phases",
+   "src": "text",
+   "code": [
+    "00579ce0",
+    "005b3fa0"
+   ],
+   "exe": "joey"
+  },
+  "1420 Mask of Brutality": {
+   "trig": "equip spell",
+   "cost": "pay 1000 LP in each of your Standby Phases, or destroy this card",
+   "does": "equipped monster: ATK +1000, DEF -1000",
+   "values": {
+    "atk": 1000,
+    "def": -1000
+   },
+   "code": [
+    "0056fd40 (equip calculator, id 0x58c)",
+    "00579ce0",
+    "005a8090"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1421 Return of the Doomed": {
+   "trig": "activate",
+   "cost": "discard 1 monster",
+   "does": "at the End Phase, 1 of your monsters sent to the Graveyard by battle this turn returns to your hand",
+   "src": "text",
+   "code": [
+    "00599e30"
+   ],
+   "exe": "joey"
+  },
+  "1422 Lightning Blade": {
+   "trig": "equip spell (Warrior only)",
+   "does": "equipped monster: ATK +800; all WATER monsters on the field lose 500 ATK",
+   "values": {
+    "atk": 800,
+    "WATER_atk": -500
+   },
+   "code": [
+    "0056fd40 (equip calculator, id 0x58e)",
+    "00567b00",
+    "00579ce0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1423 Tornado Wall": {
+   "trig": "continuous trap",
+   "does": "while Umi is face-up, damage to your LP becomes 0; destroyed when Umi leaves",
+   "cond": "activate only while Umi is face-up",
+   "src": "text",
+   "code": [
+    "00576360",
+    "00577280",
+    "00584a90"
+   ],
+   "exe": "joey"
+  },
+  "1424 Fairy Box": {
+   "trig": "continuous trap",
+   "cost": "pay 500 LP in each of your Standby Phases, or destroy this card",
+   "does": "each time an opponent monster attacks, toss a coin and call it; if right, the attacker's ATK is 0 for the Battle Phase",
+   "src": "text",
+   "code": [
+    "0056dd30",
+    "005a1f30",
+    "005a4010",
+    "005a8090",
+    "005b2640"
+   ],
+   "exe": "joey"
+  },
+  "1425 Torrential Tribute": {
+   "trig": "trap: a monster is summoned (Normal, Flip or Special)",
+   "does": "destroy all monsters on the field",
+   "src": "text",
+   "code": [
+    "005976f0"
+   ],
+   "exe": "joey"
+  },
+  "1426 Jam Breeding Machine": {
+   "trig": "continuous spell",
+   "does": "in each of your Standby Phases, Special Summon a 500/500 Slime Token; you cannot summon any other monster while it is face-up",
+   "src": "text",
+   "code": [
+    "005a7800 (probable)",
+    "00570b40 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1427 Infinite Cards": {
+   "trig": "continuous spell",
+   "does": "no hand-size limit for either player",
+   "src": "text",
+   "code": [
+    "005a5120 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1428 Jam Defender": {
+   "trig": "continuous trap",
+   "does": "when an opponent monster attacks while you have a face-up Revival Jam, you may redirect the attack to Revival Jam",
+   "src": "text",
+   "code": [
+    "00567c90",
+    "00592bb0"
+   ],
+   "exe": "joey"
+  },
+  "1429 Card of Safe Return": {
+   "trig": "continuous spell",
+   "does": "when a monster is Special Summoned from your Graveyard, you may draw 1 card",
+   "src": "text",
+   "code": [
+    "0059d8f0",
+    "005ab820"
+   ],
+   "exe": "joey"
+  },
+  "1430 Lady Panther": {
+   "trig": "ignition",
+   "cost": "Tribute this face-up card",
+   "does": "put 1 of your monsters destroyed by battle this turn on top of your Deck",
+   "src": "text",
+   "code": [
+    "005901a0",
+    "00568030",
+    "00599e30"
+   ],
+   "exe": "joey"
+  },
+  "1431 The Unfriendly Amazon": {
+   "trig": "your Standby Phase",
+   "cost": "Tribute 1 other monster you control, or destroy this card",
+   "does": "upkeep cost only",
+   "src": "text",
+   "code": [
+    "005a8090"
+   ],
+   "exe": "joey"
+  },
+  "1432 Amazon Archer": {
+   "trig": "ignition",
+   "cost": "Tribute 2 monsters you control",
+   "does": "deal 1200 damage to the opponent",
+   "code": [
+    "00584e60 (damage table, id 0x598)",
+    "00568030"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1433 Crimson Sentry": {
+   "trig": "ignition",
+   "cost": "Tribute this face-up card",
+   "does": "return 1 of your monsters destroyed by battle this turn from the Graveyard to the bottom of your Deck",
+   "code": [
+    "005901a0",
+    "00568030",
+    "00568310",
+    "00599e30"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1434 Fire Princess": {
+   "trig": "continuous",
+   "does": "each time you gain LP, the opponent takes 500 damage",
+   "src": "text",
+   "code": [
+    "0059da10",
+    "0059dab0",
+    "005ae270"
+   ],
+   "exe": "joey"
+  },
+  "1435 Lady Assailant of Flames": {
+   "trig": "flip",
+   "cost": "banish the top 3 cards of your Deck",
+   "does": "deal 800 damage to the opponent",
+   "src": "text",
+   "code": [
+    "00567620 (flip list)",
+    "00584e60"
+   ],
+   "exe": "joey"
+  },
+  "1436 Fire Sorcerer": {
+   "trig": "flip",
+   "cost": "banish 2 random cards from your hand",
+   "does": "deal 800 damage to the opponent",
+   "src": "text",
+   "code": [
+    "00567620 (flip list)",
+    "00584e60"
+   ],
+   "exe": "joey"
+  },
+  "1437 Spirit of the Breeze": {
+   "trig": "your Standby Phase, while face-up in Attack Position",
+   "does": "gain 1000 LP",
+   "src": "text",
+   "code": [
+    "005a6240 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1438 Dancing Fairy": {
+   "trig": "your Standby Phase, while face-up in Defense Position",
+   "does": "gain 1000 LP",
+   "src": "text",
+   "code": [
+    "005adec0"
+   ],
+   "exe": "joey"
+  },
+  "1439 Fairy Guardian": {
+   "trig": "ignition",
+   "cost": "Tribute this face-up card",
+   "does": "put 1 Spell the opponent sent to your Graveyard this turn on the bottom of your Deck",
+   "src": "text",
+   "code": [
+    "005901a0",
+    "00568030",
+    "00599e30"
+   ],
+   "exe": "joey"
+  },
+  "1441 Cure Mermaid": {
+   "trig": "your Standby Phase, while face-up",
+   "does": "gain 800 LP",
+   "src": "text",
+   "code": [
+    "005a6440 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1442 Hysteric Fairy": {
+   "trig": "ignition",
+   "cost": "Tribute 2 monsters you control",
+   "does": "gain 1000 LP",
+   "src": "text",
+   "code": [
+    "00568030"
+   ],
+   "exe": "joey"
+  },
+  "1444 The Forgiving Maiden": {
+   "trig": "ignition",
+   "cost": "Tribute this face-up card",
+   "does": "return 1 of your monsters destroyed by battle this turn from the Graveyard to your hand",
+   "src": "text",
+   "code": [
+    "005901a0",
+    "00568030",
+    "00599e30"
+   ],
+   "exe": "joey"
+  },
+  "1446 Marie the Fallen One": {
+   "trig": "your Standby Phase, while in the Graveyard",
+   "does": "gain 200 LP",
+   "src": "text",
+   "code": [
+    "005a6530"
+   ],
+   "exe": "joey"
+  },
+  "1448 Scroll of Bewitchment": {
+   "trig": "equip spell",
+   "does": "declare an Attribute; the equipped monster becomes that Attribute",
+   "code": [
+    "0056f9e0 (attribute override, id 0x5a8)",
+    "00584500",
+    "00419b70"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1449 United We Stand": {
+   "trig": "equip spell",
+   "does": "equipped monster gains 800 ATK and DEF for each face-up monster you control",
+   "src": "text",
+   "code": [
+    "0056dd30",
+    "00567b00",
+    "00579ce0"
+   ],
+   "exe": "joey"
+  },
+  "1450 Mage Power": {
+   "trig": "equip spell",
+   "does": "equipped monster gains 500 ATK and DEF for each Spell and Trap card you control",
+   "src": "text",
+   "code": [
+    "0056dd30",
+    "00567b00",
+    "00579ce0"
+   ],
+   "exe": "joey"
+  },
+  "1451 Offerings to the Doomed": {
+   "trig": "quick-play",
+   "does": "destroy 1 face-up monster; skip your next Draw Phase",
+   "quirk": "it shares Ring of Destruction's resolve routine",
+   "code": [
+    "00587950",
+    "00567c90",
+    "00592bb0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1510 Jowgen the Spiritualist": {
+   "trig": "ignition / continuous",
+   "cost": "discard 1 random card",
+   "does": "destroy all Special Summoned monsters on the field; while face-up, no monster can be Special Summoned",
+   "src": "text",
+   "code": [
+    "005adec0",
+    "00568030"
+   ],
+   "exe": "joey"
+  },
+  "1511 Kycoo the Ghost Destroyer": {
+   "trig": "when this card deals battle damage / continuous",
+   "does": "you may banish up to 2 cards from the opponent's Graveyard; while face-up the opponent cannot banish cards from either Graveyard",
+   "src": "text",
+   "code": [
+    "00578540",
+    "00594f00",
+    "00599e30"
+   ],
+   "exe": "joey"
+  },
+  "1512 Summoner of Illusions": {
+   "trig": "flip",
+   "cost": "Tribute 1 other monster you control",
+   "does": "Special Summon 1 Fusion Monster from your Fusion Deck; destroy it at the End Phase",
+   "src": "text",
+   "code": [
+    "00567620 (flip list)",
+    "00599e30"
+   ],
+   "exe": "joey"
+  },
+  "1513 Bazoo the Soul-Eater": {
+   "trig": "ignition, once per turn on your turn",
+   "cost": "banish up to 3 cards from your Graveyard",
+   "does": "+300 ATK per banished card until the end of the opponent's next turn",
+   "src": "text",
+   "code": [
+    "0056dd30",
+    "0056af90",
+    "00599e30"
+   ],
+   "exe": "joey"
+  },
+  "1514 Dark Necrofear": {
+   "trig": "summon condition / when destroyed by battle or an opponent's effect",
+   "does": "Special Summoned only by banishing 3 Fiends from your Graveyard; when destroyed, at the End Phase it equips to 1 opponent monster and you take control of that monster",
+   "src": "text",
+   "code": [
+    "00592bb0",
+    "0059def0",
+    "0059df40",
+    "005ab640"
+   ],
+   "exe": "joey"
+  },
+  "1515 Soul of Purity and Light": {
+   "trig": "summon condition / continuous",
+   "does": "Special Summoned only by banishing 2 LIGHT monsters from your Graveyard; opponent monsters lose 300 ATK during the opponent's Battle Phase",
+   "src": "text",
+   "code": [
+    "00599e30",
+    "0059def0",
+    "0059df40",
+    "005ab640"
+   ],
+   "exe": "joey"
+  },
+  "1516 Spirit of Flames": {
+   "trig": "summon condition / continuous",
+   "does": "Special Summoned only by banishing 1 FIRE monster from your Graveyard; gains 300 ATK during your Battle Phase",
+   "src": "text",
+   "code": [
+    "0056dd30",
+    "00599e30",
+    "0059def0",
+    "0059df40"
+   ],
+   "exe": "joey"
+  },
+  "1517 Aqua Spirit": {
+   "trig": "summon condition / opponent's Standby Phase",
+   "does": "Special Summoned only by banishing 1 WATER monster from your Graveyard; in each of the opponent's Standby Phases you may change the position of 1 opponent face-up monster (locked for that turn)",
+   "src": "text",
+   "code": [
+    "00592bb0",
+    "00599e30",
+    "0059def0",
+    "0059df40"
+   ],
+   "exe": "joey"
+  },
+  "1518 The Rock Spirit": {
+   "trig": "summon condition / continuous",
+   "does": "Special Summoned only by banishing 1 EARTH monster from your Graveyard; gains 300 ATK during the opponent's Battle Phase",
+   "code": [
+    "0056dd30 (stat calculator, id 0x5ee)",
+    "00599e30",
+    "0059def0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1519 Garuda the Wind Spirit": {
+   "trig": "summon condition / opponent's End Phase",
+   "does": "Special Summoned only by banishing 1 WIND monster from your Graveyard; at each End Phase of the opponent's turn you may change the battle position of 1 opponent face-up monster",
+   "code": [
+    "00592bb0",
+    "00599e30",
+    "0059def0",
+    "0059df40"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1520 Gilasaurus": {
+   "trig": "summon",
+   "does": "you may treat its Normal Summon as a Special Summon; if you do, the opponent may Special Summon 1 monster from their Graveyard",
+   "src": "text",
+   "code": [
+    "005a9750",
+    "005aae00",
+    "005b62f0"
+   ],
+   "exe": "joey"
+  },
+  "1521 Tornado Bird": {
+   "trig": "flip",
+   "does": "return 2 Spell/Trap cards on the field to their owners' hands",
+   "src": "text",
+   "code": [
+    "00567620 (flip list)",
+    "005b6690"
+   ],
+   "exe": "joey"
+  },
+  "1522 Dreamsprite": {
+   "trig": "when attacked by an opponent monster",
+   "does": "redirect the attack to another of your monsters, then calculate damage",
+   "src": "text",
+   "code": [],
+   "exe": "joey"
+  },
+  "1523 Zombyra the Dark": {
+   "trig": "continuous",
+   "does": "cannot attack directly; loses 200 ATK each time it destroys a monster by battle",
+   "src": "text",
+   "code": [
+    "0056b7d0",
+    "0056dd30",
+    "005a2d60"
+   ],
+   "exe": "joey"
+  },
+  "1524 Supply": {
+   "trig": "flip",
+   "does": "add 2 Fusion Material monsters that went to your Graveyard for a Fusion Summon back to your hand",
+   "src": "text",
+   "code": [
+    "00567620 (flip list)",
+    "00599e30"
+   ],
+   "exe": "joey"
+  },
+  "1525 Maryokutai": {
+   "trig": "quick, the opponent's turn: the opponent activates a Spell",
+   "cost": "Tribute this face-up card",
+   "does": "negate the Spell's activation and destroy it",
+   "src": "text",
+   "code": [
+    "00588d90",
+    "00580960",
+    "005683f0"
+   ],
+   "exe": "joey"
+  },
+  "1527 Collected Power": {
+   "trig": "trap",
+   "does": "move every face-up Equip card on the field onto 1 face-up monster; equips that cannot legally equip it are destroyed",
+   "src": "text",
+   "code": [
+    "00567c90"
+   ],
+   "exe": "joey"
+  },
+  "1529 Dark Spirit of the Silent": {
+   "trig": "trap, during the opponent's Battle Step",
+   "does": "negate 1 attack and make another face-up opponent monster attack instead (changed to Attack Position if needed)",
+   "src": "text",
+   "code": [
+    "005b2640",
+    "005b3fa0"
+   ],
+   "exe": "joey"
+  },
+  "1530 Royal Command": {
+   "trig": "continuous trap",
+   "does": "negate the activation and effects of all Flip effect monsters",
+   "code": [
+    "00588d90",
+    "00567620 (flip list)"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1531 Riryoku Field": {
+   "trig": "counter trap: a Spell that targets 1 monster is activated",
+   "does": "negate the Spell and destroy it",
+   "src": "text",
+   "code": [
+    "005683f0",
+    "00580960"
+   ],
+   "exe": "joey"
+  },
+  "1532 Skull Lair": {
+   "trig": "continuous trap",
+   "cost": "banish any number of cards from your Graveyard",
+   "does": "destroy 1 face-up monster whose Level equals the number banished",
+   "src": "text",
+   "code": [
+    "005af600",
+    "00599e30"
+   ],
+   "exe": "joey"
+  },
+  "1533 Graverobber's Retribution": {
+   "trig": "continuous trap, your Standby Phase",
+   "does": "the opponent takes 100 damage for each of their banished monsters",
+   "src": "text",
+   "code": [
+    "005a6630 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1534 Deal of Phantom": {
+   "trig": "trap",
+   "does": "1 face-up monster gains 100 ATK for each monster in your Graveyard (counted on activation) until end of turn",
+   "src": "text",
+   "code": [
+    "0056dd30",
+    "005b2e60"
+   ],
+   "exe": "joey"
+  },
+  "1535 Destruction Punch": {
+   "trig": "trap: an opponent monster attacks your Defense Position monster whose DEF is higher than the attacker's ATK",
+   "does": "destroy the attacking monster; damage is calculated normally",
+   "src": "text",
+   "code": [
+    "005683f0"
+   ],
+   "exe": "joey"
+  },
+  "1536 Blind Destruction": {
+   "trig": "continuous trap, your Standby Phase",
+   "does": "roll a die; destroy all monsters of that Level; on a 6, destroy all face-up Level 6 or higher monsters",
+   "src": "text",
+   "code": [
+    "0056fd40"
+   ],
+   "exe": "joey"
+  },
+  "1537 The Emperor's Holiday": {
+   "trig": "continuous trap",
+   "does": "negate the effects of all Equip cards",
+   "src": "text",
+   "code": [
+    "005872b0"
+   ],
+   "exe": "joey"
+  },
+  "1538 The Dark Door": {
+   "trig": "continuous spell",
+   "does": "each player can attack with only 1 monster per Battle Phase",
+   "src": "text",
+   "code": [
+    "0056b7d0 (probable)",
+    "005a1f30 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1539 Spiritualism": {
+   "trig": "activate",
+   "does": "return 1 Spell/Trap the opponent controls to their hand; its activation and effect cannot be negated",
+   "src": "text",
+   "code": [
+    "00580960",
+    "00580ec0",
+    "005872b0",
+    "00598c40"
+   ],
+   "exe": "joey"
+  },
+  "1540 Cyclon Laser": {
+   "trig": "equip spell (Gradius only)",
+   "does": "Gradius: ATK +300, and it inflicts piercing battle damage against Defense Position monsters",
+   "values": {
+    "atk": 300
+   },
+   "src": "text",
+   "code": [
+    "00567b00",
+    "0056fd40"
+   ],
+   "exe": "joey"
+  },
+  "1545 Bait Doll": {
+   "trig": "activate",
+   "does": "force 1 face-down Spell/Trap to activate; if its timing is wrong it is negated and destroyed; a non-Trap goes back face-down. This card is shuffled into the Deck instead of the Graveyard",
+   "code": [
+    "0057fc70",
+    "00592bb0",
+    "005b32a0",
+    "005b3480"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1546 De-Fusion": {
+   "trig": "quick-play",
+   "does": "return 1 Fusion Monster on the field to the Fusion Deck; if all its materials are in your Graveyard you may Special Summon them (Attack or Defense)",
+   "src": "text",
+   "code": [
+    "00567c90",
+    "00592bb0",
+    "00599e30"
+   ],
+   "exe": "joey"
+  },
+  "1547 Fusion Gate": {
+   "trig": "field spell",
+   "does": "Fusion Monsters can be Special Summoned without Polymerization; the materials are banished instead of sent to the Graveyard",
+   "src": "text",
+   "code": [
+    "005921c0",
+    "00568030",
+    "00599e30"
+   ],
+   "exe": "joey"
+  },
+  "1548 Ekibyo Drakmord": {
+   "trig": "equip spell",
+   "does": "the equipped monster cannot attack; at the end of its controller's 2nd turn it is destroyed and this card returns to its owner's hand",
+   "code": [
+    "00575570",
+    "00567b00",
+    "00579ce0",
+    "005b3fa0"
+   ],
+   "src": "code",
+   "exe": "joey"
+  },
+  "1549 Miracle Dig": {
+   "trig": "activate",
+   "does": "return 3 of your banished monsters to the Graveyard",
+   "cond": "5 or more of your monsters are banished",
+   "src": "text",
+   "code": [
+    "00599e30 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1550 Dragonic Attack": {
+   "trig": "equip spell (Warrior only)",
+   "does": "equipped monster becomes Dragon-Type and gains 500 ATK and DEF",
+   "values": {
+    "atk": 500,
+    "def": 500
+   },
+   "src": "text",
+   "code": [
+    "0056dd30",
+    "0056f6f0 (type override)",
+    "00567b00"
+   ],
+   "exe": "joey"
+  },
+  "1551 Spirit Elimination": {
+   "trig": "activate (lasts this turn)",
+   "does": "when monsters in your Graveyard would be banished, banish monsters you control instead",
+   "src": "text",
+   "code": [
+    "00588830 (probable)",
+    "00594f00 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1552 Vengeful Bog Spirit": {
+   "trig": "continuous spell",
+   "does": "monsters cannot attack on the turn they are summoned (Normal, Flip or Special)",
+   "src": "text",
+   "code": [
+    "005ab820 (probable)"
+   ],
+   "exe": "joey"
+  },
+  "1902 Scapegoat": {
+   "trig": "quick-play",
+   "does": "Special Summon 4 Sheep Tokens (0/0) in Defense Position; you cannot summon this turn; the tokens cannot be Tributed for a Tribute Summon",
+   "src": "text",
+   "code": [
+    "005674e0",
+    "005b2640"
+   ],
+   "exe": "joey"
+  }
+ }
+}

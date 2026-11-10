@@ -1,0 +1,43 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Chaos Rift"
+config/version="1.0"
+run/main_scene="res://ui/Loading.tscn"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Godot/app_userdata/Yu-Gi-Oh! Power of Chaos Remastered"
+boot_splash/bg_color=Color(0.01, 0.01, 0.015, 1)
+boot_splash/show_image=false
+boot_splash/image="res://assets/title/splash_dark.png"
+boot_splash/fullsize=true
+boot_splash/stretch_mode=1
+boot_splash/use_filter=true
+config/icon="res://assets/title/icon.png"
+config/windows_native_icon="res://assets/title/icon.ico"
+config/features=PackedStringArray("4.7", "C#", "Forward Plus")
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/mode=3
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[dotnet]
+
+project/assembly_name="PoC"
+project/solution_directory="../"
+
+[rendering]
+
+textures/vram_compression/import_etc2_astc=true
