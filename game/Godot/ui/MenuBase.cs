@@ -86,6 +86,7 @@ public abstract partial class MenuBase : Control
     static void Swap(string path, bool loop)
     {
         playing = path; looping = loop;
+        shared!.VolumeDb = -3;   // a screen left mid-fade must not leave the music quiet
         shared!.Stream = GD.Load<AudioStream>(path);
         if (shared.IsInsideTree()) shared.Play(); else shared.Autoplay = true;
     }
@@ -94,7 +95,12 @@ public abstract partial class MenuBase : Control
     protected void SetMusic(string path, bool loop = true)
     {
         if (music == null) return;
-        Swap(path, loop);
+        if (shared == null || !shared.Playing) { Swap(path, loop); return; }
+        // dip and rise instead of a hard cut (the duel's keycard / climax tracks, the win and lose jingles)
+        var tw = CreateTween();
+        tw.TweenProperty(shared, "volume_db", -40f, 0.7).SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.In);
+        tw.TweenCallback(Callable.From(() => { Swap(path, loop); shared.VolumeDb = -40; }));
+        tw.TweenProperty(shared, "volume_db", -3f, 0.9).SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.Out);
     }
 
     /// Build the scene graph and start the intro animation.
@@ -196,9 +202,12 @@ public abstract partial class MenuBase : Control
         return l;
     }
 
+    static readonly Dictionary<string, Shader> shaders = new();
     protected static ShaderMaterial Mat(string code, params (string, Variant)[] uniforms)
     {
-        var m = new ShaderMaterial { Shader = new Shader { Code = code } };
+        // one Shader per source text: compiling it again for every material froze the duel's start (2 per card)
+        if (!shaders.TryGetValue(code, out var sh)) shaders[code] = sh = new Shader { Code = code };
+        var m = new ShaderMaterial { Shader = sh };
         foreach (var (k, v) in uniforms) m.SetShaderParameter(k, v);
         return m;
     }

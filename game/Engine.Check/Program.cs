@@ -160,6 +160,14 @@ static class Program
         var p = new Profile();
         { // game modes
           var packs = Modes.OpenPacks(new Rng(3)); Check(packs.Count == 6 && packs.All(k => k.Count == 9), "six packs of nine");
+          for (ulong seed = 1; seed <= 40; seed++)
+          {
+              // themed packs: one Type or Attribute covers a good share of the monsters, and no card needs a named partner
+              var cards = Modes.OpenPacks(new Rng(seed)).SelectMany(k => k).Select(CardDb.Shared.Get).ToList();
+              var mons = cards.Where(c => c.IsMonster).ToList();
+              int top = mons.GroupBy(c => c.Race).Concat(mons.GroupBy(c => c.Attribute)).Max(g => g.Count());
+              Check(mons.Count == 30 && top >= 9 && cards.All(c => !c.Desc.Contains('"') && !c.IsFusion), $"pack pool {seed} is themed ({top} of {mons.Count} monsters share a Type / Attribute)");
+          }
           var pp = Modes.PoolProfile(packs.SelectMany(k => k)); var pd = new Deck("pack");
           foreach (var i in packs.SelectMany(k => k).Distinct()) while (DeckRules.Add(pd, db.Get(i), pp)) { }
           Check(pd.Main.Count >= 40 && pd.Main.All(i => packs.Any(k => k.Contains(i))), $"a pack deck is built only from the packs ({pd.Main.Count})");
@@ -597,6 +605,10 @@ static class Program
         ["c06"] = new[] { "Activate Scapegoat", "Activate United We Stand", "Pick Celtic Guardian", "Activate Axe of Despair", "Pick Celtic Guardian", "Battle", "Attack Celtic Guardian>Battle Ox" },
         ["c07"] = new[] { "Activate Change of Heart", "Pick Gemini Elf", "Activate Ookazi", "Activate Cannon Soldier", "Pick Gemini Elf", "Activate Cannon Soldier", "Pick Celtic Guardian", "Activate Cannon Soldier", "Pick Cannon Soldier" },
         ["c08"] = new[] { "Activate Change of Heart", "Pick Blue-Eyes White Dragon", "Activate Megamorph", "Pick Blue-Eyes White Dragon", "Activate Catapult Turtle", "Pick Blue-Eyes White Dragon" },
+        // more than one turn: "End" ends your turn, "Attack X>*" = X attacks whatever it can (the first target, or directly)
+        ["m01"] = new[] { "Activate Scapegoat", "Activate Cannon Soldier", "Pick Sheep Token", "Activate Cannon Soldier", "Pick Sheep Token", "Activate Cannon Soldier", "Pick Sheep Token", "Activate Cannon Soldier", "Pick Sheep Token", "Activate Cannon Soldier", "Pick Cannon Soldier", "End", "Activate Ookazi" },
+        ["m02"] = new[] { "Activate Monster Reborn", "Pick Blue-Eyes White Dragon", "Activate Catapult Turtle", "Pick Blue-Eyes White Dragon", "End", "Activate Premature Burial", "Pick Blue-Eyes White Dragon", "Activate Catapult Turtle", "Pick Blue-Eyes White Dragon" },
+        ["m03"] = new[] { "Activate Swords of Revealing Light", "Summon Battle Ox", "End", "Summon Summoned Skull", "Pick Battle Ox", "Activate Axe of Despair", "Pick Summoned Skull", "Battle", "Attack Summoned Skull>Blue-Eyes White Dragon", "End", "Summon Gemini Elf", "Battle", "Attack Summoned Skull>*", "Attack Gemini Elf>*" },
     };
 
     /// The tempting lines: each must lose against at least one answer of the rival.
@@ -610,6 +622,9 @@ static class Program
         ["c06"] = new[] { "Activate United We Stand", "Pick Celtic Guardian", "Activate Axe of Despair", "Pick Celtic Guardian", "Battle", "Attack Celtic Guardian>Battle Ox" },
         ["c07"] = new[] { "Activate Ookazi", "Activate Cannon Soldier", "Pick Celtic Guardian", "Activate Cannon Soldier", "Pick Cannon Soldier" },
         ["c08"] = new[] { "Activate Change of Heart", "Pick Blue-Eyes White Dragon", "Battle", "Attack Blue-Eyes White Dragon" },
+        ["m01"] = new[] { "Activate Scapegoat", "Activate Cannon Soldier", "Pick Sheep Token", "Activate Cannon Soldier", "Pick Sheep Token", "Activate Cannon Soldier", "Pick Sheep Token", "Activate Cannon Soldier", "Pick Sheep Token", "End", "Activate Ookazi", "Activate Cannon Soldier", "Pick Cannon Soldier" },
+        ["m02"] = new[] { "Activate Monster Reborn", "Pick Blue-Eyes White Dragon", "End", "Activate Catapult Turtle", "Pick Blue-Eyes White Dragon" },
+        ["m03"] = new[] { "Activate Swords of Revealing Light", "Summon Battle Ox", "End", "Activate Axe of Despair", "Pick Battle Ox", "Battle", "Attack Battle Ox>Blue-Eyes White Dragon", "End", "Summon Gemini Elf", "Battle", "Attack Battle Ox>*", "Attack Gemini Elf>*" },
     };
 
     /// Play `steps` on puzzle z; the rival answers by `path` (index per decision with a real choice, 0 past its end).
@@ -638,11 +653,13 @@ static class Program
                     "Summon" => p.Kind == Ask.Main ? p.Options.FindIndex(o => o.Act == Act.Summon && o.Card?.Name == card) : -1,
                     "Activate" => p.Kind is Ask.Main or Ask.Battle or Ask.Respond ? p.Options.FindIndex(o => o.Act == Act.Activate && o.Card?.Name == card) : -1,
                     "Battle" => p.Kind == Ask.Main ? p.Options.FindIndex(o => o.Act == Act.ToBattle) : -1,
-                    "Attack" => p.Kind == Ask.Battle ? p.Options.FindIndex(o => o.Act == Act.Attack && o.Card?.Name == card && (target == null ? o.Target == null : o.Target?.Name == target)) : -1,
+                    "Attack" => p.Kind == Ask.Battle ? p.Options.FindIndex(o => o.Act == Act.Attack && o.Card?.Name == card && (target == "*" || (target == null ? o.Target == null : o.Target?.Name == target))) : -1,
+                    "End" => p.Kind is Ask.Main or Ask.Battle ? p.Options.FindIndex(o => o.Act == Act.EndTurn) : -1,
                     "Pick" => p.Kind == Ask.Pick ? p.Options.FindIndex(o => o.Card?.Name == card) : -1,
                     _ => -1,
                 };
             }
+            if (pick < 0 && q.Count > 0 && q.Peek() == "End" && p.Options.FindIndex(o => o.Act == Act.ToMain2) is >= 0 and var m2) { d.Submit(new Command(0, new[] { m2 })); continue; }   // the Battle Phase ends through Main Phase 2
             if (pick >= 0) { q.Dequeue(); d.Submit(new Command(0, new[] { pick })); continue; }
             if (p.Kind is Ask.Main or Ask.Battle && q.Count > 0) { stuck = $"'{q.Peek()}' at {p}"; break; }
             int i = p.Kind switch { Ask.Respond => p.Options.FindIndex(o => o.Act == Act.Pass), Ask.Main or Ask.Battle => p.Options.FindIndex(o => o.Act == Act.EndTurn), _ => 0 };
@@ -655,7 +672,7 @@ static class Program
     static (int Runs, int Wins, string? Stuck) AllAnswers(Puzzles.Puzzle z, string[] steps)
     {
         var path = new List<int>(); int runs = 0, wins = 0; string? stuck = null;
-        while (runs < 500)
+        while (runs < 20000)
         {
             var (won, counts, st) = PlayPuzzle(z, steps, path);
             runs++; if (won) wins++; stuck ??= st;
@@ -676,6 +693,8 @@ static class Program
             var d = new Duel(Puzzles.Setup(z)); Puzzles.Prepare(d, z);
             Check(d.Turn == 3 && d.Pending is { Player: 0, Kind: Ask.Main } && d.P(1).Lp == z.TheirLp && d.P(0).Lp == z.YourLp && d.P(0).Hand.Count == z.Hand.Length, $"{z.Id} board laid");
             var (runs, wins, stuck) = AllAnswers(z, Solutions[z.Id]);
+            Check(runs < 20000, $"{z.Id}: every rival answer walked ({runs} lines)");
+            if (z.Turns > 1) Console.WriteLine($"puzzle {z.Id} ({z.Turns} turns): solution won {wins} of {runs} rival lines");
             Check(stuck == null && wins == runs, $"{z.Id} {z.Name}: the solution wins against every answer ({wins}/{runs}{(stuck != null ? ", stuck " + stuck : "")})");
             var (fr, fw, fs) = AllAnswers(z, Fails[z.Id]);
             Check(fw < fr, $"{z.Id}: the tempting line loses to some answer ({fw}/{fr} won{(fs != null ? ", stuck " + fs : "")})");
@@ -698,6 +717,9 @@ static class Program
                 var rec = prof.Of(r);
                 rec.LastWon = rng.Int(2) == 0; rec.Streak = rng.Int(8); rec.Level = 1 + rng.Int(7);
                 var pick = Progression.Pick(r, prof, rng);
+                // one loss never drops the rival; a second loss in a row drops it one level at most (playtest 2026-11-12)
+                if (r is "yugi" or "kaiba" && !rec.LastWon && rec.Streak > 0 && rec.Level >= 2 && !pick.DeckKey.StartsWith("god/") && !pick.DeckKey.Contains("exodia"))
+                    Check(pick.Level >= Math.Min(r == "yugi" ? 6 : 7, rec.Level - (rec.Streak % 2 == 0 ? 1 : 0)), $"{r} after {rec.Streak} loss(es) at level {rec.Level}: level {pick.Level}");
                 levels.Add(pick.Level);
                 if (!decks.Contains(pick.DeckKey)) { Check(false, $"progression picked unknown deck {pick.DeckKey}"); return; }
                 if (pick.DeckKey == $"{r}/x_lv{pick.Level}" || (r == "yugi" && pick.DeckKey.StartsWith("yugi/x_exodia") && pick.Level is 1 or 2)) expertDecks++;
@@ -727,7 +749,10 @@ static class Program
             Progression.Record(q, r, true, 5); Progression.Record(q, r, true, 5);
             Check(Enumerable.Range(0, 200).All(_ => Progression.Pick(r, q, rng).Level >= 6), $"{r}: 3 wins in a row at HARD -> EXPERT");
             Progression.Record(q, r, false, 6);
-            Check(Enumerable.Range(0, 200).Any(_ => Progression.Pick(r, q, rng).Level < 5), $"{r}: a loss lifts the floor");
+            // playtest 2026-11-12: one loss keeps the level, the second in a row lowers it by one (no drop to EASY)
+            Check(Enumerable.Range(0, 200).All(_ => Progression.Pick(r, q, rng).Level >= 6), $"{r}: one loss at EXPERT keeps EXPERT");
+            Progression.Record(q, r, false, 6);
+            Check(Enumerable.Range(0, 200).All(_ => Progression.Pick(r, q, rng).Level >= 5) && Enumerable.Range(0, 200).Any(_ => Progression.Pick(r, q, rng).Level < 6), $"{r}: two losses in a row -> one level down");
         }
     }
 

@@ -18,6 +18,17 @@ public static class LabText
         (new(@"\b([Oo]nce per (?:turn|Duel|battle|Chain)|[Cc]annot|can't|[Mm]ust|instead|[Uu]naffected|[Ii]gnoring (?:its|their) Summoning conditions)\b"), Gold),
     };
 
+    // the same marks in darker inks, for text on the light side of the rift
+    static readonly (string, string)[] OnLight = { (Gold, "#8a5a00"), (Cond, "#1565a8"), (Cost, "#b3541e"), (Name, "#7a4d00"), (Bad, "#b3261e"), (Good, "#2e7d32"), (Aim, "#6a3fb5") };
+
+    /// Card text for the previews (menus and duel): keywords, quoted names and numbers highlighted, line breaks kept.
+    public static string Card(string desc, bool light = false)
+    {
+        var s = Mark(desc.Replace("\r", ""));
+        if (light) foreach (var (a, b) in OnLight) s = s.Replace(a, b);
+        return s;
+    }
+
     static string Esc(string s) => s.Replace("[", "[lb]");
 
     /// Highlight keywords, quoted card names and numbers in plain text.

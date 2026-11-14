@@ -465,18 +465,19 @@ public partial class DuelField
     {
         var homes = vs.Select(v => (v, v.S)).ToList();
         for (int i = 0; i < vs.Count; i++) Move(vs[i], vs[i].S with { Up = true }, i * 0.08f, 0.3f, 0.3f);
-        After(0.65, () =>
+        // quicker than it was (playtest 2026-11-12: 3.5 s per reveal dragged): up, a beat to read, back
+        After(0.4, () =>
         {
             foreach (var (v, s) in homes)
             {
                 v.Front = true;
-                Lift(v, new Vector3(0, 2.2f, s.Side == 0 ? -0.8f : 0.6f), 1.35f, 0.3);
+                Lift(v, new Vector3(0, 2.2f, s.Side == 0 ? -0.8f : 0.6f), 1.35f, 0.25);
             }
         });
-        After(0.7, () => Caption(title, edge, 0.56f, 2.6));
-        After(3.1, () => { foreach (var (v, s) in homes) CreateTween().TweenProperty(v.Root, "transform", Target(v, s), 0.35).SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.InOut); });
-        After(3.45, () => { foreach (var (v, s) in homes) Place(v, s); });
-        return 3.5;
+        After(0.45, () => Caption(title, edge, 0.56f, 1.4));
+        After(1.75, () => { foreach (var (v, s) in homes) CreateTween().TweenProperty(v.Root, "transform", Target(v, s), 0.25).SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.InOut); });
+        After(2.0, () => { foreach (var (v, s) in homes) Place(v, s); });
+        return 2.05;
     }
 
     // ---------------------------------------------------------------- duel end

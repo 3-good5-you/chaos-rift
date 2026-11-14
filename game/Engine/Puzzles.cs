@@ -9,7 +9,12 @@ public static class Puzzles
     public sealed record On(string Name, bool Set = false, bool Def = false);
 
     public sealed record Puzzle(string Id, string Name, string Goal, int TheirLp, string[] Hand, On[] Mine, On[] Theirs,
-        string[]? Grave = null, string[]? Extra = null, string[]? TheirGrave = null, int YourLp = 8000, int Dp = 200);
+        string[]? Grave = null, string[]? Extra = null, string[]? TheirGrave = null, int YourLp = 8000, int Dp = 200,
+        int Turns = 1, string[]? Draws = null, string[]? TheirDraws = null)
+    {
+        /// "WIN THIS TURN" / "WIN WITHIN 3 TURNS" (your turns; the rival plays its own in between).
+        public string Limit => Turns == 1 ? "WIN THIS TURN" : $"WIN WITHIN {Turns} TURNS";
+    }
 
     /// Rising difficulty. Every solution wins against any answer the rival can give (Engine.Check walks all of them),
     /// and the obvious line loses. Goals never name face-down cards (2026-11-09: the player finds out like in a duel).
@@ -46,6 +51,24 @@ public static class Puzzles
             new[] { "Change of Heart", "Megamorph" },
             new[] { new On("Catapult Turtle") },
             new[] { new On("Blue-Eyes White Dragon"), new On("Mirror Force", Set: true) }, YourLp: 2900, Dp: 300),
+        // ---- more than one turn (2026-11-12): `Draws` are your next draws in order, the rival draws `TheirDraws` and
+        // plays its turns for real. The solutions win whatever the rival does on its turns (Engine.Check walks them).
+        new("m01", "SLOW BURN", "Their monster is too strong to fight. Your next draw is Ookazi.", 3300,
+            new[] { "Scapegoat" },
+            new[] { new On("Cannon Soldier") },
+            new[] { new On("Summoned Skull") }, YourLp: 2600, Dp: 300,
+            Turns: 2, Draws: new[] { "Ookazi" }, TheirDraws: new[] { "Polymerization" }),
+        new("m02", "SECOND FLIGHT", "A wall and a face-down card. Your next draw is Premature Burial.", 3000,
+            new[] { "Monster Reborn" },
+            new[] { new On("Catapult Turtle", Def: true) },
+            new[] { new On("Labyrinth Wall", Def: true), new On("Mirror Force", Set: true) },
+            Grave: new[] { "Blue-Eyes White Dragon" }, YourLp: 1000, Dp: 300,
+            Turns: 2, Draws: new[] { "Premature Burial" }, TheirDraws: new[] { "Polymerization" }),
+        new("m03", "THREE LIGHTS", "Their dragon rules the field. Your next draws: Axe of Despair, then Gemini Elf.", 5400,
+            new[] { "Swords of Revealing Light", "Battle Ox", "Summoned Skull" },
+            Array.Empty<On>(),
+            new[] { new On("Blue-Eyes White Dragon") }, YourLp: 1500, Dp: 400,
+            Turns: 3, Draws: new[] { "Axe of Despair", "Gemini Elf" }, TheirDraws: new[] { "Polymerization", "Black Luster Ritual" }),
     };
 
     public static Puzzle? Get(string id) => All.FirstOrDefault(p => p.Id == id);
@@ -56,10 +79,10 @@ public static class Puzzles
     public static DuelSetup Setup(Puzzle z)
     {
         var db = CardDb.Shared;
-        var s = new DuelSetup { Seed = 1, FirstPlayer = 0, Shuffle = false, Classic = true, TurnLimit = 3 };
+        var s = new DuelSetup { Seed = 1, FirstPlayer = 0, Shuffle = false, Classic = true, TurnLimit = 1 + 2 * z.Turns };   // your last turn: 3, 5, 7 ...
         List<int> Deck(IEnumerable<string> need) => need.Concat(Enumerable.Range(0, 40).Select(i => Filler[i % Filler.Length])).Take(Math.Max(40, need.Count())).Select(n => db.Named(n).Idx).ToList();
-        s.Main[0].AddRange(Deck(z.Hand.Concat(z.Mine.Select(o => o.Name)).Concat(z.Grave ?? Array.Empty<string>()).Where(n => !db.Named(n).IsFusion)));
-        s.Main[1].AddRange(Deck(z.Theirs.Select(o => o.Name).Concat(z.TheirGrave ?? Array.Empty<string>())));
+        s.Main[0].AddRange(Deck(z.Hand.Concat(z.Mine.Select(o => o.Name)).Concat(z.Grave ?? Array.Empty<string>()).Concat(z.Draws ?? Array.Empty<string>()).Where(n => !db.Named(n).IsFusion)));
+        s.Main[1].AddRange(Deck(z.Theirs.Select(o => o.Name).Concat(z.TheirGrave ?? Array.Empty<string>()).Concat(z.TheirDraws ?? Array.Empty<string>())));
         foreach (var x in z.Extra ?? Array.Empty<string>()) s.Extra[0].Add(db.Named(x).Idx);
         return s;
     }
@@ -84,6 +107,16 @@ public static class Puzzles
         foreach (var o in z.Theirs) Lay(them, 1, o);
         foreach (var n in z.Grave ?? Array.Empty<string>()) { var c = Take(me, n); c.Loc = Loc.Grave; c.FaceUp = true; me.Grave.Add(c); }
         foreach (var n in z.TheirGrave ?? Array.Empty<string>()) { var c = Take(them, n); c.Loc = Loc.Grave; c.FaceUp = true; them.Grave.Add(c); }
+        // the next draws, in order, on top of each Deck
+        void Top(Player pl, string[]? names)
+        {
+            for (int i = 0; i < (names?.Length ?? 0); i++)
+            {
+                var c = pl.Deck.Skip(i).First(x => x.Name == names![i]);
+                pl.Deck.Remove(c); pl.Deck.Insert(i, c);
+            }
+        }
+        Top(me, z.Draws); Top(them, z.TheirDraws);
         them.Lp = z.TheirLp; me.Lp = z.YourLp;
         me.NormalSummoned = false;
         d.RefreshPrompt();

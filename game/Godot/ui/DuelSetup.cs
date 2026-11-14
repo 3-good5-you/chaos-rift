@@ -25,7 +25,9 @@ public partial class DuelSetup : RiftMenu
         if (Session.Selected < 0) Session.Selected = 0;
         playable = Session.Decks.Where(d => DeckRules.IsLegal(d, P)).ToList();
         if (Session.Playing == null || !playable.Contains(Session.Playing)) Session.Playing = playable.FirstOrDefault();
-        if (Session.Tour != null || Session.Mode != GameMode.Regular) Session.Match = false;   // only a regular duel can be a match
+        if (Session.Tour != null) Session.Match = true;   // a tournament round is a best-of-three match (playtest 2026-11-12)
+        else if (Session.Mode == GameMode.Pack) Session.Match = true;   // pack duels too (playtest 2026-11-13)
+        else if (Session.Mode != GameMode.Regular) Session.Match = false;
         if (Session.Run?.Current is { } g) Session.Selected = Array.FindIndex(RivalPanels.All, r => r.File == g.Rival);
 
         Rift(0.6f, 0.54f);
@@ -61,13 +63,14 @@ public partial class DuelSetup : RiftMenu
             Put(modes, info.Name, Title, 40, GoldDeep, new Vector2(110, 170));
             string line = Session.Run is { } run ? $"Rival {run.Index + 1} of {run.Order.Length}   ·   your LP {run.Lp:N0}"
                 : Session.Rule is { } rule ? $"{rule.Name}   ·   both start at {rule.Lp:N0} LP" : info.Line;
+            if (Session.Match) line += "   ·   best of three";
             Put(modes, line, Body, 22, Graphite, new Vector2(112, 226));
             return;
         }
         if (Session.Tour is { } t)
         {
             Put(modes, Tournament.RoundNames[t.Round], Title, 40, GoldDeep, new Vector2(110, 170));
-            Put(modes, "Win to go through. Prizes are paid by where you finish.", Body, 22, Graphite, new Vector2(112, 226));
+            Put(modes, "Best of three, side deck between duels. Prizes are paid by where you finish.", Body, 22, Graphite, new Vector2(112, 226));
             return;
         }
         string[] names = { "SINGLE DUEL", "MATCH" };
@@ -125,7 +128,7 @@ public partial class DuelSetup : RiftMenu
         if (Session.ModeDeck == null && Session.Playing == null) return;
         Session.Save();
         Session.MatchWins = Session.MatchLosses = 0;
-        Session.MatchDeck = Session.Match ? Session.Playing.Copy() : null;
+        Session.MatchDeck = Session.Match ? (Session.ModeDeck ?? Session.Playing)!.Copy() : null;
         (Session.RivalDeck, Session.RivalSeen) = (null, new CpuSide.Seen());
         Transition.Go(this, "res://ui/TurnOrder.tscn");
     }

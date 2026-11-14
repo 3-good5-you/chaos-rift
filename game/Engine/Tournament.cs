@@ -140,7 +140,8 @@ public sealed class Tournament
 
     /// Prizes by where you finish (2026-11-08: paid once, when you go out or win it; winning it all pays big).
     /// Index = place: 0 champion, 1 runner-up, 2 semifinal, 3 quarterfinal. The champion also gets the finalist's ace.
-    public static readonly (int Dp, int Cards, int New)[] Ladder = { (1500, 6, 3), (600, 4, 1), (250, 2, 0), (50, 0, 0) };
+    /// 2026-11-12: your rounds are best-of-three matches now, so the prizes doubled and every place wins something.
+    public static readonly (int Dp, int Cards, int New)[] Ladder = { (3000, 6, 4), (1200, 4, 2), (500, 2, 1), (100, 1, 0) };
     public static readonly string[] PlaceNames = { "CHAMPION", "RUNNER-UP", "SEMIFINAL", "QUARTERFINAL" };
 
     /// The round you lost (-1 = not out).

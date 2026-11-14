@@ -44,11 +44,15 @@ public abstract partial class RiftMenu
         public CardData? Selected;
         /// Cards drawn faded (e.g. not owned).
         public Func<CardData, bool>? Faded;
+        /// Deck Builder: a tighter bar, Monster > Spell > Trap before any sort, and clicks on release so tiles can be dragged.
+        public bool Compact, GroupKinds, ReleaseClick;
+        public Control Grid => grid;
+        Action<int, int> setPage = (_, _) => { };
         bool open;
         public bool FiltersOpen { set => open = value; }
         Control bar = null!, grid = null!;
         List<CardData> list = new();
-        Label count = null!, pageLabel = null!;
+        Label count = null!;
 
         public CardBrowser(RiftMenu menu, Rect2 area, float tileW, Func<List<CardData>> source, string[]? sorts = null)
         {
@@ -63,7 +67,10 @@ public abstract partial class RiftMenu
             };
         }
 
-        IEnumerable<CardData> Sorted(IEnumerable<CardData> l) => sorts[Sort] switch
+        // OrderBy is stable: sorting by kind last keeps the chosen order inside each kind
+        IEnumerable<CardData> Sorted(IEnumerable<CardData> l) => GroupKinds ? ByChoice(l).OrderBy(c => c.Kind).ThenBy(c => c.IsFusion) : ByChoice(l);
+
+        IEnumerable<CardData> ByChoice(IEnumerable<CardData> l) => sorts[Sort] switch
         {
             "ATK" => l.OrderByDescending(c => c.IsMonster ? c.Atk : -1).ThenBy(c => c.Name),
             "DEF" => l.OrderByDescending(c => c.IsMonster ? c.Def : -1).ThenBy(c => c.Name),
@@ -104,23 +111,23 @@ public abstract partial class RiftMenu
             var ink = dark ? Silver : RiftMenu.Ink; var dim = ink * new Color(1, 1, 1, 0.5f); var gold = dark ? GoldLight : GoldDeep;
             // search
             Put(bar, "⌕", Body, 24, dim, new Vector2(0, -3));
-            var search = new LineEdit { Text = Q.Text, Position = new Vector2(28, -6), Size = new Vector2(170, 40), Flat = true, PlaceholderText = "SEARCH", ClearButtonEnabled = true };
+            var search = new LineEdit { Text = Q.Text, Position = new Vector2(28, -6), Size = new Vector2(Compact ? 130 : 170, 40), Flat = true, PlaceholderText = "SEARCH", ClearButtonEnabled = true };
             search.AddThemeFontOverride("font", Body); search.AddThemeFontSizeOverride("font_size", 20);
             search.AddThemeColorOverride("font_color", ink); search.AddThemeColorOverride("font_placeholder_color", dim); search.AddThemeColorOverride("caret_color", ink);
             search.TextChanged += t => { Q.Text = t.Trim(); list = Sorted(source().Where(Q.Match)).ToList(); Page = 0; BuildGrid(); count.Text = $"{list.Count:N0} CARDS"; };
             bar.AddChild(search);
-            Hair(bar, new Vector2(0, 32), 200, ink * new Color(1, 1, 1, 0.3f));
-            float x = 236;
+            Hair(bar, new Vector2(0, 32), Compact ? 160 : 200, ink * new Color(1, 1, 1, 0.3f));
+            float x = Compact ? 188 : 236;
             var kinds = new (string, Kind?)[] { ("ALL", null), ("MONSTER", PoC.Engine.Kind.Monster), ("SPELL", PoC.Engine.Kind.Spell), ("TRAP", PoC.Engine.Kind.Trap) };
             foreach (var (label, k) in kinds)
             {
                 var kk = k;
-                x += m.Word(bar, label, new Vector2(x, 2), 17, Q.Kind == k, () => { Q.Kind = kk; if (kk != PoC.Engine.Kind.Monster) { Q.Attribute = null; Q.Race = null; } Q.Frame = null; Refresh(); }).W + 24;
+                x += m.Word(bar, label, new Vector2(x, 2), 17, Q.Kind == k, () => { Q.Kind = kk; if (kk != PoC.Engine.Kind.Monster) { Q.Attribute = null; Q.Race = null; } Q.Frame = null; Refresh(); }).W + (Compact ? 14 : 24);
             }
             var ft = Put(bar, (open ? "FILTERS ▴" : "FILTERS ▾") + (Q.Extra > 0 ? $"  {Q.Extra}" : ""), Title, 16, gold, new Vector2(x + 6, 3));
             Click(ft, () => { open = !open; BuildBar(); BuildGrid(); });
-            x += 6 + Title.GetStringSize(ft.Text, HorizontalAlignment.Left, -1, 16).X + 26;
-            var sort = Put(bar, sorts[Sort] + " ▾", Title, 16, dim, new Vector2(x, 3));
+            x += 6 + Title.GetStringSize(ft.Text, HorizontalAlignment.Left, -1, Z(16)).X + 26;
+            var sort = Put(bar, (Compact ? "SORT: " : "") + sorts[Sort] + " ▾", Title, 16, Compact ? gold : dim, new Vector2(x, 3));
             sort.TooltipText = "Sort";
             Click(sort, () => { Sort = (Sort + 1) % sorts.Length; Refresh(); });
             float y = 48;
@@ -160,10 +167,11 @@ public abstract partial class RiftMenu
             if (Q.Extra > 0)
             {
                 // CLEAR sits on the count line, never among the filter words
-                var cl = Put(bar, "CLEAR FILTERS", Title, 14, gold, new Vector2(Thin.GetStringSize(count.Text, HorizontalAlignment.Left, -1, 15).X + 30, y + 4));
+                var cl = Put(bar, "CLEAR FILTERS", Title, 14, gold, new Vector2(Thin.GetStringSize(count.Text, HorizontalAlignment.Left, -1, Z(15)).X + 30, y + 4));
                 Click(cl, () => { Q.Attribute = Q.Frame = Q.Race = null; Refresh(); });
             }
-            pageLabel = Put(bar, "", Thin, 15, dim, new Vector2(area.Size.X - 260, y + 4), new Vector2(260, 20), HorizontalAlignment.Right);
+            if (Compact) sort.Position = new Vector2(area.Size.X - 470, y + 3);   // narrow bar: the sort sits on the count line
+            setPage = Pager(bar, new Vector2(area.Size.X - 260, y), Turn, dark);
             grid.Position = new Vector2(area.Position.X, area.Position.Y + y + 40);
             grid.Size = new Vector2(area.Size.X, area.End.Y - grid.Position.Y);
         }
@@ -202,8 +210,7 @@ public abstract partial class RiftMenu
             float gx = tileW * 0.16f;
             int pages = Math.Max(1, (list.Count + per - 1) / per);
             Page = Math.Clamp(Page, 0, pages - 1);
-            pageLabel.Text = pages > 1 ? $"‹  PAGE {Page + 1} / {pages}  ›" : "";
-            Click(pageLabel, () => Turn(1), null, () => Turn(-1));
+            setPage(Page, pages);
             var slice = list.Skip(Page * per).Take(per).ToList();
             for (int i = 0; i < slice.Count; i++)
             {
@@ -220,7 +227,7 @@ public abstract partial class RiftMenu
                     if (!IsInstanceValid(card)) return;   // the grid was rebuilt under the mouse
                     if (d != Selected) Ink_.Only(m, card).TweenProperty(card, "scale", h ? new Vector2(1.05f, 1.05f) : Vector2.One, 0.12);
                     if (h) Hovered?.Invoke(d);
-                }, Right == null ? null : () => Right(d));
+                }, Right == null ? null : () => Right(d), ReleaseClick);
             }
             if (slice.Count == 0) Put(grid, "NO CARDS MATCH", Title, 22, m.InkAt(grid.Position + new Vector2(10, 10)) * new Color(1, 1, 1, 0.5f), new Vector2(0, 40));
         }

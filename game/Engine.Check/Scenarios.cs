@@ -221,6 +221,14 @@ static class Scenarios
             check(s.Has(Ask.Pick) && s.D.Pending!.Text.Contains("1500"), "Sangan search prompt");
         });
 
+        T("Tributed Sangan searches after the Tribute Summon has landed (playtest 2026-11-13)", () =>
+        {
+            var s = new Sc(new[] { "Sangan", "Summoned Skull" }, new string[0]);
+            s.Do(Act.Summon, "Sangan").PassAll().EndTurn().EndTurn();
+            s.Do(Act.Summon, "Summoned Skull").Pick("Sangan").PassAll();
+            check(s.Has(Ask.Pick) && s.D.Pending!.Text.Contains("1500") && s.Mon(0, "Summoned Skull") != null, "Skull on the field when Sangan's search asks");
+        });
+
         T("Replay of a scripted duel reproduces the state", () =>
         {
             var s = new Sc(new[] { "Neo the Magic Swordsman", "Yami" }, new[] { "Kuriboh" });

@@ -53,8 +53,15 @@ public sealed partial class Ai
         if (d.Turn != turn) { turn = d.Turn; tried.Clear(); gains.Clear(); }
         // An open field is attacked (every brain; playtest 2026-11-09: the look-ahead talked itself out of free direct
         // attacks and the duel stalled). Once the rules have nothing left to play before battle, they decide.
-        if ((Brain == Brain.Seer || JudgeWorlds > 0) && !Opp(d).MonstersOnField.Any() && (p.Kind == Ask.Battle || p.Kind == Ask.Main && d.Phase == Phase.Main1)
-            && Rule(d, p) is { } open && p.Options[open[0]] is { Act: Act.ToBattle } or { Act: Act.Attack, Target: null }) return new Command(me, open);
+        if ((Brain == Brain.Seer || JudgeWorlds > 0) && !Opp(d).MonstersOnField.Any() && (p.Kind == Ask.Battle || p.Kind == Ask.Main && d.Phase == Phase.Main1))
+        {
+            // Only asking: the rules' per-turn memory must not keep a play this look did not make (playtest 2026-11-12:
+            // the summon / trap was marked done here, then never made - the CPU sat on its hand facing an empty field).
+            var keep = tried.ToList();
+            var open = Rule(d, p);
+            if (p.Options[open[0]] is { Act: Act.ToBattle } or { Act: Act.Attack, Target: null }) return new Command(me, open);
+            tried.Clear(); tried.UnionWith(keep);
+        }
         if (Brain == Brain.Seer && Search(d, p) is int best && !SummonsExodia(p, best)) return new Command(me, new[] { SetFlips(p, best) });
         if (JudgeWorlds > 0 && Judge(d, p) is int[] judged && !(judged.Length == 1 && SummonsExodia(p, judged[0]))) return new Command(me, judged);
         return new Command(me, Rule(d, p));
@@ -76,6 +83,31 @@ public sealed partial class Ai
         if (p.Kind == Ask.Pick) return PickCards(d, p);
         if (pick < 0 || pick >= p.Options.Count) pick = p.Options.Count - 1;
         return new[] { SetFlips(p, pick) };
+    }
+
+    /// Guard rails on the look-ahead (playtest 2026-11-12). Its simulated worlds talked it out of plain good plays:
+    /// it ended turns with a monster or a Trap still in hand, held a 2500 ATK monster back from monsters it beats,
+    /// turned a 2600 DEF wall to its 100 ATK, and hid an attacker in Defense. The look-ahead may pick a different
+    /// play, never "do nothing" over the rules' summon / set / attack, and never those two position changes.
+    int Sane(Duel d, Prompt p, int pick, int rule)
+    {
+        if (pick == rule || pick < 0 || pick >= p.Options.Count) return pick;
+        var o = p.Options[pick];
+        if (o.Act is Act.EndTurn or Act.ToMain2)
+        {
+            if (p.Options[rule].Act is Act.Summon or Act.Set or Act.SetSpell or Act.Special or Act.FlipSummon or Act.Attack or Act.ToBattle) return rule;
+            // Ending the turn instead of a card the rules would play is the look-ahead's call, but not when it also
+            // throws away a Battle Phase the rules' count says pays (two 2500s left idle facing three Set cards).
+            int toBattle = Find(p, x => x.Act == Act.ToBattle);
+            if (p.Kind == Ask.Main && d.Phase == Phase.Main1 && toBattle >= 0
+                && Score(d, Me(d).MonstersOnField.Where(m => m.FaceUp && !m.Defense && d.CanAttack(m)).Select(d.Atk).ToList()) > 0) return toBattle;
+        }
+        if (o is { Act: Act.ChangePos, Card: { FaceUp: true } c })
+        {
+            if (c.Defense && WantsDefense(d, d.Atk(c), d.Def(c))) return rule;
+            if (!c.Defense && d.Phase == Phase.Main1 && d.Turn > 1 && d.CanAttack(c) && Opp(d).MonstersOnField.Any(t => d.Atk(c) > Guard(d, t))) return rule;
+        }
+        return pick;
     }
 
     static bool IsFlip(Card c) => c.Data.Desc.StartsWith("FLIP");
@@ -215,6 +247,8 @@ public sealed partial class Ai
             var o = p.Options[k];
             if (o.Act != Act.Summon || o.Card!.Data.Level < 5) continue;
             int need = d.TributesFor(o.Card);   // the Gods take 3
+            // a God on the field is never one of the Tributes (playtest 2026-11-12: Ra went to the GY for Sphere Mode / Summoned Skull)
+            if (need > Me(d).MonstersOnField.Count(m => !IsGod(m))) continue;
             var rest = Me(d).MonstersOnField.OrderByDescending(TributeValue(d)).Take(Math.Max(0, Me(d).MonstersOnField.Count() - need))
                 .Where(c => c.FaceUp && !c.Defense).Select(d.Atk).ToList();
             int atk = SummonAtk(d, o.Card, rest);
@@ -281,7 +315,7 @@ public sealed partial class Ai
         "Obelisk the Tormentor" => true,
         "Slifer the Sky Dragon" => atk >= Math.Max(2000, OppBestAtk(d)),
         "The Winged Dragon of Ra" => atk > 0 || Me(d).Lp >= 3000 && RaShot(d),
-        "The Winged Dragon of Ra - Sphere Mode" => Me(d).Hand.Concat(Me(d).Deck).Any(x => x.Name == "The Winged Dragon of Ra"),
+        "The Winged Dragon of Ra - Sphere Mode" => !Me(d).MonstersOnField.Any(IsGod) && Me(d).Hand.Concat(Me(d).Deck).Any(x => x.Name == "The Winged Dragon of Ra"),
         _ => false,
     };
 
@@ -546,7 +580,14 @@ public sealed partial class Ai
     static bool Has(string? s, params string[] w) => s != null && w.Any(s.Contains);
 
     /// A second copy of a card already on this chain, or a lock on an attacker one already holds.
-    bool Doubled(Duel d, Opt o) => o.Act == Act.Activate && o.Card is { } c && (d.Chain.Any(l => l.Player == me && l.Card.Name == c.Name)
+    static readonly HashSet<string> Shields = new() { "Mirror Force", "Waboku", "Negate Attack", "Magic Cylinder", "Sakuretsu Armor", "Draining Shield", "Widespread Ruin", "Threatening Roar", "Hallowed Life Barrier" };
+
+    /// One answer per attack (playtest 2026-11-12: Waboku and Mirror Force fired on the same attack). A second shield
+    /// on a chain that already has one, or in a turn Waboku already covers, is kept for the next turn.
+    bool ShieldSpent(Duel d, Card c) => Shields.Contains(c.Name)
+        && (d.Chain.Any(l => l.Player == me && Shields.Contains(l.Card.Name)) || d.TurnFlags.Contains($"nobattledamage{me}"));
+
+    bool Doubled(Duel d, Opt o) => o.Act == Act.Activate && o.Card is { } c && (ShieldSpent(d, c) || d.Chain.Any(l => l.Player == me && l.Card.Name == c.Name)
         || c.Name == "Spellbinding Circle" && ((d.Window?.Kind == EvKind.AttackDeclared ? d.Window.Card : d.Attacker) is { } a && Bound(d, a)
             // nothing but Defense Position monsters to bind: a wasted card (every brain, look-ahead included)
             || Opp(d).MonstersOnField.Where(m => m.FaceUp).All(m => m.Defense)));
@@ -565,7 +606,10 @@ public sealed partial class Ai
     }
 
     /// Tribute order: Sangan, Witch of the Black Forest, then lowest DEF + 2*ATK.
-    Func<Card, int> TributeValue(Duel d) => c => c.Name == "Sangan" ? -2 : c.Name == "Witch of the Black Forest" ? -1 : c.Data.Def + 2 * c.Data.Atk;
+    /// A God is never Tribute fodder, and a monster on the field counts at the ATK / DEF it has there (playtest
+    /// 2026-11-12: Ra's printed ATK is 0, so the CPU Tributed its 4000 ATK Ra for Summoned Skull).
+    Func<Card, int> TributeValue(Duel d) => c => c.Name == "Sangan" ? -2 : c.Name == "Witch of the Black Forest" ? -1 : IsGod(c) ? 1_000_000
+        : c.OnField && c.FaceUp ? Math.Max(c.Data.Def, d.Def(c)) + 2 * Math.Max(c.Data.Atk, d.Atk(c)) : c.Data.Def + 2 * c.Data.Atk;
 
     int[] PickCards(Duel d, Prompt p)
     {

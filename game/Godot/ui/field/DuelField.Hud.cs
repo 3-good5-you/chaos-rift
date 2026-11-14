@@ -9,6 +9,7 @@ public partial class DuelField
     Control hud = null!;
     TextureRect detailArt = null!;
     Label detailName = null!, detailType = null!, detailStars = null!, detailStats = null!, detailDesc = null!, detailHint = null!;
+    RichTextLabel detailRich = null!;   // the text as shown, keywords marked; detailDesc stays (invisible) as the measure
     readonly Panel[] profile = new Panel[2];
     readonly Label[] lpText = new Label[2];
     readonly ColorRect[] lpFill = new ColorRect[2], lpTrail = new ColorRect[2];
@@ -84,6 +85,13 @@ void fragment() { float r = length((UV - 0.5) * vec2(1.6, 1.0)); COLOR = vec4(co
         detail.AddChild(detailRule);
         detailDesc = Put(detail, "", Ui, 17, new Color(1, 1, 1, 0.82f), new Vector2(20, y + 142), new Vector2(w, 40));
         detailDesc.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        detailDesc.SelfModulate = Colors.Transparent;
+        detailRich = new RichTextLabel { BbcodeEnabled = true, ScrollActive = false, MouseFilter = MouseFilterEnum.Ignore };
+        // one font for normal and bold: the marks are colour only, so the lines break where the measured Label's do
+        detailRich.AddThemeFontOverride("normal_font", Ui); detailRich.AddThemeFontOverride("bold_font", Ui);
+        detailRich.AddThemeColorOverride("default_color", new Color(1, 1, 1, 0.82f));
+        detailRich.AddThemeConstantOverride("line_separation", 3);
+        detail.AddChild(detailRich);
         detailHint = Put(detail, "", Cond, 24, new Color(1, 1, 1, 0.25f), Vector2.Zero, Vector2.Zero);
         detail.Modulate = new Color(1, 1, 1, 0);
     }
@@ -125,6 +133,9 @@ void fragment() { float r = length((UV - 0.5) * vec2(1.6, 1.0)); COLOR = vec4(co
         detailDesc.AddThemeFontSizeOverride("font_size", fs);
         float descH = Math.Min(room, Need(fs)), coinH = CoinNeed(c, fs);
         detailDesc.Size = new Vector2(DetailW - 40, descH - coinH);
+        detailRich.Text = LabText.Card(detailDesc.Text);
+        detailRich.Position = detailDesc.Position; detailRich.Size = detailDesc.Size;
+        detailRich.AddThemeFontSizeOverride("normal_font_size", fs); detailRich.AddThemeFontSizeOverride("bold_font_size", fs);
         CoinRows(c, ruleY + 10 + descH - coinH, fs);
         float h = Math.Min(H - ProfH - 72, ruleY + 10 + descH + 22);
         if (detail.Modulate.A < 0.99f) { detail.Size = new Vector2(DetailW, h); CreateTween().TweenProperty(detail, "modulate:a", 1f, 0.2); }
@@ -146,7 +157,6 @@ void fragment() { float r = length((UV - 0.5) * vec2(1.6, 1.0)); COLOR = vec4(co
         {
             var pic = (TextureRect)framed.GetChild(1);
             var t = RivalPanels.Portrait(Rival);
-            float rw = 0.5f, rh = 0.5f * t.GetWidth() / t.GetHeight();
             pic.Texture = t; pic.StretchMode = TextureRect.StretchModeEnum.Scale;
             pic.Material = Mat(@"shader_type canvas_item;
 uniform vec4 region;
@@ -154,7 +164,7 @@ void fragment() {
   float m = 1.0 - smoothstep(0.49, 0.5, length(UV - 0.5));
   vec4 c = texture(TEXTURE, region.xy + UV * region.zw);
   COLOR = vec4(c.rgb, c.a * m);
-}", ("region", new Vector4(0.25f, 0.0f, rw, rh)));
+}", ("region", RivalPanels.Face(Rival)));
         }
         p.AddChild(framed);
 

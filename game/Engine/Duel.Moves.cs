@@ -192,7 +192,7 @@ public sealed partial class Duel
         if (shuffle) Shuffle(c.Owner);
     }
 
-    public void Shuffle(int player) => Rng.Shuffle(P(player).Deck);
+    public void Shuffle(int player) { Rng.Shuffle(P(player).Deck); OnEvent?.Invoke(new Ev { Kind = EvKind.Shuffled, Player = player }); }
 
     /// Test hook (Engine.Check log replay): swap a copy of `name` from the Deck into the hand,
     /// putting a hand card that is not `name` back in its place. Not reachable from commands.

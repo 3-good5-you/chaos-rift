@@ -89,7 +89,7 @@ public partial class TournamentScreen : RiftMenu
         if (key == Tournament.You) { c.AddChild(UI.Cosmetics.Framed(Avatar, P.Frame, d)); return; }
         bool now = InCurrent(key);
         c.AddChild(new ColorRect { Size = c.Size, Color = now || big ? GoldC : InkAt(at) * new Color(1, 1, 1, 0.25f), Material = Kit.RoundedMat(1, 0.5f), MouseFilter = MouseFilterEnum.Ignore });
-        var p = Pic(c, RivalPanels.Art(RivalPanels.Of(Tournament.Get(key))), new Vector2(4, 4), c.Size - new Vector2(8, 8));
+        var p = Pic(c, RivalPanels.FaceTex(RivalPanels.Of(Tournament.Get(key))), new Vector2(4, 4), c.Size - new Vector2(8, 8));
         p.Material = Kit.RoundedMat(1, 0.5f);
         if (!big && Out(key)) p.Modulate = new Color(0.5f, 0.5f, 0.55f, 0.4f);
     }

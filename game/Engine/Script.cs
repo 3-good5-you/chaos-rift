@@ -33,6 +33,7 @@ public enum EvKind
     Placed,          // a monster card was placed face-up in a Spell & Trap Zone as a Continuous Spell: Card, Player
     DamageStart,     // start of the Damage Step, before a face-down defender is flipped: Card = attacker, Other = defender
     Resolved,        // a chain link finished resolving: Link, Card, Player (Chain Burst: "immediately after it resolves")
+    Shuffled,        // Player's Deck was shuffled mid-duel; presentation only
 }
 
 public sealed class Ev

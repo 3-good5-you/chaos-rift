@@ -297,8 +297,26 @@ public partial class DuelField
                 labPlayed = true;   // once per run: a variant that reloads the field would otherwise replay itself
                 var p = a[10..].Split(':');
                 int e = int.TryParse(p[0], out var en) ? en - 1 : labEvents.FindIndex(x => x.Name.Contains(p[0], StringComparison.OrdinalIgnoreCase)), v = p.Length > 1 ? int.Parse(p[1]) - 1 : 0;   // a row by number or by name
-                After(1.0, () => { LabSelect(e); LabRun(e, v); });
+                After(1.0, () => { LabSelect(e); LabRun(e, v); LabFilm(); });
             }
+    }
+
+    /// `--labfilm=<folder>|<seconds between frames>|<frames>` with --labplay: saves small frames of the option as it
+    /// plays, then quits (for looking at an effect over time).
+    void LabFilm()
+    {
+        var arg = OS.GetCmdlineUserArgs().FirstOrDefault(x => x.StartsWith("--labfilm="));
+        if (arg == null) return;
+        var p = arg[10..].Split('|');
+        double gap = double.Parse(p[1], System.Globalization.CultureInfo.InvariantCulture); int n = int.Parse(p[2]), k = 0;
+        void Shot()
+        {
+            var img = GetViewport().GetTexture().GetImage();
+            img.Resize(1440, 1440 * img.GetHeight() / img.GetWidth(), Image.Interpolation.Bilinear);
+            img.SaveJpg($"{p[0]}/f{k:00}.jpg", 0.85f);
+            if (++k >= n) GetTree().Quit(); else After(gap, Shot);
+        }
+        After(gap, Shot);
     }
 
     LabPick Pick()

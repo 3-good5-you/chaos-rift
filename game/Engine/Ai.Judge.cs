@@ -63,7 +63,7 @@ public sealed partial class Ai
         }
         double Gain(int i) => gains.TryGetValue(Key(d, p.Options[i]) + board, out var g) && !double.IsNaN(g) ? g : double.MinValue;
         int best = plays.MaxBy(Gain);
-        if (Gain(best) > JudgeMargin && (!IsPlay(p.Options[rule]) || Gain(best) > Gain(rule) + JudgeMargin))
+        if (Sane(d, p, best, rule) == best && Gain(best) > JudgeMargin && (!IsPlay(p.Options[rule]) || Gain(best) > Gain(rule) + JudgeMargin))
         {
             tried.Clear(); tried.UnionWith(before);
             // Without the learned value the score can't see next turn's attacks: the summon takes the rules' position.

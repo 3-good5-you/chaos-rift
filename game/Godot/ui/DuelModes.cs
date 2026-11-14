@@ -51,7 +51,7 @@ public partial class DuelModes : RiftMenu
 
     protected override void OnFocus(int old, int now)
     {
-        if (now < 0) return;
+        if (now < 0 || now >= names.Count) return;   // a hover that lands while the list is still being built
         for (int i = 0; i < names.Count; i++)
         {
             bool on = i == now, ready = Modes.All[i].Ready;

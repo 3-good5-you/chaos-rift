@@ -71,17 +71,17 @@ public static class Progression
     public const int GodOdds = 20;
     public static string GodDeck(Rng rng) => GodDecks[rng.Int(GodDecks.Length)];
 
-    /// Remake rule (Yugi, Kaiba): the original re-rolls every duel, so beating a HARD deck often fell back to NORMAL.
-    /// On a win streak the rival never drops below the level you last beat, and every 3rd win in a row goes one higher.
+    /// Remake rule (Yugi, Kaiba): the original re-rolls every duel, so beating a HARD deck often fell back to NORMAL
+    /// and one loss at EXPERT could bring an EASY deck next. On a win streak the rival never drops below the level you
+    /// last beat, and every 3rd win in a row goes one higher. After a loss the rival stays where it was, then comes
+    /// down one level for every second loss in a row (playtest 2026-11-12: no sudden drop to EASY).
     static OpponentPick Ratchet(OpponentPick pick, Profile p)
     {
         var r = p.Of(pick.Rival);
-        if (!r.LastWon || r.Level < 5) return pick;
+        if (r.Streak == 0 || r.Level < (r.LastWon ? 5 : 2)) return pick;
         int top = pick.Rival == "yugi" ? 6 : 7;
-        int floor = Math.Min(top, r.Level + (r.Streak % 3 == 0 ? 1 : 0));
-        if (pick.Level >= floor) return pick;
-        if (pick.Rival == "yugi") return pick with { DeckKey = floor == 5 ? "yugi/cpuk" : "yugi/cpukk", Level = floor };
-        return pick with { DeckKey = $"kaiba/{(p.CarriedOver ? KaibaPool1 : KaibaPool0)[floor + 5]}", Level = floor };   // slots 10-12 = levels 5-7
+        int floor = r.LastWon ? Math.Min(top, r.Level + (r.Streak % 3 == 0 ? 1 : 0)) : Math.Clamp(r.Level - (r.Streak % 2 == 0 ? 1 : 0), 1, top);
+        return pick.Level >= floor ? pick : pick with { Level = floor };   // Pick names the deck from the level
     }
 
     // ---- Yugi (0x434d00): default cpu01..04; j/jj easier after losses, k/kk harder after wins.

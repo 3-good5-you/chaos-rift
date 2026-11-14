@@ -427,11 +427,20 @@ void fragment() {
     }
 
     /// Everything freezes for a moment of real time.
-    void HitStop(double s)
+    /// Hit-stops and slow motion (SlowMo) are factors on one saved duel speed (ApplyTs), never a speed saved from
+    /// inside another effect (2026-11-13: SlowMo saved the 0.03 clock of a lightning hit-stop as "normal", so the
+    /// duel stayed slow for minutes).
+    int hitStops; double fxBase = -1, hitF = 1, slowF = 1;
+    void ApplyTs()
     {
-        double was = Godot.Engine.TimeScale;
-        Godot.Engine.TimeScale = 0.03;
-        GetTree().CreateTimer(s, true, false, true).Timeout += () => Godot.Engine.TimeScale = was;
+        if (fxBase < 0) fxBase = Godot.Engine.TimeScale;
+        Godot.Engine.TimeScale = fxBase * hitF * slowF;
+        if (hitF >= 1 && slowF >= 1) fxBase = -1;
+    }
+    void HitStop(double s, double scale = 0.03)
+    {
+        hitStops++; hitF = Math.Min(hitF, scale); ApplyTs();
+        GetTree().CreateTimer(s, true, false, true).Timeout += () => { if (--hitStops == 0) { hitF = 1; ApplyTs(); } };
     }
 
     /// The camera pushes toward a point for an instant and settles back.

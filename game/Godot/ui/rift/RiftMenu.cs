@@ -98,13 +98,23 @@ void fragment() {
 
     static Font? title, thin, body;
     public static Font Title => title ??= Fonts.Spaced(Sys(new[] { "Perpetua Titling MT", "Castellar" }, 700), 6);
-    public static Font Thin => thin ??= Fonts.Spaced(Sys(new[] { "Perpetua Titling MT", "Castellar" }, 300), 5);
-    public static Font Body => body ??= Sys(new[] { "Gill Sans MT", "Segoe UI" }, 400);
+    // was the Light cut (300): too thin to read at caption sizes (playtest 2026-11-12)
+    public static Font Thin => thin ??= Fonts.Spaced(Sys(new[] { "Perpetua Titling MT", "Castellar" }, 700), 4);
+    // FX lab pick 2026-11-12: body text in the heavy cut, small text 15% bigger (Z). Card text keeps the regular cut
+    // (BodyRegular) so its bold keywords still stand out.
+    public static Font Body => body ??= Sys(new[] { "Gill Sans MT", "Segoe UI" }, 700);
+    static Font? bodyRegular;
+    public static Font BodyRegular => bodyRegular ??= Sys(new[] { "Gill Sans MT", "Segoe UI" }, 400);
+    /// The size small menu text is drawn at: up to 22 it grows 15%; headings stay. Put applies it, so anything that
+    /// measures a label must measure at Z(size) too.
+    public static int Z(int size) => size <= 22 ? (int)MathF.Round(size * 1.15f) : size;
 
     // ---------------------------------------------------------------- screen
 
     protected float W, H;
     protected float Top = 0.58f, Bottom = 0.44f;
+    /// Where this screen's rift runs (x at the top and bottom edge, 0..1); the transition tears along it.
+    public Vector2? RiftLine => bg == null ? null : new Vector2(Top, Bottom);
     protected ShaderMaterial bg = null!;
     protected override string? MusicPath => Md("menu_02");
     protected override void OnFocus(int old, int now) { }
@@ -130,7 +140,7 @@ void fragment() {
 
     protected static Label Put(Control host, string s, Font f, int size, Color c, Vector2 pos, Vector2 box = default, HorizontalAlignment a = HorizontalAlignment.Left)
     {
-        var l = Kit.Put(host, s, f, size, c, pos, box, a);
+        var l = Kit.Put(host, s, f, Z(size), c, pos, box, a);
         l.MouseFilter = MouseFilterEnum.Ignore;
         return l;
     }
@@ -166,7 +176,7 @@ void fragment() {
     protected void Heading(string s, Vector2 at, int size = 48)
     {
         T(this, s, Title, size, at);
-        float w = Title.GetStringSize(s, HorizontalAlignment.Left, -1, size).X;
+        float w = Title.GetStringSize(s, HorizontalAlignment.Left, -1, Z(size)).X;
         Hair(this, new Vector2(at.X, at.Y + size * 1.25f), w * 0.6f, GoldC with { A = 0.8f });
         Pip(this, new Vector2(at.X + w * 0.6f + 10, at.Y + size * 1.25f), 9);
     }
@@ -202,18 +212,59 @@ void fragment() {
         return root;
     }
 
+    static Font? bodyBold;
+    public static Font BodyBold => bodyBold ??= Sys(new[] { "Gill Sans MT", "Segoe UI" }, 700);
+
+    /// A card's text with its keywords marked (LabText.Card), shrunk from `size` until it fits the box. `light` = the
+    /// darker inks for the light side of the rift.
+    protected static RichTextLabel CardText(Control host, CardData d, Vector2 pos, Vector2 box, int size, bool light, int min = 12)
+    {
+        string text = d.TcgDesc ?? d.Desc;
+        while (size > min && BodyRegular.GetMultilineStringSize(text, HorizontalAlignment.Left, box.X, size).Y * 1.12f > box.Y) size--;
+        var rt = new RichTextLabel { BbcodeEnabled = true, Text = LabText.Card(text, light), Position = pos, Size = box, ScrollActive = false, MouseFilter = MouseFilterEnum.Ignore };
+        rt.AddThemeFontOverride("normal_font", BodyRegular); rt.AddThemeFontOverride("bold_font", BodyBold);
+        rt.AddThemeFontSizeOverride("normal_font_size", size); rt.AddThemeFontSizeOverride("bold_font_size", size);
+        rt.AddThemeColorOverride("default_color", light ? Ink : Silver * new Color(1, 1, 1, 0.9f));
+        host.AddChild(rt);
+        return rt;
+    }
+
+    /// The card preview column on the light side (Deck Builder, Side Deck): the card, its name, type line, ATK / DEF
+    /// and its text with the keywords marked, down to the bottom of the screen.
+    protected void Preview(Control host, CardData d, float pw)
+    {
+        foreach (var c in host.GetChildren()) c.QueueFree();
+        float ph = pw / 0.686f, y = ph + 16;
+        Card(host, d, new Vector2(pw, ph) / 2, ph, 0, 0.8f, large: true);
+        float nh = Title.GetMultilineStringSize(d.Name.ToUpperInvariant(), HorizontalAlignment.Left, pw, 22).Y;
+        Kit.Put(host, d.Name.ToUpperInvariant(), Title, 22, Ink, new Vector2(0, y), new Vector2(pw, nh), wrap: true);
+        y += nh + 4;
+        string line = d.IsMonster ? $"{d.Attribute} · {d.Race} / {d.Frame} · ★{d.Level}" : $"{d.Kind} · {d.Frame}";
+        Put(host, line, BodyBold, 17, Graphite, new Vector2(0, y), new Vector2(pw, 24)).ClipText = true;
+        y += 26;
+        if (d.IsMonster) { Put(host, $"ATK {d.AtkText}    DEF {d.DefText}", BodyBold, 20, Ink, new Vector2(0, y)); y += 32; }
+        Hair(host, new Vector2(0, y), pw, GoldDeep with { A = 0.6f });
+        y += 10;
+        CardText(host, d, new Vector2(0, y), new Vector2(pw, H - 44 - host.Position.Y - y), 19, light: true);
+    }
+
     /// Make any control clickable: hover callback, left click, optional right click.
-    protected static void Click(Control c, Action click, Action<bool>? hover = null, Action? right = null)
+    protected static void Click(Control c, Action click, Action<bool>? hover = null, Action? right = null, bool release = false)
     {
         c.MouseFilter = MouseFilterEnum.Pass;   // Pass: the mouse wheel still reaches the page underneath
         c.MouseDefaultCursorShape = CursorShape.PointingHand;
         if (hover != null) { c.MouseEntered += () => hover(true); c.MouseExited += () => hover(false); }
         if (right != null) c.SetMeta("rmb", true);   // MenuBase._Input: this right click is not "back"
+        Vector2 down = default; bool armed = false;
         c.GuiInput += e =>
         {
-            if (e is not InputEventMouseButton { Pressed: true } mb) return;
-            if (mb.ButtonIndex == MouseButton.Left) click();
-            else if (mb.ButtonIndex == MouseButton.Right) right?.Invoke();
+            if (e is not InputEventMouseButton mb) return;
+            if (mb.ButtonIndex == MouseButton.Right) { if (mb.Pressed) right?.Invoke(); return; }
+            if (mb.ButtonIndex != MouseButton.Left) return;
+            if (!release) { if (mb.Pressed) click(); return; }
+            // `release`: draggable things click when the button comes up without having moved (a drag is not a click)
+            if (mb.Pressed) { down = mb.GlobalPosition; armed = true; }
+            else if (armed) { armed = false; if (down.DistanceTo(mb.GlobalPosition) < 10) click(); }
         };
     }
 
@@ -221,7 +272,7 @@ void fragment() {
     protected (float W, Action<bool> Set) Word(Control host, string s, Vector2 at, int size, bool on, Action click, Font? f = null)
     {
         f ??= Title;
-        float w = f.GetStringSize(s, HorizontalAlignment.Left, -1, size).X;
+        float w = f.GetStringSize(s, HorizontalAlignment.Left, -1, Z(size)).X;
         var l = T(host, s, f, size, at, default, HorizontalAlignment.Left, 0.55f);
         var pip = Pip(host, new Vector2(at.X + w / 2, at.Y + size * 1.55f), 7);
         void Set(bool v) { l.Mat().P("lit", v ? 1f : 0f); pip.Visible = v; }
@@ -230,22 +281,21 @@ void fragment() {
         return (w, Set);
     }
 
-    /// A text button between two diamonds; hairlines above and below grow on hover.
+    /// A text button: just the word, a gold line sweeps in under it on hover (FX lab pick 2026-11-12, replacing the
+    /// two diamonds with lines above and below).
     protected Control Button(Control host, string s, Vector2 centre, Action click, int size = 26)
     {
-        float w = Title.GetStringSize(s, HorizontalAlignment.Left, -1, size).X;
+        float w = Title.GetStringSize(s, HorizontalAlignment.Left, -1, Z(size)).X;
         var root = new Control { Position = centre - new Vector2(w / 2 + 50, size), Size = new Vector2(w + 100, size * 2) };
         host.AddChild(root);
         var l = T(root, s, Title, size, new Vector2(10, size * 0.28f), new Vector2(w + 80, size * 1.45f), HorizontalAlignment.Center);
-        Pip(root, new Vector2(14, size), 10); Pip(root, new Vector2(w + 86, size), 10);
-        var top = Hair(root, new Vector2(30, 2), w + 40, GoldC with { A = 0.6f });
-        var bot = Hair(root, new Vector2(30, size * 2 - 3), w + 40, GoldC with { A = 0.6f });
-        foreach (var x in new Control[] { top, bot }) { x.PivotOffset = new Vector2(x.Size.X / 2, 0); x.Scale = new Vector2(0.3f, 1); }
+        var bot = Hair(root, new Vector2(50, size * 1.72f), w, GoldC, 2);
+        bot.PivotOffset = new Vector2(w / 2, 0); bot.Scale = new Vector2(0, 1);
         Click(root, () => { UiSound(true); click(); }, on =>
         {
             if (on) UiSound(false);
             l.Mat().P("lit", on ? 1f : 0f);
-            foreach (var x in new Control[] { top, bot }) Ink_.Only(this, x).TweenProperty(x, "scale:x", on ? 1f : 0.3f, 0.25).SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.Out);
+            Ink_.Only(this, bot).TweenProperty(bot, "scale:x", on ? 1f : 0f, 0.2).SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.Out);
         });
         return root;
     }
@@ -276,6 +326,9 @@ void fragment() {
     {
         var l = T(this, "‹  " + to, Title, 18, new Vector2(62, 30), default, HorizontalAlignment.Left, 0.7f);
         Click(l, OnBack, h => l.Mat().P("lit", h ? 1f : 0f));
+        // on top of whatever the screen adds after it: a full-size layer over it (the Deck Builder's drop area)
+        // swallowed its clicks (playtest 2026-11-12)
+        Callable.From(() => { if (IsInstanceValid(l)) MoveChild(l, -1); }).CallDeferred();
     }
 
     /// Pages of items (no scroll bars anywhere): `draw(i, host, at)` places item i at `at`. The mouse wheel or
@@ -285,7 +338,6 @@ void fragment() {
         int per = Math.Max(1, cols * rows), page = 0;
         var root = new Control { Position = area.Position, Size = area.Size, MouseFilter = MouseFilterEnum.Stop };
         parent.AddChild(root);
-        var lab = Put(parent, "", Thin, 16, InkAt(label) * new Color(1, 1, 1, 0.6f), label, new Vector2(300, 22));
         Action redraw = null!;
         void Turn(int d)
         {
@@ -293,19 +345,38 @@ void fragment() {
             int np = Math.Clamp(page + d, 0, pages - 1);
             if (np != page) { page = np; redraw(); UiSound(false); }
         }
+        var setPage = Pager(parent, label, Turn, !OnLight(label));
         redraw = () =>
         {
             foreach (var c in root.GetChildren()) c.QueueFree();
             int pages = Math.Max(1, (count + per - 1) / per);
             page = Math.Clamp(page, 0, pages - 1);
-            lab.Text = pages > 1 ? $"‹  PAGE {page + 1} / {pages}  ›" : "";
+            setPage(page, pages);
             for (int k = 0; k < per && page * per + k < count; k++)
                 draw(page * per + k, root, new Vector2(k % cols * cell.X, k / cols * cell.Y));
         };
         root.GuiInput += e => { if (e is InputEventMouseButton { Pressed: true } mb && mb.ButtonIndex is MouseButton.WheelDown or MouseButton.WheelUp) Turn(mb.ButtonIndex == MouseButton.WheelDown ? 1 : -1); };
-        Click(lab, () => Turn(1), null, () => Turn(-1));
         redraw();
         return redraw;
+    }
+
+    /// "‹  PAGE 1 / 3  ›" (260 wide): bold text between two big gold arrows you click; an arrow fades at the first /
+    /// last page; hidden when there is only one page. Returns the setter (page, pages).
+    protected static Action<int, int> Pager(Control host, Vector2 at, Action<int> turn, bool dark)
+    {
+        var root = new Control { Position = at, Size = new Vector2(260, 30), MouseFilter = MouseFilterEnum.Ignore };
+        host.AddChild(root);
+        var gold = dark ? GoldLight : GoldDeep;
+        var prev = Put(root, "‹", Title, 34, gold, new Vector2(0, -14), new Vector2(44, 48), HorizontalAlignment.Center);
+        var text = Put(root, "", Title, 17, dark ? Silver : Ink, new Vector2(44, 2), new Vector2(172, 24), HorizontalAlignment.Center);
+        var next = Put(root, "›", Title, 34, gold, new Vector2(216, -14), new Vector2(44, 48), HorizontalAlignment.Center);
+        Click(prev, () => turn(-1)); Click(next, () => turn(1));
+        return (page, pages) =>
+        {
+            root.Visible = pages > 1;
+            text.Text = $"PAGE {page + 1} / {pages}";
+            prev.Modulate = new Color(1, 1, 1, page > 0 ? 1 : 0.25f); next.Modulate = new Color(1, 1, 1, page < pages - 1 ? 1 : 0.25f);
+        };
     }
 
     /// A one-line message with up to two choices, centred at the bottom of the screen (replaces the old toasts).

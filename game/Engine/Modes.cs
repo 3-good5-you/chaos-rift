@@ -52,25 +52,37 @@ public static class Modes
 
     // ---------------------------------------------------------------- Pack Duel
 
-    /// Six packs of nine from the collectable cards: per pack 5 monsters, 2 spells, 2 traps, one of them a
-    /// higher-level monster. Returns the card idx list (duplicates possible).
+    /// Six packs of nine from the collectable cards: per pack 5 monsters (one of them higher-level), 2 spells, 2 traps.
+    /// The packs share two themes (a monster Type or Attribute each, playtest 2026-11-12: fully random packs gave piles
+    /// that could not make a deck): three of a pack's four low monsters and most high ones come from its theme, one
+    /// spell backs the theme when one exists, and the rest are cards that work on their own (no card named in their
+    /// text, no Ritual pieces, nothing that can't be Normal Summoned). One low monster per pack stays fully random.
+    /// Returns the card idx list (duplicates possible).
     public static List<List<int>> OpenPacks(Rng rng, int packs = 6)
     {
         var db = CardDb.Shared;
+        static bool Alone(CardData c) => !c.Desc.Contains('"') && c.Frame != "Ritual" && !c.Desc.Contains("Cannot be Normal Summoned", StringComparison.OrdinalIgnoreCase);
         var pool = db.ByIdx.Values.Where(c => c.PackMask != 0 && db.Canon(c.Idx) == c.Idx && c.Name.Length > 0 && !c.Name.EndsWith("Token") && !c.IsFusion).ToList();
-        var low = pool.Where(c => c.IsMonster && c.Level <= 4).ToList();
-        var high = pool.Where(c => c.IsMonster && c.Level >= 5).ToList();
-        var spells = pool.Where(c => c.IsSpell).ToList();
-        var traps = pool.Where(c => c.IsTrap).ToList();
-        var fusions = db.ByIdx.Values.Where(c => c.IsFusion && c.PackMask != 0 && db.Canon(c.Idx) == c.Idx).ToList();
+        var low = pool.Where(c => c.IsMonster && c.Level <= 4 && Alone(c)).ToList();
+        var high = pool.Where(c => c.IsMonster && c.Level is >= 5 and <= 8 && Alone(c)).ToList();
+        var spells = pool.Where(c => c.IsSpell && Alone(c)).ToList();
+        var traps = pool.Where(c => c.IsTrap && Alone(c)).ToList();
+        // themes: any Type or Attribute with enough low monsters to fill packs
+        var themes = low.GroupBy(c => c.Race).Concat(low.GroupBy(c => c.Attribute)).Where(g => g.Key.Length > 1 && char.IsLetter(g.Key[0]) && g.Count() >= 12).Select(g => g.Key).ToList();
+        string t1 = themes[rng.Int(themes.Count)], t2 = themes[rng.Int(themes.Count)];
+        static bool In(CardData c, string theme) => c.Race == theme || c.Attribute == theme;
+        static bool Backs(CardData c, string theme) => c.Desc.Contains(theme, StringComparison.Ordinal);
         int Pick(List<CardData> l) => l[rng.Int(l.Count)].Idx;
+        int Themed(List<CardData> l, Func<CardData, bool> f) { var t = l.Where(f).ToList(); return Pick(t.Count > 0 ? t : l); }
         var all = new List<List<int>>();
         for (int p = 0; p < packs; p++)
         {
+            string theme = p % 2 == 0 ? t1 : t2;
             var pack = new List<int>();
-            for (int k = 0; k < 4; k++) pack.Add(Pick(low));
-            pack.Add(Pick(rng.Int(6) == 0 && fusions.Count > 0 ? fusions : high));
-            pack.Add(Pick(spells)); pack.Add(Pick(spells));
+            for (int k = 0; k < 3; k++) pack.Add(Themed(low, c => In(c, theme)));
+            pack.Add(Pick(low));
+            pack.Add(rng.Int(4) == 0 ? Pick(high) : Themed(high, c => In(c, theme)));
+            pack.Add(Themed(spells, c => Backs(c, theme))); pack.Add(Pick(spells));
             pack.Add(Pick(traps)); pack.Add(Pick(traps));
             all.Add(pack);
         }

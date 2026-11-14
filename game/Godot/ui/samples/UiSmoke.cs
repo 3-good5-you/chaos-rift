@@ -43,7 +43,12 @@ public partial class UiSmoke : Node
 
     Control? Find(string text) => Clickables().LastOrDefault(c => HasText(c, text));   // last = the newest (a question bar over the screen)
 
-    void Click(Control c, bool right = false) => c.EmitSignal(Control.SignalName.GuiInput, new InputEventMouseButton { Pressed = true, ButtonIndex = right ? MouseButton.Right : MouseButton.Left });
+    void Click(Control c, bool right = false)
+    {
+        // press + release: draggable tiles (Deck Builder) click on release
+        foreach (bool down in new[] { true, false })
+            if (GodotObject.IsInstanceValid(c)) c.EmitSignal(Control.SignalName.GuiInput, new InputEventMouseButton { Pressed = down, ButtonIndex = right ? MouseButton.Right : MouseButton.Left });
+    }
 
     async Task Tap(string text, bool right = false)
     {
@@ -102,10 +107,10 @@ public partial class UiSmoke : Node
         var deckTiles = Clickables().Where(c => c.GlobalPosition.X > crack + 60 && c is TextureRect).ToList();
         Check(deckTiles.Count > 0, $"deck tiles ({deckTiles.Count})");
         int before = deck.Main.Count + deck.Side.Count + deck.Extra.Count;
-        if (deckTiles.Count > 0) { Click(deckTiles[0]); await Wait(0.3); }
+        if (deckTiles.Count > 0) { Click(deckTiles[0], right: true); await Wait(0.3); }
         await Tap("SAVE");
         if (Find("SAVE ANYWAY") != null) await Tap("SAVE ANYWAY");
-        Check(deck.Main.Count + deck.Side.Count + deck.Extra.Count == before - 1, "clicking a deck card takes it out");
+        Check(deck.Main.Count + deck.Side.Count + deck.Extra.Count == before - 1, "right-clicking a deck card takes it out");
 
         // ---- Shop
         await Go("res://ui/ShopScreen.tscn");

@@ -21,6 +21,8 @@ public partial class DuelField : MenuBase
         public Phase Phase;
         public int Tp, Turn, Chain;
         public int[] Lp = new int[2];
+        public int HitLp = -1;     // a direct attack's Damage Step: the LP its hit leaves (shown at the impact, not a step later)
+        public bool HitShown;      // the Damage step of that hit: already shown
         public St[] Cards = null!;
         public int Seq;   // Duel.Seq when taken (Duel.OnTriggered inserts before later steps)
         public int[] Blocked = new int[2];   // per screen side: Monster Zones that can't be used (bit = zone; Ground Collapse, Dimensionhole)
@@ -31,6 +33,7 @@ public partial class DuelField : MenuBase
         public bool Together;            // a discard with the next one (Card Destruction): both hands burn at once
         public bool NoDraw, ToEnd;       // the Draw Phase without its draw; the turn skips to its End Phase
         public int Chaos = -1;           // Chaos Duel: the rule in force
+        public Card? By;                 // the card whose effect was resolving when this happened (Change of Heart)
     }
 
     sealed class View
@@ -226,7 +229,7 @@ public partial class DuelField : MenuBase
         var db = CardDb.Shared;
         var setup = new PoC.Engine.DuelSetup { Seed = seed, FirstPlayer = Session.YouFirst ? Me : 1 - Me, Classic = Session.Classic };
         // Your deck from DuelSetup; a fixed decks.json deck when the field is started on its own (dev/screenshots).
-        var (m0, e0) = (Session.ModeDeck ?? Session.MatchDeck ?? Session.Playing) is { } mine ? (mine.Main.ToList(), mine.Extra.ToList()) : db.Deck("yugi/cpu01");
+        var (m0, e0) = (Session.MatchDeck ?? Session.ModeDeck ?? Session.Playing) is { } mine ? (mine.Main.ToList(), mine.Extra.ToList()) : db.Deck("yugi/cpu01");
         var (m1, e1) = Session.RivalDeck is { } rd ? (rd.Main.ToList(), rd.Extra.ToList()) : db.Deck(Session.Pick.DeckKey);
         m1 = DeckRules.ForCpu(m1);   // 2004 list: the rival plays legal too; 2003: as the original decks were
         setup.Main[Me].AddRange(m0); setup.Extra[Me].AddRange(e0);
@@ -276,7 +279,7 @@ public partial class DuelField : MenuBase
         // Opening: everything starts in the decks and the first snapshot deals the hands.
         var now = Snap(null);
         for (int i = 0; i < 2; i++) { shownLp[i] = D.P(Side(i)).Lp; SetLp(i, shownLp[i], false); }
-        foreach (var c in D.Cards)
+        foreach (var c in D.Cards.OrderBy(c => now.Cards[c.Uid].Loc == Loc.Hand ? 0 : 1))   // the opening hands' pictures load first
         {
             var v = ViewOf(c.Uid);
             var s = now.Cards[c.Uid];
@@ -299,12 +302,18 @@ public partial class DuelField : MenuBase
         cam.Position = new Vector3(0, 12, 0);
         cam.RotationDegrees = new Vector3(-90, 0, 0);
         cam.Size = MatD + 0.9f;
+        // `--matshot=<file.png>`: save the render and quit (Card List / Shop previews, cropped by hand to the mat)
+        if (OS.GetCmdlineUserArgs().FirstOrDefault(a => a.StartsWith("--matshot=")) is { } ms)
+            GetTree().CreateTimer(2.0).Timeout += () => { GetViewport().GetTexture().GetImage().SavePng(ms[10..]); GetTree().Quit(); };
     }
 
     // ---------------------------------------------------------------- 3D world
 
     void BuildWorld()
     {
+        // the table's darkening for big moments (DuelField.FxLab.Batch6 SetDark): the mat, frames and sky multiply by it
+        if (!tableDimAdded) { RenderingServer.GlobalShaderParameterAdd("table_dim", RenderingServer.GlobalShaderParameterType.Float, 0f); tableDimAdded = true; }
+        RenderingServer.GlobalShaderParameterSet("table_dim", 0f);
         world = new Node3D();
         AddChild(world);
         (int Kind, Color Deep, Color Glow)? sur = Pm.Tex != null && Surrounds.TryGetValue(Pm.Tex, out var su) ? su : PlainWorld;   // your world, under your half
@@ -371,6 +380,7 @@ public partial class DuelField : MenuBase
             };
             frame.Position = Grid3(z) + new Vector3(0, z.Loc == Loc.Banished ? -0.056f : 0.003f, 0);
             world.AddChild(frame);
+            zoneLines.Add(((ShaderMaterial)frame.MaterialOverride, mon ? 0.85f : 0.5f));
             if (z.Loc == Loc.Banished) { frame.Visible = false; banishMarks[z.Side].Add(frame); }
             if (mon)
             {
@@ -392,6 +402,7 @@ public partial class DuelField : MenuBase
             l.RotationDegrees = new Vector3(-90, z.Side == 1 ? 180 : 0, 0);
             l.Position = Grid3(z) + new Vector3(0, z.Loc == Loc.Banished ? -0.055f : 0.004f, 0);
             world.AddChild(l);
+            zoneLabels.Add(l);
             if (z.Loc == Loc.Banished) { l.Visible = false; banishMarks[z.Side].Add(l); }
         }
 
@@ -746,7 +757,8 @@ void fragment() {
     void SetFace(View v, bool front)
     {
         v.Front = front;
-        v.Face.AlbedoTexture = CardArt.Small(v.Card.Data);
+        // decoded off the main thread the first time (87 pictures at once froze the duel's start); at once when cached
+        CardArt.SmallAsync(v.Card.Data, t => { if (IsInstanceValid(v.Root)) v.Face.AlbedoTexture = t; });
         // The face quad always shows the card; face-down cards are simply turned over.
     }
 
@@ -759,7 +771,7 @@ void fragment() {
         v.Count.Visible = s.Counter > 0 && s.Loc is Loc.Monster or Loc.Spell or Loc.Field;
         v.Count.Text = s.Counter.ToString();
         UpdateMarks(v);
-        v.Stat.Visible = s.Loc == Loc.Monster && (s.Up || s.Side == 0) && !crackedEarly.Contains(v.Card.Uid);
+        v.Stat.Visible = s.Loc == Loc.Monster && (s.Up || s.Side == 0) && !crackedEarly.Contains(v.Card.Uid) && !(sheeted.Contains(v.Card.Uid) && !v.Root.Visible) && !arriving.Contains(v.Card.Uid);   // not for a card a signature effect took over or is bringing in
         if (!v.Stat.Visible) return;
         var d = v.Card.Data;
         v.StatAtk.Text = s.Atk.ToString();
@@ -828,8 +840,26 @@ void fragment() {
                     }
                 }
                 // A destroyed card leaves the field a step before its Destroyed event: its effect plays where it stood.
-                destroying.Clear();
+                destroying.Clear(); swept.Clear();
                 foreach (var s in batch) if (s.Ev is { Kind: EvKind.Destroyed, Card: { } dc }) destroying[dc.Uid] = (s.Ev.Battle, s.Ev.Other);
+                // Mass destruction (Dark Hole, Raigeki, Mirror Force...): the cards burn together, not one after the other
+                // (playtest 2026-11-12). Every step of theirs but the last plays without its wait.
+                var mass = destroying.Where(kv => !kv.Value.Item1).Select(kv => kv.Key).ToHashSet();
+                if (mass.Count >= 2)
+                {
+                    var burn = batch.Where(x => x.Ev is { Kind: EvKind.LeftField or EvKind.ToGrave or EvKind.Destroyed, Card: { } mc } && mass.Contains(mc.Uid)).ToList();
+                    foreach (var x in burn.SkipLast(1)) x.Together = true;
+                }
+                // A direct attack and its damage are one event (playtest 2026-11-12): the LP drop rides on the impact.
+                for (int i = 0; i < batch.Count; i++)
+                    if (batch[i].Ev is { Kind: EvKind.DamageCalc, Card: { } da, Other: null })
+                    {
+                        int hit = 1 - Side(da.Controller);
+                        int j = batch.FindIndex(i + 1, x => x.Lp[hit] != batch[i].Lp[hit]);
+                        if (j < 0 || j > i + 8 || batch[j].Lp[hit] > batch[i].Lp[hit]) continue;
+                        batch[i].HitLp = batch[j].Lp[hit];
+                        if (batch[j].Ev?.Kind == EvKind.Damage) batch[j].HitShown = true;
+                    }
                 offered.Clear();
                 for (int i = 0; i < batch.Count; i++)
                     if (batch[i].Ev is { Card: { } oc } oe && (oe.Kind == EvKind.LeftField || oe.Kind == EvKind.ToGrave && oe.From == Loc.Hand) && !destroying.ContainsKey(oc.Uid) && !offered.ContainsKey(oc.Uid))
@@ -839,6 +869,9 @@ void fragment() {
                                 if ((SummonKind)se.Arg is SummonKind.Tribute or SummonKind.Fusion) offered[oc.Uid] = ((SummonKind)se.Arg, sum.Uid, batch[j].Cards[sum.Uid]);
                                 break;
                             }
+                // Two or more tributes for one summon go up together (playtest 2026-11-13), not one after the other.
+                var trib = batch.Where(x => x.Ev is { Kind: EvKind.LeftField or EvKind.ToGrave, Card: { } tc } && offered.ContainsKey(tc.Uid)).ToList();
+                if (trib.Count > 0) { int lastT = trib[^1].Ev!.Card!.Uid; foreach (var x in trib.Where(x => x.Ev!.Card!.Uid != lastT)) x.Together = true; }
                 // Random discards are pulled out by the card that caused them; a hand thrown away by one card burns at once.
                 foreach (var d in batch.Where(x => x.Ev is { Kind: EvKind.Discarded, Arg: 1, Other: not null }))
                     foreach (var x in batch.Where(x => x.Ev is { Kind: EvKind.ToGrave, From: Loc.Hand } && d.Ev!.Cards!.Contains(x.Ev.Card!))) x.Thief = d.Ev!.Other;
@@ -853,13 +886,18 @@ void fragment() {
                     foreach (var x in l) x.InGroup = true;
                 }
                 foreach (var s in batch) { if (surrendered) throw new OperationCanceledException(); await Play(s); }
+                if (SigCheckOn) { await Wait(1.6); VerifyBoard($"t{D.Turn} {D.Phase}"); }
                 if (D.Over) break;
                 var p = D.Pending!;
-                if (p.Source != null && p.Kind is Ask.Pick or Ask.YesNo or Ask.Choose) await EffectFlash(p.Source, Side(p.Player));
+                // Not a card still hidden in the rival's hand (playtest 2026-11-12: the Tribute pick for a monster the rival
+                // was about to Set lit it up in the hand and showed it in the details).
+                if (p.Source != null && p.Kind is Ask.Pick or Ask.YesNo or Ask.Choose && !(p.Source.Loc == Loc.Hand && !Mine(p.Player) && !handsOpen && !handShown[p.Player]))
+                    await EffectFlash(p.Source, Side(p.Player));
                 Command cmd;
                 // Response windows the field doesn't think worth asking about pass for you (Worth).
                 if (Watch != null) cmd = await Watched(p);
-                else if (Mine(p.Player) && liveMove != null && p.Options.FindIndex(o => liveMove(o)) is >= 0 and var lm) { cmd = new Command(Me, new[] { lm }); liveMove = null; }
+                else if (Mine(p.Player) && liveMove != null && p.Options.FindIndex(o => liveMove(o)) is >= 0 and var lm) { cmd = new Command(Me, new[] { lm }); liveMove = liveMove2; liveMove2 = null; }
+                else if (Mine(p.Player) && liveAuto && D.Turn < 5 && p.Kind is not (Ask.Main or Ask.Battle)) cmd = AutoAnswer(p);   // a scenario's live move (Signature); from your turn 5 you play on yourself
                 else if (Mine(p.Player) && !autoplay && p.Kind == Ask.Respond && !Worth(p))
                     cmd = new Command(p.Player, new[] { p.Options.FindIndex(o => o.Act == Act.Pass) });
                 else if (Mine(p.Player) && !autoplay) cmd = await Human(p);   // the sandbox's ME mode answers for the rival too
@@ -897,7 +935,7 @@ void fragment() {
             string them = ThemName.ToUpperInvariant(), why = D.EndReason == "LP reached 0" ? "" : D.EndReason.ToUpperInvariant();
             await EndTitle(w == 0 ? "VICTORY" : w == 1 ? "DEFEAT" : "DRAW", w == 1 ? Bad : RivalPanels.Gold, w != 1,
                 why.Length > 0 ? why : w == 0 ? $"{them} DEFEATED" : w == 1 ? $"{them} WINS" : "");
-            await Wait(2);
+            await Wait(0.15);   // was 2 s of nothing after the title had already gone (playtest 2026-11-12)
             if (selftest || backToLab) { GetTree().ReloadCurrentScene(); return; }
             if (Watch != null) { LeaveReplay(); return; }
             KeepReplay(w, D.EndReason);
@@ -942,6 +980,7 @@ void fragment() {
         s.NoDraw = e?.Kind == EvKind.DrawPhase && (D.TurnFlags.Contains($"skipdraw{D.TurnPlayer}") || D.Flags.GetValueOrDefault($"skipdraw{D.TurnPlayer}") > 0);
         s.ToEnd = D.TurnFlags.Contains("toend");
         s.Chaos = D.ChaosRule;
+        s.By = D.IsResolving ? D.Resolving?.Card : null;
         s.Lp[0] = D.P(Me).Lp; s.Lp[1] = D.P(1 - Me).Lp;
         for (int p = 0; p < 2; p++) s.Blocked[Side(p)] = D.Flags.GetValueOrDefault($"blocked{p}");
         foreach (var c in D.Cards) s.Cards[c.Uid] = StateOf(c);
@@ -1012,8 +1051,8 @@ void fragment() {
         if (Session.Puzzle is { } pz && !puzzleShown && scenario == null)
         {
             puzzleShown = true;
-            ChaosLine($"{pz.Name}  ·  WIN THIS TURN");
-            chaosLine!.Text = $"CHALLENGE:  {pz.Name}  ·  WIN THIS TURN  ·  {pz.Goal.ToUpperInvariant()}";
+            ChaosLine($"{pz.Name}  ·  {pz.Limit}");
+            chaosLine!.Text = $"CHALLENGE:  {pz.Name}  ·  {pz.Limit}  ·  {pz.Goal.ToUpperInvariant()}";
         }
         if (s.Chaos != shownChaos && s.Chaos >= 0)
         {
@@ -1053,14 +1092,15 @@ void fragment() {
                     if (other >= 0 && views.TryGetValue(other, out var ov) && ov.S.Loc == Loc.Monster && crackedEarly.Add(other))
                         CrackBreak(ov, lv.Root.GlobalPosition);   // hidden until its own LeftField (HideFor skips crackedEarly)
                 }
+                else if (how.By is { } hb && DestroyedByCard(lv, hb)) { }   // the destroying card's own effect (Signature)
                 else EffectBurn(lv);
                 veiled = lv;
             }
             else if (offered.Remove(lc.Uid, out var o))
             {
                 var to = Target(ViewOf(o.Uid), o.At).Origin;
-                if (o.Kind == SummonKind.Fusion) SwirlOut(lv, to); else SoulsOut(lv, to);
-                veiled = lv; extra = 0.9;
+                if (GodTribute(lv, o)) veiled = lv;   // struck and taken by lightning (Signature): the God's arrival follows at once
+                else { if (o.Kind == SummonKind.Fusion) SwirlOut(lv, to); else SoulsOut(lv, to); veiled = lv; extra = 0.9; }
             }
             else if (s.Ev.Kind == EvKind.ToGrave && s.Ev.From == Loc.Hand && s.Thief is { } thief && views.TryGetValue(thief.Uid, out var tv) && tv.Root.Visible && tv.S.Loc is Loc.Monster or Loc.Spell or Loc.Field)
             {
@@ -1084,8 +1124,17 @@ void fragment() {
             }
         }
         // A monster changing sides: its frame flares where it stood before it arcs across.
-        if (s.Ev is { Kind: EvKind.ControlChanged, Card: { } cc } && views.TryGetValue(cc.Uid, out var ccv)) { Cue("control_out"); FrameBurst(ccv, FxEmber, 0.95f, 1.2f); }
+        // A signature effect started by this step (cards destroyed by a card, a God's tribute struck): it plays out
+        // before the cards move, so it acts on them where they are and they are not seen leaving early.
+        if (sigTask != null) { var pre = sigTask; sigTask = null; await pre; }
+        var sig = await SigBefore(s);   // a resolving card's own moment, a banished card phasing out (Signature)
+        if (!sig.Shown && s.Ev is { Kind: EvKind.ControlChanged, Card: { } cc } && views.TryGetValue(cc.Uid, out var ccv)) { Cue("control_out"); FrameBurst(ccv, FxEmber, 0.95f, 1.2f); }
         int moved = Sync(s.Cards, s.Ev);
+        shownCards = s.Cards; shownStep = $"{s.Ev?.Kind} {s.Ev?.Card?.Name}";
+        KeepSheetedHidden(s.Cards);
+        sig.Then?.Invoke();
+        // a God or Dark Magician lands hidden: its own arrival plays and burns it in (Signature)
+        if (SigSummon(s) && views.TryGetValue(s.Ev!.Card!.Uid, out var sgv)) SigArrive(sgv, s.Cards[s.Ev.Card.Uid]);
         if (veiled != null) HideFor(veiled, 1.1);
         // A discard rebuilds in the Graveyard once its embers arrive (the restore and the rebuild's own hide fall on the same frame).
         if (discarded != null) { var dv = discarded; HideFor(dv, 1.0); After(1.0, () => _ = Rebuild(dv, FxEmber, 0.5, "rebuild_gy")); }
@@ -1119,18 +1168,25 @@ void fragment() {
             foreach (var m in banishMarks[side]) m.Visible = any;
         }
         for (int i = 0; i < 2; i++)
+        {
+            // LP already shown ahead by a direct hit: the snapshots in between still carry the old number
+            if (lpAhead[i] >= 0) { if (s.Lp[i] == lpAhead[i]) lpAhead[i] = -1; else continue; }
             if (s.Lp[i] != shownLp[i])
             {
                 LpHit(i, shownLp[i], s.Lp[i]);
                 shownLp[i] = s.Lp[i];
                 if (s.Lp[i] <= 2000) Escalate(2);
             }
+        }
         if (s.Chain == 0 && groupBadged.Count == 0) { ClearBadges(); ChainClear(); }
         double wait = s.Ev == null ? 0 : Flair(s.Ev, s);
+        if (sigTask != null) { var t = sigTask; sigTask = null; await t; wait = 0.2; }   // a signature effect: the replay goes on when it is done
         await Wait(s.Together ? 0.05 : Math.Max(wait, moved > 0 ? 0.45 + (moved - 1) * 0.1 : 0.04) + extra);
     }
 
     string? lastReveal;
+    readonly bool[] shuffling = new bool[2];
+    readonly int[] lpAhead = { -1, -1 };
 
     double Flair(Ev e, Step s)
     {
@@ -1142,6 +1198,8 @@ void fragment() {
                 {
                     var kind = (SummonKind)e.Arg;
                     bool def = s.Cards[e.Card!.Uid].Def;
+                    if (SigSummon(s)) { Escalate(1); Focus(e.Card); return 0; }   // its own arrival (Signature) is already playing
+                    if (sigShown.Remove(e.Card.Uid)) { Focus(e.Card); After(0.1, () => { if (V(e.Card) is { } rv) PlacementFx(rv, def); }); return 0.5; }   // Monster Reborn built it in
                     if (V(e.Card) is { } sv)
                     {
                         // The landing (fusion: rebuilt out of the swirl; tribute: the souls' impact; special: rebuilt from embers;
@@ -1186,11 +1244,13 @@ void fragment() {
                 if (V(e.Card) is { S: { Loc: Loc.Monster, Up: true } } pv) { Cue("turn"); After(0.4, () => PlacementFx(pv, pv.S.Def)); return 1.0; }
                 return 0;
             case EvKind.ControlChanged:
+                if (s.By?.Name is "Change of Heart" or "Brain Control") return 0;   // its own effect carried it over (Signature)
                 if (V(e.Card) is { } cv) After(0.6, () => { Cue("control_in"); FrameBurst(cv, FxGold, 0.9f, 1.3f); });
                 return 1.0;
             case EvKind.AttackDeclared:
                 {
                     var a = V(e.Card); var t = V(e.Other); int side = Side(e.Card!.Controller);
+                    SigAttack(e);
                     if (a != null) AimShow(a, t != null ? Target(t, t.S).Origin : DirectPoint(side));
                     Focus(e.Card);
                     return 0.7;
@@ -1211,7 +1271,16 @@ void fragment() {
                     if (blocked) Lunge(a, t, side, onHit: h => BlockHit(t!, h), repel: true);
                     else if (locked) Lunge(a, t, side, grind: true);
                     else if (mutual && a != null) MeetInMiddle(a, t!, side);
-                    else if (t == null) Lunge(a, null, side, onHit: _ => DirectHit(side));
+                    else if (t == null) Lunge(a, null, side, onHit: _ =>
+                    {
+                        DirectHit(side);
+                        if (s.HitLp < 0) return;
+                        int hit = 1 - side;
+                        LpHit(hit, shownLp[hit], s.HitLp);
+                        shownLp[hit] = lpAhead[hit] = s.HitLp;
+                        if (hit == 0) Vignette(FxRed, 0.8);
+                        if (s.HitLp <= 2000) Escalate(2);
+                    });
                     else Lunge(a, t, side);
                     return locked ? 1.5 : 1.0;
                 }
@@ -1277,6 +1346,7 @@ void fragment() {
                     ShieldPop(dv); FrameBurst(dv, FxIce, 1f, 1.3f, 0.45);
                     return 0.6;
                 }
+            case EvKind.Damage when s.HitShown: return 0.25;   // shown with the direct hit itself
             case EvKind.Damage or EvKind.Gain:
                 {
                     bool you = e.Player == Me;
@@ -1299,8 +1369,12 @@ void fragment() {
                 return DiceCup(e);
             case EvKind.Discarded:
                 return 0.3;   // no words: the cards burnt away when they left the hand (Play)
-            case EvKind.Revealed when e.Cards is { Count: > 0 } shown:
+            case EvKind.Revealed when e.Cards is { Count: > 0 } all:
                 {
+                    // Banished cards already lie face-up for both players (Nobleman of Crossout reveals what it
+                    // banished): no reveal, the pile shows them.
+                    var shown = all.Where(c => V(c)?.S.Loc != Loc.Banished).ToList();
+                    if (shown.Count == 0) return 0;
                     // Revealed names who sees the cards; effects shown to both players raise it twice in a row.
                     var key = string.Join(",", shown.Select(c => c.Uid));
                     if (key == lastReveal) return 0;
@@ -1309,9 +1383,22 @@ void fragment() {
                     string title = $"{(mine ? "YOUR" : ThemName.ToUpperInvariant() + "'S")} CARDS  ·  REVEALED";
                     var vs = shown.Select(V).OfType<View>().ToList();
                     if (vs.Count == shown.Count && vs.All(v => v.S.Loc == Loc.Hand && v.S.Side == 1 && v.S.Up) && handShown[1 - Me]) return 0;   // already kept face-up (Mind on Air)
-                    // A whole hand rises in a line (and stays for a pick from it); field cards flip up and lift where they are.
-                    if (vs.Count == shown.Count && vs.All(v => v.S.Loc == Loc.Hand && v.S.Side == vs[0].S.Side)) { RaiseHand(vs, vs[0].S.Side, title); return 1.8; }
-                    return LiftReveal(vs, title, mine ? Pm.You : Pm.Them);
+                    // Picked in the FX lab 2026-11-12: a whole hand rises in a line (and stays for a pick from it), cards
+                    // on the field turn face-up where they are, anything else (one hand card, a Deck card) pops up big.
+                    if (vs.Count == 0) return 0;
+                    if (vs.Count == shown.Count && vs.Count > 1 && vs.All(v => v.S.Loc == Loc.Hand && v.S.Side == vs[0].S.Side)) { RaiseHand(vs, vs[0].S.Side, title); return 1.3; }
+                    if (vs.All(v => v.S.Loc is Loc.Monster or Loc.Spell or Loc.Field)) return RevealFlip(vs);
+                    return RevealPop(vs, title, mine ? Pm.You : Pm.Them);
+                }
+            case EvKind.Shuffled:
+                {
+                    // the riffle (FX lab pick 2026-11-12); two shuffles of one Deck in a row play once
+                    var deck = views.Values.Where(v => v.S.Loc == Loc.Deck && v.S.Side == Side(e.Player)).OrderByDescending(v => v.S.Index).ToList();
+                    if (deck.Count < 4 || shuffling[e.Player]) return 0;
+                    shuffling[e.Player] = true;
+                    After(0.9, () => shuffling[e.Player] = false);
+                    _ = ShuffleRiffle(deck);
+                    return 0.9;
                 }
             case EvKind.Equipped:
                 if (V(e.Card) is { } ev && V(e.Other) is { } mv) { EquipThread(ev, mv); return 1.2; }
@@ -1341,7 +1428,7 @@ void fragment() {
     /// Card-specific activation sounds Master Duel has for cards in this game.
     static readonly Dictionary<string, string> CardSounds = new()
     {
-        ["Dark Hole"] = "SE_EV_BLACKHOLE", ["Mystical Space Typhoon"] = "SE_EV_CYCLONE", ["Monster Reborn"] = "SE_EV_MONSTER_REBORN",
+        ["Monster Reborn"] = "SE_EV_MONSTER_REBORN",   // Dark Hole and MST: their sound is in their effect (SignatureFx), on the moment it belongs to
     };
 
     /// A small pool of players so effects can overlap.
@@ -1412,7 +1499,9 @@ void fragment() {
 
     // ---------------------------------------------------------------- shaders
 
+    static bool tableDimAdded;
     const string SkyShader = @"shader_type sky;
+global uniform float table_dim;
 uniform vec4 top : source_color;
 uniform vec4 low : source_color;
 uniform vec4 accent : source_color;
@@ -1435,7 +1524,7 @@ void sky() {
     float star = step(0.985, h(id)) * (1.0 - smoothstep(0.0, 0.12, length(fp))) * smoothstep(0.0, 0.3, y);
     c += vec3(star) * (0.6 + 0.4 * sin(TIME * 1.7 + h(id + 3.0) * 40.0));
   }
-  COLOR = c;
+  COLOR = c * (1.0 - table_dim * 0.8);
 }";
 
     const string FloorShader = @"shader_type spatial;
@@ -1563,6 +1652,7 @@ void fragment() {
 
     /// Playmat: veined stone (or card art) per half, glowing gold border and centre line.
     const string MatShader = @"shader_type spatial;
+global uniform float table_dim;
 uniform vec4 stone : source_color;
 uniform vec4 col_you : source_color;
 uniform vec4 col_them : source_color;
@@ -1620,8 +1710,9 @@ void fragment() {
   float cl = (1.0 - smoothstep(0.0, 0.018, abs(p.y))) * step(abs(p.x), size.x * 0.5 - 0.3);
   float clGlow = exp(-abs(p.y) * 9.0) * 0.25;
   vec3 em = gold * line * 1.1 + side * seal * 0.22 * pulse + side * (vein * 0.07 * pulse * (1.0 - has * 0.6)) + mix(col_them.rgb, col_you.rgb, step(0.0, p.y)) * (cl * 1.6 + clGlow);
-  ALBEDO = base;
-  EMISSION = em;
+  float dk = 1.0 - table_dim * 0.8;   // table_dim: the table darkening for a big moment (effects stay bright)
+  ALBEDO = base * dk;
+  EMISSION = em * dk;
   ROUGHNESS = 0.42 - 0.2 * vein;
   METALLIC = 0.25;
   }
@@ -1630,6 +1721,7 @@ void fragment() {
     /// Zone frame: rounded outline with soft glow and brighter corners.
     const string FrameShader = @"shader_type spatial;
 render_mode unshaded, blend_add, depth_draw_never, cull_disabled, shadows_disabled;
+global uniform float table_dim;
 uniform vec4 col : source_color;
 uniform vec2 size;
 uniform float strength = 1.0;
@@ -1642,7 +1734,7 @@ void fragment() {
   float line = 1.0 - smoothstep(0.0, 0.01, abs(d));
   float glow = exp(-abs(d) * 40.0) * 0.18;
   float fill = step(d, 0.0) * 0.015;
-  ALBEDO = col.rgb * (line * (0.9 + corner * 1.4) + glow + fill) * strength;
+  ALBEDO = col.rgb * (line * (0.9 + corner * 1.4) + glow + fill) * strength * (1.0 - table_dim * 0.8);
 }";
 
     /// Light sweep across a card face (activation shine); t runs -1 (off) .. 0..1 (sweep).

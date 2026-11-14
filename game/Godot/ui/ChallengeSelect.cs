@@ -51,7 +51,7 @@ public partial class ChallengeSelect : RiftMenu
         float x = W * 0.56f, w = W - x - 80;
         Put(detail, z.Name, Title, 52, Silver, new Vector2(x, H * 0.16f), new Vector2(w, 70));
         Put(detail, z.Goal, Body, 26, Mist, new Vector2(x, H * 0.16f + 84), new Vector2(w, 40));
-        Put(detail, "WIN THIS TURN", Title, 18, GoldLight, new Vector2(x, H * 0.16f + 140));
+        Put(detail, z.Limit, Title, 18, GoldLight, new Vector2(x, H * 0.16f + 140));
         Put(detail, "THEIR LP", Thin, 15, Mist, new Vector2(x, H * 0.16f + 196));
         Put(detail, $"{z.TheirLp:N0}", Title, 44, Silver, new Vector2(x, H * 0.16f + 218));
         Put(detail, "YOUR HAND", Thin, 15, Mist, new Vector2(x, H * 0.16f + 300));

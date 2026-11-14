@@ -535,14 +535,10 @@
     "idea": "EASY - Duelist Kingdom Joey: warriors and beasts with equips; Flame Manipulator + Masaki = Flame Swordsman, the M-Warriors = Karbonala Warrior, one Red-Eyes.",
     "main": {
       "Axe Raider": 3,
-      "Battle Warrior": 3,
       "Garoozis": 2,
-      "Tiger Axe": 2,
-      "Rock Ogre Grotto #1": 2,
-      "Armored Lizard": 2,
-      "Anthrosaurus": 2,
-      "Claw Reacher": 2,
-      "Kagemusha of the Blue Flame": 2,
+      "Tiger Axe": 3,
+      "Rock Ogre Grotto #1": 1,
+      "Armored Lizard": 3,
       "M-Warrior #1": 1,
       "M-Warrior #2": 1,
       "Masaki the Legendary Swordsman": 2,
@@ -558,7 +554,12 @@
       "Dragon Treasure": 1,
       "Trap Hole": 2,
       "Kunai with Chain": 1,
-      "Graverobber": 1
+      "Graverobber": 1,
+      "Kojikocy": 2,
+      "Alligator's Sword": 2,
+      "Crawling Dragon #2": 2,
+      "Rocket Warrior": 1,
+      "Swordsman of Landstar": 1
     },
     "fusion": {
       "Flame Swordsman": 1,
@@ -579,15 +580,13 @@
       "Baby Dragon": 2,
       "Time Wizard": 2,
       "Axe Raider": 2,
-      "Battle Warrior": 2,
       "Garoozis": 2,
       "Masaki the Legendary Swordsman": 2,
       "Flame Manipulator": 1,
       "Swamp Battleguard": 1,
       "Lava Battleguard": 1,
       "Kuriboh": 1,
-      "Rock Ogre Grotto #1": 2,
-      "Kagemusha of the Blue Flame": 2,
+      "Rock Ogre Grotto #1": 1,
       "Alligator's Sword": 2,
       "Tiger Axe": 1,
       "Polymerization": 2,
@@ -601,7 +600,11 @@
       "Kunai with Chain": 2,
       "Graverobber": 1,
       "Skull Dice": 1,
-      "Magic-Arm Shield": 1
+      "Magic-Arm Shield": 1,
+      "Kojikocy": 2,
+      "Crawling Dragon #2": 1,
+      "Rocket Warrior": 1,
+      "Armored Lizard": 1
     },
     "fusion": {
       "Flame Swordsman": 1,
@@ -962,15 +965,13 @@
     "main": {
       "Elemental HERO Avian": 3,
       "Elemental HERO Burstinatrix": 3,
-      "Elemental HERO Clayman": 2,
+      "Elemental HERO Clayman": 3,
       "Elemental HERO Sparkman": 3,
-      "Elemental HERO Bubbleman": 1,
+      "Elemental HERO Bubbleman": 2,
       "Hero Kid": 2,
       "Winged Kuriboh": 2,
       "Wroughtweiler": 1,
       "Kuriboh": 1,
-      "Axe Raider": 1,
-      "Gemini Elf": 1,
       "Polymerization": 2,
       "Fusion Recovery": 1,
       "Monster Reborn": 1,
@@ -985,9 +986,10 @@
       "Fissure": 1,
       "Hero Signal": 2,
       "Hero Barrier": 1,
-      "Trap Hole": 2,
       "Negate Attack": 1,
-      "Clay Charge": 1
+      "Clay Charge": 1,
+      "A Hero Emerges": 1,
+      "Draining Shield": 1
     },
     "fusion": {
       "Elemental HERO Flame Wingman": 1,
@@ -996,7 +998,7 @@
     "side": {
       "Kuriboh": 1,
       "Mystical Space Typhoon": 1,
-      "Trap Hole": 1
+      "Hero Barrier": 1
     }
   },
   "jaden/x_lv1": {
@@ -1023,9 +1025,9 @@
       "Hero Signal": 2,
       "Hero Barrier": 1,
       "Clay Charge": 1,
-      "Trap Hole": 1,
       "Negate Attack": 1,
-      "Mirror Gate": 1
+      "Mirror Gate": 1,
+      "Draining Shield": 1
     },
     "fusion": {
       "Elemental HERO Flame Wingman": 2,
@@ -1039,8 +1041,8 @@
     "side": {
       "Kuriboh": 1,
       "Mystical Space Typhoon": 1,
-      "Trap Hole": 1,
-      "Mirror Force": 1
+      "Mirror Force": 1,
+      "A Hero Emerges": 1
     }
   },
   "jaden/x_lv2": {
@@ -1086,8 +1088,9 @@
     "side": {
       "Kuriboh": 1,
       "Mystical Space Typhoon": 1,
-      "Trap Hole": 2,
-      "Hero Spirit": 1
+      "Hero Spirit": 1,
+      "Draining Shield": 1,
+      "A Hero Emerges": 1
     }
   },
   "jaden/x_lv3": {
@@ -1133,8 +1136,9 @@
     },
     "side": {
       "Mystical Space Typhoon": 2,
-      "Trap Hole": 2,
-      "Kuriboh": 1
+      "Kuriboh": 1,
+      "Draining Shield": 1,
+      "A Hero Emerges": 1
     }
   },
   "jaden/x_lv4": {
@@ -1169,7 +1173,7 @@
       "Call Of The Haunted": 1,
       "Solemn Judgment": 1,
       "Hero Spirit": 1,
-      "Trap Hole": 1
+      "A Hero Emerges": 1
     },
     "fusion": {
       "Elemental HERO Flame Wingman": 2,
@@ -1185,8 +1189,8 @@
     },
     "side": {
       "Mystical Space Typhoon": 2,
-      "Trap Hole": 2,
-      "Kuriboh": 1
+      "Kuriboh": 1,
+      "Draining Shield": 2
     }
   },
   "jaden/x_lv5": {
@@ -1240,9 +1244,9 @@
     },
     "side": {
       "Mystical Space Typhoon": 2,
-      "Trap Hole": 1,
       "Kuriboh": 1,
-      "Hero Barrier": 1
+      "Hero Barrier": 1,
+      "Draining Shield": 1
     }
   },
   "jaden/x_lv6": {
@@ -1290,9 +1294,9 @@
     },
     "side": {
       "Mystical Space Typhoon": 2,
-      "Trap Hole": 1,
       "Kuriboh": 1,
-      "Hero's Rule 2": 1
+      "Hero's Rule 2": 1,
+      "Draining Shield": 1
     }
   },
   "jaden/x_lv7": {
@@ -1347,10 +1351,11 @@
       "Elemental HERO Tempest": 1
     },
     "side": {
-      "Trap Hole": 2,
       "Kuriboh": 1,
       "Hero Barrier": 1,
-      "Mystical Space Typhoon": 1
+      "Mystical Space Typhoon": 1,
+      "Draining Shield": 1,
+      "Hero Signal": 1
     }
   },
   "yugi/x_exodia_insta": {

@@ -6,7 +6,7 @@ namespace PoC.Game.UI;
 /// Your Decks (Chaos Rift sample A, locked 2026-11-08): between the main menu and the Deck Builder. Your decks as
 /// cases (cover card on two card backs) in the light, plus NEW DECK; IMPORT bottom left. The chosen deck opens up in
 /// the dark: cover, name, IN USE, Main / Side / Fusion counts, ban-list legality, EDIT DECK and USE / COPY / RENAME /
-/// EXPORT / DELETE.
+/// EXPORT / DELETE. Pointing at a deck shows it on the right; clicking it opens the Deck Builder.
 public partial class DeckSelect : RiftMenu
 {
     static Deck? remembered;
@@ -28,6 +28,7 @@ public partial class DeckSelect : RiftMenu
         list = new Control { Size = new Vector2(W, H), MouseFilter = MouseFilterEnum.Ignore };
         detail = new Control { Size = new Vector2(W, H), MouseFilter = MouseFilterEnum.Ignore };
         AddChild(list); AddChild(detail);
+        Session.Decks.RemoveAll(d => d != Session.Playing && d.Main.Count + d.Extra.Count + d.Side.Count == 0);   // left by an old bug (NEW DECK saved before any card)
         sel = remembered != null && Session.Decks.Contains(remembered) ? remembered : Session.Playing ?? Session.Decks.FirstOrDefault();
         var imp = Put(this, "IMPORT DECK FILE", Title, 18, GoldDeep, new Vector2(110, H - 96));
         Click(imp, Import, h => imp.AddThemeColorOverride("font_color", h ? Ink : GoldDeep));
@@ -42,7 +43,8 @@ public partial class DeckSelect : RiftMenu
         const float cw = 150, gx = 100, gy = 110;
         float ch = cw * 1.458f;
         int cols = 3, rows = Math.Max(1, (int)((H - 400 + gy) / (ch + gy)));
-        Paged(list, new Rect2(110, 230, W * 0.46f, H - 380), decks.Count + 1, cols, rows, new Vector2(cw + gx, ch + gy), (i, host, at) =>
+        Action redraw = () => { };
+        redraw = Paged(list, new Rect2(110, 230, W * 0.46f, H - 380), decks.Count + 1, cols, rows, new Vector2(cw + gx, ch + gy), (i, host, at) =>
         {
             if (i == decks.Count)
             {
@@ -62,7 +64,7 @@ public partial class DeckSelect : RiftMenu
             if (d == Session.Playing) Put(host, "IN USE", Title, 12, GoldDeep, at + new Vector2(0, -40), new Vector2(cw, 18), HorizontalAlignment.Center);
             var hit = new Control { Position = at - new Vector2(10, 10), Size = new Vector2(cw + 30, ch + 20) };
             host.AddChild(hit);
-            Click(hit, () => { sel = d; Refresh(); }, null, () => { sel = d; Edit(); });
+            Click(hit, () => { sel = d; Edit(); }, h => { if (h && sel != d) { sel = d; redraw(); Detail(); } });
         }, new Vector2(110, H - 140));
         Detail();
     }
@@ -106,7 +108,7 @@ public partial class DeckSelect : RiftMenu
             var pr = DeckRules.Problem(d, P, key);
             var l = Put(detail, $"{name} {(pr == null ? "✓" : "✕")}", Title, 20, pr == null ? Silver : new Color(1f, 0.55f, 0.5f), new Vector2(lx, y + 22));
             if (pr != null) l.TooltipText = pr;
-            lx += Title.GetStringSize(l.Text, HorizontalAlignment.Left, -1, 20).X + 34;
+            lx += Title.GetStringSize(l.Text, HorizontalAlignment.Left, -1, Z(20)).X + 34;
         }
         var why = DeckRules.Problem(d, P);
         if (why != null) Put(detail, why, Body, 17, new Color(1f, 0.6f, 0.55f), new Vector2(tx, y + 56), new Vector2(W - tx - 60, 24)).ClipText = true;
@@ -132,11 +134,11 @@ public partial class DeckSelect : RiftMenu
 
     void NewDeck()
     {
-        var d = new Deck(UniqueName("New Deck"));
-        Session.Decks.Add(d);
-        Session.Save();
-        sel = d;
-        Edit();
+        // not in Session.Decks until the builder's SAVE: backing out leaves nothing behind
+        remembered = sel;
+        DeckBuilder.Editing = new Deck(UniqueName("New Deck"));
+        DeckBuilder.Temp = null;
+        Transition.Go(this, "res://ui/DeckBuilder.tscn");
     }
 
     void Use() { Session.Playing = sel; Session.Save(); Flash("IN USE"); Refresh(); }

@@ -1,6 +1,6 @@
 """Cuts duel sounds out of Master Duel's own sound files (trim, fade, pitch, re-time) for the VFX Lab's sound round.
 
-    python game/tools/sfxcut.py <md_sound_dir> <out_dir>
+    python game/tools/sfxcut.py <md_sound_dir> <out_dir>     (D:/Yu-Gi-Oh Extras/md_assets/sound -> game/Godot/assets/audio/gen)
 
 Writes C_<name>.wav (mono 16-bit 44.1 kHz), the ones the duel uses (DuelField.Sounds.cs). Real game material only: the long story-mode effects are trimmed to the
 moment we need, and short ticks are placed on an animation's own rhythm (each turn of the coin, each shake of the cup).

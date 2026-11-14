@@ -431,7 +431,7 @@ public partial class Results : RiftMenu
         if (r == null) return Cosmetics.Framed(Avatar, P.Frame, d);
         var root = new Control { Size = new Vector2(d, d), MouseFilter = MouseFilterEnum.Ignore };
         Texture2D t = RivalPanels.HasPortrait(r) ? RivalPanels.Portrait(r) : RivalPanels.Art(r);
-        var region = RivalPanels.HasPortrait(r) ? new Vector4(0.25f, 0f, 0.5f, 0.5f * t.GetWidth() / t.GetHeight()) : new Vector4(0, 0, 1, 1);
+        var region = RivalPanels.Face(r);   // per-duelist face box
         root.AddChild(new ColorRect { Size = new Vector2(d, d), Color = GoldC, Material = Kit.RoundedMat(1, 0.5f), MouseFilter = MouseFilterEnum.Ignore });
         var pic = Pic(root, t, new Vector2(5, 5), new Vector2(d - 10, d - 10));
         var m = new ShaderMaterial { Shader = faceShader ??= new Shader { Code = @"shader_type canvas_item;

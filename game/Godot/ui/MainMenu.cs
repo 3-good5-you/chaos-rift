@@ -56,6 +56,7 @@ void fragment() {
 	protected override void Build()
 	{
 		Demo.Ensure();
+		Session.LastReplay = null;   // SAVE REPLAY belongs to the screen right after the duel, not to a later LAN lobby
 		RenderingServer.SetDefaultClearColor(new Color(0.008f, 0.008f, 0.012f));
 		Session.ClearMode();   // back at the menu: no mode left over (a puzzle, a chaos duel ...)   // the intro's shake shows the clear colour at the edges
 		Rift(0.58f, 0.44f);

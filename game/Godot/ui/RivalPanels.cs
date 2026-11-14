@@ -43,6 +43,39 @@ public static class RivalPanels
             if (ResourceLoader.Exists(p)) return GD.Load<Texture2D>(p);
         return Art(r);
     }
+    /// Where the face is in each portrait (left, top, width as fractions of the picture), for round icons. One fixed
+    /// crop for all of them cut some rivals to half a face or just hair (playtest 2026-11-12).
+    static readonly Dictionary<string, Vector3> Faces = new()
+    {
+        ["yugi"] = new(0.24f, 0.13f, 0.5f), ["kaiba"] = new(0.34f, 0.03f, 0.36f), ["joey"] = new(0.41f, 0f, 0.42f), ["jaden"] = new(0.22f, 0.03f, 0.5f),
+        // tournament duelists (portraits added 2026-11-12; boxes estimated from the cut-outs)
+        ["aster"] = new(0.27f, 0f, 0.62f), ["keith"] = new(0.18f, 0f, 0.5f), ["bastion"] = new(0.28f, 0.01f, 0.34f), ["chazz"] = new(0.22f, 0f, 0.4f),
+        ["crowler"] = new(0.25f, 0f, 0.42f), ["ishizu"] = new(0.25f, 0f, 0.46f), ["mai"] = new(0.1f, 0.02f, 0.8f), ["mako"] = new(0.25f, 0f, 0.5f),
+        ["pegasus"] = new(0.35f, 0f, 0.51f), ["odion"] = new(0.29f, 0f, 0.45f), ["rex"] = new(0.2f, 0.05f, 0.6f), ["bakura"] = new(0.2f, 0.03f, 0.62f),
+        ["alexis"] = new(0.55f, 0f, 0.42f), ["weevil"] = new(0.3f, 0.02f, 0.48f), ["marik"] = new(0.28f, 0.08f, 0.5f), ["syrus"] = new(0.2f, 0f, 0.6f),
+        ["zane"] = new(0.21f, 0f, 0.38f),
+    };
+
+    static readonly Dictionary<string, Texture2D> faceTex = new();
+    /// A square picture for round icons: the face cut from the portrait, or the signature card art without one.
+    public static Texture2D FaceTex(Rival r)
+    {
+        if (!HasPortrait(r)) return Art(r);
+        if (faceTex.TryGetValue(r.File, out var done)) return done;
+        var img = Portrait(r).GetImage(); var f = Face(r);
+        if (img.IsCompressed()) img.Decompress();
+        var box = new Rect2I((int)(f.X * img.GetWidth()), (int)(f.Y * img.GetHeight()), (int)(f.Z * img.GetWidth()), (int)(f.W * img.GetHeight())).Intersection(new Rect2I(0, 0, img.GetWidth(), img.GetHeight()));
+        return faceTex[r.File] = ImageTexture.CreateFromImage(img.GetRegion(box));
+    }
+
+    /// The square face region of Portrait(r) in UV (x, y, w, h); a duelist shown by card art gets the whole picture.
+    public static Vector4 Face(Rival r)
+    {
+        if (!HasPortrait(r)) return new Vector4(0, 0, 1, 1);
+        var t = Portrait(r);
+        var f = Faces.TryGetValue(r.File, out var v) ? v : new Vector3(0.25f, 0, 0.5f);
+        return new Vector4(f.X, f.Y, f.Z, f.Z * t.GetWidth() / t.GetHeight());
+    }
     public const float Skew = 150, Overlap = 10;
 
     public const string Rim = @"shader_type canvas_item;
@@ -210,7 +243,7 @@ public static class Chips
             }
         l.AddThemeFontSizeOverride("font_size", fontSize);
         // It grew to the long text's width before the fit (the size sticks until it's on screen): back to the chip's.
-        l.Ready += () => Callable.From(() => l.Size = size).CallDeferred();
+        l.Ready += () => Callable.From(() => { if (GodotObject.IsInstanceValid(l)) l.Size = size; }).CallDeferred();   // the scene may be gone by then
         l.AddThemeColorOverride("font_color", new Color(1, 1, 1, 0.8f));
         chip.AddChild(fill); chip.AddChild(l);
         // Hover lifts the chip a little; a press squashes it and springs back.

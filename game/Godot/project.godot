@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Chaos Rift"
-config/version="1.0.1"
+config/version="1.1.0"
 run/main_scene="res://ui/Loading.tscn"
 config/use_custom_user_dir=true
 config/custom_user_dir_name="Godot/app_userdata/Yu-Gi-Oh! Power of Chaos Remastered"

@@ -95,8 +95,10 @@ public partial class ShopScreen : RiftMenu
         ClearDetail();
         Card(detail, d, new Vector2(W * 0.81f, H * 0.4f), H * 0.48f, 0.04f, 1f, large: true);
         float x = W * 0.64f, w = W * 0.34f, y = H * 0.7f;
-        int ns = 24; while (ns > 16 && Title.GetStringSize(d.Name.ToUpperInvariant(), HorizontalAlignment.Left, -1, ns).X > w) ns -= 2;
+        int ns = 24; while (ns > 16 && Title.GetStringSize(d.Name.ToUpperInvariant(), HorizontalAlignment.Left, -1, Z(ns)).X > w) ns -= 2;
         Put(detail, d.Name.ToUpperInvariant(), Title, ns, Silver, new Vector2(x, y), new Vector2(w, 34), HorizontalAlignment.Center);
+        // the card's text with the keywords marked, under the buy row
+        CardText(detail, d, new Vector2(x, y + 176), new Vector2(w, H - y - 200), 17, light: OnLight(new Vector2(x + w / 2, y + 176)));
         int own = P.Count(d.Idx), price = Shop.Price(d);
         Put(detail, $"{price:N0} DP EACH   ·   OWNED ×{own}", Thin, 20, GoldLight, new Vector2(x, y + 44), new Vector2(w, 28), HorizontalAlignment.Center);
         if (own >= 3) { Put(detail, "YOU HAVE ALL THREE", Thin, 20, Mist, new Vector2(x, y + 110), new Vector2(w, 28), HorizontalAlignment.Center); return; }

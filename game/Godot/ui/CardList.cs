@@ -80,14 +80,13 @@ public partial class CardList : RiftMenu
         if (P.Fresh.Remove(d.Idx)) Session.Save();
         Card(detail, d, new Vector2(W * 0.81f, H * 0.36f), H * 0.46f, 0.04f, 1f, large: true);
         float x = W * 0.66f, w = W * 0.3f, y = H * 0.64f;
-        int ns = 30; while (ns > 18 && Title.GetStringSize(d.Name.ToUpperInvariant(), HorizontalAlignment.Left, -1, ns).X > w) ns -= 2;
+        int ns = 30; while (ns > 18 && Title.GetStringSize(d.Name.ToUpperInvariant(), HorizontalAlignment.Left, -1, Z(ns)).X > w) ns -= 2;
         Put(detail, d.Name.ToUpperInvariant(), Title, ns, Silver, new Vector2(x, y + (30 - ns) / 2f), new Vector2(w, 44));
         string type = d.IsMonster ? $"{d.Attribute}  ·  {d.Race}  ·  LEVEL {d.Level}" : $"{d.Frame} {d.Kind}";
         Put(detail, type.ToUpperInvariant(), Thin, 18, Mist, new Vector2(x, y + 50));
         float ty = y + 86;
         if (d.IsMonster) { Put(detail, $"ATK {d.AtkText}    DEF {d.DefText}", Title, 24, GoldLight, new Vector2(x, ty)); ty += 44; }
-        var t = Put(detail, d.TcgDesc ?? d.Desc, Body, 20, Mist, new Vector2(x, ty), new Vector2(w, H - ty - 70));
-        t.AutowrapMode = TextServer.AutowrapMode.WordSmart; t.CustomMinimumSize = new Vector2(w, 0); t.Size = new Vector2(w, H - ty - 70);
+        CardText(detail, d, new Vector2(x, ty), new Vector2(w, H - ty - 70), 20, light: false, min: 14);
         int own = P.Count(d.Idx);
         int inDecks = Session.Decks.Count(k => k.Copies(d.Idx) > 0);
         Put(detail, own > 0 ? $"OWNED ×{own}   ·   IN {inDecks} DECK{(inDecks == 1 ? "" : "S")}" : "NOT OWNED YET", Thin, 18, own > 0 ? Silver : Mist, new Vector2(x, H - 50));

@@ -132,7 +132,7 @@ public partial class OptionsScreen : RiftMenu
         {
             var l = Put(profile, s, Title, 17, Graphite, new Vector2(x, 72));
             Click(l, act, h => l.AddThemeColorOverride("font_color", h ? GoldDeep : Graphite));
-            x += Title.GetStringSize(s, HorizontalAlignment.Left, -1, 17).X + 34;
+            x += Title.GetStringSize(s, HorizontalAlignment.Left, -1, Z(17)).X + 34;
         }
     }
 

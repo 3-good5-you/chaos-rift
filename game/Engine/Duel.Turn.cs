@@ -286,7 +286,16 @@ public sealed partial class Duel
             }
         if (tr.Any(t => t.Controller != p)) TurnFlags.Add("nobattle"); // Soul Exchange
         LastTributes.Clear(); LastTributes.AddRange(tr);
-        foreach (var t in tr) await Tribute(t);
+        held = new();
+        try { foreach (var t in tr) await Tribute(t); }
+        catch { held = null; throw; }
+        var late = held; held = null;
+        await SummonTail(c, p, set, need);
+        foreach (var e in late) await RaiseCore(e, replay: true);
+    }
+
+    async Flow SummonTail(Card c, int p, bool set, int need)
+    {
         if (CountActive("Chain Energy") is > 0 and var ce) Pay(p, 500 * ce);
         if (!Place(c, p, Loc.Monster)) { await MoveTo(c, Loc.Grave); return; }
         c.SummonTurn = Turn;
@@ -562,6 +571,7 @@ public sealed partial class Duel
     }
 
     public Link? Resolving;   // the chain link resolving now (Different Dimension Dragon: did this effect target it?)
+    public bool IsResolving => resolving > 0;   // a chain is resolving right now (Resolving keeps its last link after)
 
     public async Flow Negate(Link l, bool destroy = true)
     {

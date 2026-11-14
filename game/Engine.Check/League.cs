@@ -418,6 +418,9 @@ static class League
         var board = brainFile != null ? Value.FromJson(File.ReadAllText(brainFile)) : Value.Trained;
         var decks = db.DeckNames().ToList();
         int open = 0, missed = 0, tributeSets = 0, wins = 0, turns = 0, unfinished = 0;
+        // playtest 2026-11-12 habits: walls flipped to Attack, a winning attack not made, an attacker hidden in Defense,
+        // a turn ended with a monster / Trap still playable
+        int wallFlips = 0, beats = 0, beatsMissed = 0, hides = 0, idleMon = 0, idleTrap = 0, myTurns = 0;
         // PASSIVE_TRACE=1: one duel at a time, and each turn that let a free attack go is printed with what the CPU saw.
         bool trace = Environment.GetEnvironmentVariable("PASSIVE_TRACE") != null;
         var lines = new List<string>();
@@ -431,11 +434,12 @@ static class League
             var cpu = Ai.ForLevel(1, rng.Next(), Level);
             cpu.Board = board; cpu.TimeBudgetMs = cpu.JudgeBudgetMs = int.MaxValue;
             var ais = new[] { new Ai(0, rng.Next()), cpu };
-            int turn = -1; bool couldAttack = false, attacked = false;
+            int turn = -1; bool couldAttack = false, attacked = false, couldBeat = false;
             void Close()
             {
                 if (couldAttack) { Interlocked.Increment(ref open); if (!attacked) { Interlocked.Increment(ref missed); if (trace) { Console.WriteLine($"--- duel {g} turn {turn}: free attack not taken"); foreach (var l in lines) Console.WriteLine(l); } } }
-                couldAttack = attacked = false; lines.Clear();
+                if (couldBeat) { Interlocked.Increment(ref beats); if (!attacked) { Interlocked.Increment(ref beatsMissed); if (trace) { Console.WriteLine($"--- duel {g} turn {turn}: winning attack not made"); foreach (var l in lines) Console.WriteLine(l); } } }
+                couldAttack = attacked = couldBeat = false; lines.Clear();
             }
             int steps = 0;
             while (!d.Over && steps++ < 4000)
@@ -450,6 +454,21 @@ static class League
                     if (pr.Kind == Ask.Main && d.Phase == Phase.Main1 && pr.Options.Any(x => x.Act == Act.ToBattle) && !d.P(0).MonstersOnField.Any()
                         && d.P(1).MonstersOnField.Any(m => !m.Defense && d.CanAttack(m) && d.Atk(m) > 0)) couldAttack = true;
                     if (o.Act == Act.Attack) attacked = true;
+                    bool Beats(Card m) => d.P(0).MonstersOnField.Any(t => t.FaceUp && d.Atk(m) > (t.Defense ? d.Def(t) : d.Atk(t)));
+                    if (pr.Kind == Ask.Main && d.Phase == Phase.Main1 && pr.Options.Any(x => x.Act == Act.ToBattle)
+                        && d.P(1).MonstersOnField.Any(m => m.FaceUp && !m.Defense && d.CanAttack(m) && Beats(m))) couldBeat = true;
+                    if (pr.Kind == Ask.Main && o.Act == Act.ChangePos && o.Card is { FaceUp: true } pc)
+                    {
+                        if (pc.Defense && d.Def(pc) > d.Atk(pc) && d.Atk(pc) < 1500 && !Beats(pc) && d.P(0).MonstersOnField.Any()) { Interlocked.Increment(ref wallFlips); if (trace) Console.WriteLine($"--- duel {g} turn {turn}: wall flipped to Attack: {pc.Name} {d.Atk(pc)}/{d.Def(pc)}"); }
+                        if (!pc.Defense && d.Phase == Phase.Main1 && d.CanAttack(pc) && Beats(pc)) { Interlocked.Increment(ref hides); if (trace) Console.WriteLine($"--- duel {g} turn {turn}: attacker hidden in Defense: {pc.Name} {d.Atk(pc)}"); }
+                    }
+                    if (pr.Kind == Ask.Main && o.Act == Act.EndTurn)
+                    {
+                        Interlocked.Increment(ref myTurns);
+                        var me1 = d.P(1);
+                        if (pr.Options.Any(x => x.Act is Act.Summon or Act.Set && x.Card!.Data.Level <= 4 && !Duel.Exodia.Contains(x.Card.Name))) { Interlocked.Increment(ref idleMon); if (trace) { Console.WriteLine($"--- duel {g} turn {turn}: ended with a monster to play"); foreach (var l in lines) Console.WriteLine(l); } }
+                        if (pr.Options.Any(x => x.Act == Act.SetSpell && x.Card!.Data.IsTrap)) Interlocked.Increment(ref idleTrap);
+                    }
                     if (pr.Kind == Ask.Main && o.Act == Act.Set && o.Card!.Data.Level >= 5) Interlocked.Increment(ref tributeSets);
                 }
                 d.Submit(cmd);
@@ -460,6 +479,8 @@ static class League
         });
         Console.WriteLine($"passive ({(brainFile == null ? "shipped" : Path.GetFileName(brainFile))}): {duels} duels, CPU won {wins}, unfinished {unfinished}, {turns / (double)duels:0.0} turns a duel; " +
             $"free attacks on an empty field {open}, not taken {missed}; tribute Sets {tributeSets}");
+        Console.WriteLine($"habits: CPU turns {myTurns}; walls flipped to Attack {wallFlips}; turns with a winning attack {beats}, none made {beatsMissed}; attackers hidden in Defense {hides}; " +
+            $"turns ended with a monster to play {idleMon}, with a Trap to set {idleTrap}");
     }
 
     /// How long rebuilding a duel from its log takes (the cost of one look-ahead branch).

@@ -39,6 +39,7 @@ public partial class DuelField
             case "mutualtrap": you = new[] { "Celtic Guardian", "Mystical Elf", "Silver Fang", "Battle Ox", "Feral Imp" }; them = new[] { "Celtic Guardian", "Call Of The Haunted" }; break;
             case "mutual": you = new[] { "Celtic Guardian", "Mystical Elf", "Silver Fang", "Battle Ox", "Feral Imp" }; them = new[] { "Celtic Guardian" }; break;
             case "exodia": you = new[] { "Exodia the Forbidden One", "Left Arm of the Forbidden One", "Right Arm of the Forbidden One", "Left Leg of the Forbidden One", "Celtic Guardian", "Mystical Elf", "Right Leg of the Forbidden One" }; them = new[] { "Gemini Elf", "Battle Ox" }; break;
+            case not null when scenario.StartsWith("sig:"): you = new[] { scenario[4..], "Battle Ox", "Silver Fang", "Mystical Elf", "Battle Ox" }; them = new[] { "Gemini Elf" }; break;
             case "fusion": you = new[] { "Flame Manipulator", "Masaki the Legendary Swordsman", "Polymerization", "Mystical Elf", "Silver Fang" }; them = new[] { "Gemini Elf" }; break;
             case not null when stage != null: you = stage.You; them = stage.Them; break;
             default: you = new[] { "Feral Imp", "Sword of Dark Destruction", "Yami", "Celtic Guardian", "Axe of Despair", "Mystical Elf" }; them = new[] { "Shining Abyss" }; break;
@@ -82,6 +83,7 @@ public partial class DuelField
             if (scenario!.StartsWith("sandbox")) SandboxStart();
             return;
         }
+        if (scenario!.StartsWith("sig:")) { SigScenario(scenario[4..]); return; }
         switch (scenario)
         {
             case "respond":

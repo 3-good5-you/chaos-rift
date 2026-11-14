@@ -28,11 +28,14 @@ public partial class DuelField
         var db = CardDb.Shared;
         string[] you = { "Exodia the Forbidden One", "Left Arm of the Forbidden One", "Right Arm of the Forbidden One", "Left Leg of the Forbidden One", "Right Leg of the Forbidden One",
                          "Kuriboh", "Pot of Greed", "Dark Magician", "Celtic Guardian", "Monster Reborn", "Card Destruction", "Blue-Eyes White Dragon", "White Magical Hat",
-                         "Summoned Skull", "Gaia The Fierce Knight", "Curse of Dragon", "Feral Imp", "Raigeki", "Trap Hole", "Mirror Force" };
+                         "Summoned Skull", "Gaia The Fierce Knight", "Curse of Dragon", "Feral Imp", "Raigeki", "Trap Hole", "Mirror Force",
+                         "Swords of Revealing Light", "Mystical Space Typhoon", "Dark Hole", "Negate Attack", "Harpie's Feather Duster",
+                         "Change of Heart", "Heavy Storm", "Graceful Charity", "Brain Control", "Magic Cylinder", "Torrential Tribute", "Ring of Destruction", "Solemn Judgment",
+                         "Red-Eyes B. Dragon", "Obelisk the Tormentor", "Slifer the Sky Dragon", "The Winged Dragon of Ra", "Jinzo", "Time Wizard", "Black Luster Soldier - Envoy of the Beginning" };
         string[] them = { "Vorse Raider", "Gemini Elf", "Trap Hole", "Summoned Skull", "Feral Imp", "Gaia The Fierce Knight", "Mirror Force", "Raigeki", "Robbin' Goblin",
                           "Battle Ox", "Celtic Guardian", "Swords of Revealing Light", "Dark Hole", "Kuriboh", "Curse of Dragon", "Blue-Eyes White Dragon" };
         var s = new PoC.Engine.DuelSetup { Seed = 1, FirstPlayer = 0, Shuffle = false, Classic = true };
-        List<int> Deck(string[] top) => top.Concat(Enumerable.Range(0, 40 - top.Length).Select(i => Filler[i % Filler.Length])).Select(n => db.Named(n).Idx).ToList();
+        List<int> Deck(string[] top) => top.Where(db.ByName.ContainsKey).Concat(Enumerable.Range(0, Math.Max(0, 40 - top.Length)).Select(i => Filler[i % Filler.Length])).Select(n => db.Named(n).Idx).ToList();   // names this card pool lacks are left out
         s.Main[0].AddRange(Deck(you)); s.Main[1].AddRange(Deck(them));
         return s;
     }
@@ -99,17 +102,8 @@ public partial class DuelField
         void Add(string group, string name, params (string, Func<Task>)[] vars) => labEvents.Add((group, name, vars));
         if (cardLab) { CardLabEvents(); return; }
 
-        // All locked 2026-10-29 and playing in duels; kept here to watch them again.
-        const string L = "LOCKED";
-        Add(L, "1  Exodia finish (you win)", ("A  Master Duel from the fire wall on, film (DuelField.ExodiaMd.cs)", () => ExodiaLabMd(0, false)),
-            ("B  The same, native Godot build (in duels; DuelField.ExodiaNative.cs)", () => ExodiaLabMd(0, true)),
-            ("C  Old: the original game's Exodia charges and fires (fallback without the frames)", () => ExodiaLab(0)));
-        Add(L, "2  Exodia finish (the rival wins)", ("A  Master Duel, film", () => ExodiaLabMd(1, false)), ("B  Master Duel, native", () => ExodiaLabMd(1, true)),
-            ("C  Old: the ball comes at you", () => ExodiaLab(1)));
-        Add(L, "3  Random discard: a card from the rival's hand", ("Thief's pull: a stream from the effect's card yanks the card out of the hand", () => DiscardThief(1)));
-        Add(L, "4  Random discard: a card from your hand", ("Thief's pull", () => DiscardThief(0)));
-        Add(L, "5  Card Destruction / Morphing Jar (both hands)", ("Burn and redraw: both hands burn at once, then each player draws the same number", () => RedrawBurn()));
-        Add(L, "40  Banish", ("The pile behind the Deck, off the table (as it was)", () => BanishNow()));
+        // Only rows still waiting on a pick are listed (user rule 2026-11-12): a row leaves the lab once it is built.
+        CardFxLabEvents((g, n, v) => Add(g, n, v));   // signature card effects (DuelField.FxLab.Cards.cs)
 
     }
 

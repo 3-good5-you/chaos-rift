@@ -68,6 +68,7 @@ public sealed partial class Ai
             foreach (int i in reps)
                 if (n[i] == worlds && sum[i] / worlds > bestScore + Margin) { best = i; bestScore = sum[i] / worlds; }
         }
+        best = Sane(d, p, best, baseline);
         if (best != baseline) Overruled?.Invoke($"Seer {p.Options[best]} over {p.Options[baseline]} ({worlds} worlds): " + string.Join(", ", reps.Select(i => $"{p.Options[i]} {(n[i] == worlds && worlds > 0 ? (sum[i] / worlds).ToString("0") : "failed")}")));
         // Keep the per-turn memory in step with what Classic+ would have recorded (stops ping-pong).
         if (best == baseline) tried.UnionWith(plus.tried);

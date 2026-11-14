@@ -378,11 +378,20 @@ public sealed partial class Duel
         try { await RaiseCore(e); } finally { raiseDepth--; }
     }
 
-    async Flow RaiseCore(Ev e)
+    /// Tribute Summon: the tributes' own events (left the field, sent to the GY) are shown at once but held here, and
+    /// their reactions ("when this card is sent to the GY") run after the summon (playtest 2026-11-13: a tributed Sangan
+    /// searched before the summon landed, so the card hopped about before reaching the GY).
+    List<Ev>? held;
+
+    async Flow RaiseCore(Ev e, bool replay = false)
     {
-        Seq++;
-        OnEvent?.Invoke(e);
-        Trace(e.ToString());
+        if (!replay)
+        {
+            Seq++;
+            OnEvent?.Invoke(e);
+            Trace(e.ToString());
+            if (held != null) { held.Add(e); return; }
+        }
         // Automatic (triggered/continuous) reactions. Turn player's cards first.
         // A card just banished also sees its own Banished event ("If this card is banished": Kaitoptera).
         var reactors = Reactors();

@@ -1,6 +1,6 @@
 """Release packaging: Godot export -> Windows installer (.exe) + macOS disk image (.dmg) + zips, into one folder.
 
-    python game/tools/package.py <output folder> 1.0
+    python game/tools/package.py "D:/Yu-Gi-Oh Extras/releases/v1.1" 1.1
 
 Windows: the exported game is zipped and appended to a small installer (tools/Setup.cs, built with the .NET Framework
 compiler in every Windows) that unpacks it to %LOCALAPPDATA%/Programs, adds Start-menu / desktop shortcuts and an uninstaller.
@@ -10,7 +10,7 @@ link, saved as .dmg (macOS mounts it like any disk image). Not notarized: first 
 import os, shutil, subprocess, sys, zipfile, stat
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-GODOT = os.environ.get("GODOT", "godot")   # path to the Godot 4.7 .NET console executable
+GODOT = r"C:\Users\norma\tools\godot\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe"
 NAME = "Chaos Rift"
 APP = "Yu-Gi-Oh! Chaos Rift"
 FILE = "ChaosRift"   # release file prefix
