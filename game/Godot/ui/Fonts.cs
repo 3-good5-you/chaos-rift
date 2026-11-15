@@ -49,8 +49,19 @@ public static partial class Fonts
     public static Font Spaced(Font f, int glyph)
     {
         var v = f as FontVariation ?? new FontVariation { BaseFont = f };
-        v.SpacingGlyph = glyph;
+        v.SpacingGlyph = joined ? 0 : glyph;
+        spaced.Add((v, glyph));
         return v;
+    }
+
+    /// Arabic letters join: letter spacing pulls every word apart, so while the game is in a joined script every
+    /// spaced font drops its spacing (Lang.Set), and gets it back for Latin scripts.
+    static readonly List<(FontVariation V, int Glyph)> spaced = new();
+    static bool joined;
+    public static void Joined(bool on)
+    {
+        joined = on;
+        foreach (var (v, g) in spaced) v.SpacingGlyph = on ? 0 : g;
     }
 
     static bool Installed(string name) => !ForceBundled && OS.GetSystemFontPath(name) != "";

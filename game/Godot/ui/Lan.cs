@@ -28,13 +28,16 @@ public static class Lan
     public static LanLink.Msg Hello() => new()
     {
         T = "hello", Name = Settings.PlayerName, Pic = Settings.Picture, Mat = Session.Profile.Mat, Back = Session.Profile.Back, Frame = Session.Profile.Frame,
-        List = DeckRules.LimitGame, Build = LanLink.Build,
+        List = DeckRules.LimitGame, Build = MyBuild,
     };
+
+    /// Game version + engine data fingerprint: equal on every OS's export of the same release.
+    static string MyBuild => $"{Updater.Current}/{LanLink.Build}";
 
     public static void Greet(LanLink.Msg m) => Them = new Peer(m.Name ?? "Opponent", m.Pic, m.Mat ?? Shop.DefaultMat, m.Back ?? Shop.DefaultBack, m.Frame ?? Shop.DefaultFrame, m.List ?? "joey", m.Build ?? "");
 
     /// Same engine build and card data, or the two duels could drift apart.
-    public static bool SameBuild => Them?.Build == LanLink.Build;
+    public static bool SameBuild => Them?.Build == MyBuild;
 
     /// The host's ban list rules the duel.
     public static string List => Link?.IsHost == false && Them != null ? Them.List : DeckRules.LimitGame;

@@ -23,8 +23,25 @@ public sealed class LanLink : IDisposable
         public ulong Seed, Hash;
     }
 
-    /// Same engine build and card data on both PCs, or the duels could drift apart.
-    public static string Build => $"{Proto}/{typeof(Duel).Assembly.ManifestModule.ModuleVersionId}/{CardDb.Shared.ByIdx.Count}";
+    /// Same card data on both PCs, or the duels could drift apart. Hashes the embedded data, not the compiled dll:
+    /// each OS's export compiles its own Engine.dll, so a dll id never matches across Windows / Mac / Linux.
+    /// The Godot side adds the game version; drift inside one version still trips the per-turn state hash.
+    public static readonly string Build = Fingerprint();
+
+    static string Fingerprint()
+    {
+        var a = typeof(Duel).Assembly;
+        using var h = System.Security.Cryptography.IncrementalHash.CreateHash(System.Security.Cryptography.HashAlgorithmName.SHA256);
+        foreach (var n in a.GetManifestResourceNames().Order(StringComparer.Ordinal))
+        {
+            using var s = a.GetManifestResourceStream(n)!;
+            using var ms = new MemoryStream();
+            s.CopyTo(ms);
+            h.AppendData(Encoding.UTF8.GetBytes(n));
+            h.AppendData(ms.ToArray());
+        }
+        return $"{Proto}/{Convert.ToHexString(h.GetHashAndReset())[..16]}/{CardDb.Shared.ByIdx.Count}";
+    }
 
     static readonly JsonSerializerOptions Json = new() { IncludeFields = true, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };
 

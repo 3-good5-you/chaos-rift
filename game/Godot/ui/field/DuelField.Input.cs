@@ -40,7 +40,7 @@ public partial class DuelField
         Act.Summon => "NORMAL SUMMON",
         Act.Set => "SET",
         Act.Special => "SPECIAL SUMMON",
-        Act.Activate => o.Arg >= 10 ? (o.Text ?? "USE EFFECT").ToUpperInvariant() : o.Arg == 1 ? "USE EFFECT" : "ACTIVATE",
+        Act.Activate => o.Arg >= 10 ? Lang.Duel(o.Text ?? "USE EFFECT").ToUpperInvariant() : o.Arg == 1 ? "USE EFFECT" : "ACTIVATE",
         Act.SetSpell => "SET",
         Act.FlipSummon => "FLIP SUMMON",
         Act.ChangePos => "CHANGE POSITION",
@@ -96,7 +96,7 @@ public partial class DuelField
                 break;
             default: // YesNo, Choose, Position
                 if (p.Source != null) Focus(p.Source);
-                if (!EffectSheet(p)) ShowSheet(p.Text.ToUpperInvariant(), null, p.Options.Select((o, i) => (Label(o), (System.Action)(() => Answer(i)), true)).ToList());
+                if (!EffectSheet(p)) ShowSheet(Lang.Duel(p.Text).ToUpperInvariant(), null, p.Options.Select((o, i) => (Label(o), (System.Action)(() => Answer(i)), true)).ToList());
                 break;
         }
         RefreshHints();
@@ -111,7 +111,7 @@ public partial class DuelField
         return cmd;
     }
 
-    static string Label(Opt o) => o.Act == Act.Pass ? "PASS" : o.Act == Act.Option ? (o.Text ?? "OK").ToUpperInvariant() : o.Card != null ? o.Card.Name : o.ToString();
+    static string Label(Opt o) => o.Act == Act.Pass ? "PASS" : o.Act == Act.Option ? Lang.Duel(o.Text ?? "OK").ToUpperInvariant() : o.Card != null ? o.Card.Name : o.ToString();
 
     void Answer(params int[] picks)
     {
@@ -208,7 +208,7 @@ public partial class DuelField
             {
                 int k = actSel.GetValueOrDefault(hovered) % l.Count;
                 text = l[k].Name;
-                sub = l.Count > 1 ? $"RIGHT-CLICK: NEXT  ({k + 1}/{l.Count})" : "LEFT-CLICK";
+                sub = l.Count > 1 ? Lang.F("RIGHT-CLICK: NEXT  ({0}/{1})", k + 1, l.Count) : "LEFT-CLICK";
                 // Main Phase 1 with a Battle Phase ahead: say so, it's easy to think you're already in battle.
                 if (l[k].Index >= 0 && ask.Options[l[k].Index].Act == Act.ChangePos && D.Phase == Phase.Main1 && ask.Options.Any(o => o.Act == Act.ToBattle))
                     sub = "MAIN PHASE 1  ·  NOT IN BATTLE YET";
@@ -216,7 +216,7 @@ public partial class DuelField
             else if (pileActs.TryGetValue((v.S.Side, v.S.Loc), out var pl) && PileTop(v.S.Side, v.S.Loc) == v)
             {
                 text = ZoneLabel(v.S.Loc) == "" ? "CARDS" : ZoneLabel(v.S.Loc);
-                sub = $"{pl.Count} CARD{(pl.Count > 1 ? "S" : "")} WITH ACTIONS";
+                sub = (pl.Count > 1 ? Lang.F("{0} CARDS WITH ACTIONS", pl.Count) : Lang.Tr("1 CARD WITH ACTIONS"));
             }
             else show = false;
         }
@@ -332,12 +332,12 @@ public partial class DuelField
         // Candidates you can see on the field are clicked there; anything else is listed in the sheet.
         bool hidden = p.Options.Any(o => o.Card != null && views[o.Card.Uid].S.Loc is not (Loc.Monster or Loc.Spell or Loc.Field) && !(views[o.Card.Uid].S.Loc == Loc.Hand && views[o.Card.Uid].S.Side == 0));
         var cards = hidden ? p.Options.Select(o => o.Card!).ToList() : null;
-        string count = p.Min == p.Max ? $"CHOOSE {p.Max}" : $"CHOOSE {p.Min}–{p.Max}";
+        string count = p.Min == p.Max ? Lang.F("CHOOSE {0}", p.Max) : Lang.F("CHOOSE {0}–{1}", p.Min, p.Max);
         bool ok = picked.Count >= p.Min && picked.Count <= p.Max;
         var chips = new List<(string, System.Action, bool)>();
         if (p.Max > 1 || p.Min == 0) chips.Add((picked.Count == 0 && p.Min == 0 ? "SKIP" : "CONFIRM", () => { if (picked.Count >= p.Min && picked.Count <= p.Max) Answer(picked.ToArray()); }, ok));
         if (p.CancelOk) chips.Add(("CANCEL", () => Answer(), true));
-        ShowSheet($"{p.Text.ToUpperInvariant()}  ·  {count}", cards, chips, onCard: i => TogglePick(i), top: !hidden);
+        ShowSheet($"{Lang.Duel(p.Text).ToUpperInvariant()}  ·  {count}", cards, chips, onCard: i => TogglePick(i), top: !hidden);
     }
 
     void TogglePick(int i)
@@ -370,9 +370,8 @@ public partial class DuelField
         var cards = views.Values.Where(v => v.S.Side == s.Side && v.S.Loc == s.Loc).OrderByDescending(v => v.S.Index).Select(v => v.Card).ToList();
         if (cards.Count == 0) return;
         Sfx("SE_DECK_WINDOW_OPEN");
-        string whose = s.Side == 0 ? "YOUR" : $"{ThemName.ToUpperInvariant()}'S";
         string what = s.Loc switch { Loc.Grave => "GRAVEYARD", Loc.Banished => "BANISHED CARDS", _ => "FUSION DECK" };
-        ShowSheet($"{whose} {what}  ·  {cards.Count}", cards, new() { ("CLOSE", CloseSheet, true) });
+        ShowSheet($"{(s.Side == 0 ? Lang.Tr($"YOUR {what}") : Lang.F($"{{0}}'S {what}", ThemName.ToUpperInvariant()))}  ·  {cards.Count}", cards, new() { ("CLOSE", CloseSheet, true) });
         sheetClosable = true;
     }
 
@@ -390,7 +389,7 @@ public partial class DuelField
         int chipCols = Math.Min(3, Math.Max(1, chips.Count));
         int chipRows = (chips.Count + chipCols - 1) / chipCols;
         // Wide enough for the title (effect prompts can be long: "UFO Turtle: Special Summon a FIRE monster..."), within reason.
-        float titleW = Cond.GetStringSize(title, HorizontalAlignment.Left, -1, 26).X + 48;
+        float titleW = Cond.GetStringSize(Lang.Tr(title), HorizontalAlignment.Left, -1, 26).X + 48;
         float w = Math.Min(W * 0.85f, Math.Max(Math.Max(640, titleW), cols * (cw + gap) + 48));
         float gridH = Math.Min(rows, 2.6f) * (chh + gap);
         float h = 66 + (cards != null ? gridH + 10 : 0) + chipRows * 56 + 14;
@@ -459,7 +458,7 @@ public partial class DuelField
         sheet = Box(hud, new Rect2(W / 2 - w / 2, H * 0.44f - h / 2, w, h), new StyleBoxEmpty());
         sheet.MouseFilter = MouseFilterEnum.Stop;
         sheet.AddChild(new ColorRect { Position = -sheet.Position, Size = new Vector2(W, H), Color = new Color(0, 0, 0, 0.45f), MouseFilter = MouseFilterEnum.Ignore });
-        Put(sheet, $"{(p.Source?.Name ?? "COIN TOSS").ToUpperInvariant()}: CALL IT", Cond, 26, Colors.White, new Vector2(20, 14), new Vector2(w - 40, 34), HorizontalAlignment.Center);
+        Put(sheet, Lang.F("{0}: CALL IT", (p.Source?.Name ?? Lang.Tr("COIN TOSS")).ToUpperInvariant()), Cond, 26, Colors.White, new Vector2(20, 14), new Vector2(w - 40, 34), HorizontalAlignment.Center);
         sheetChips.Clear(); sheetCards.Clear(); sheetLabels.Clear();
         string[] img = { "puzzle", "eye" }, label = { "HEADS", "TAILS" };
         for (int i = 0; i < 2; i++)

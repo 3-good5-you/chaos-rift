@@ -67,7 +67,7 @@ public static class Cosmetics
             var ring = Kit.Box(root, new Rect2(-5, -5, w + 10, h + 10), new StyleBoxFlat { DrawCenter = false, BorderColor = Teal, BorderWidthTop = 3, BorderWidthBottom = 3, BorderWidthLeft = 3, BorderWidthRight = 3, CornerRadiusTopLeft = 14, CornerRadiusTopRight = 14, CornerRadiusBottomLeft = 14, CornerRadiusBottomRight = 14, AntiAliasing = true });
             ring.MouseFilter = Control.MouseFilterEnum.Ignore;
         }
-        Kit.Put(root, it.Name.ToUpperInvariant(), Kit.Cond, mat ? 28 : 22, Colors.White, new Vector2(mat ? 4 : -10, h + 10), new Vector2(mat ? w : w + 20, 36), mat ? HorizontalAlignment.Left : HorizontalAlignment.Center);
+        Kit.Put(root, Lang.Cosmetic(it.Name).ToUpperInvariant(), Kit.Cond, mat ? 28 : 22, Colors.White, new Vector2(mat ? 4 : -10, h + 10), new Vector2(mat ? w : w + 20, 36), mat ? HorizontalAlignment.Left : HorizontalAlignment.Center);
         float pw = Math.Max(110, pill.Length * 11 + 30);
         var tag = new Control { Position = new Vector2(mat ? 0 : w / 2 - pw / 2, h + 52), Size = new Vector2(pw, 38), MouseFilter = Control.MouseFilterEnum.Ignore };
         tag.Draw += () => Kit.Badge(tag, new Rect2(Vector2.Zero, tag.Size), gold ? new Color(0.08f, 0.06f, 0.02f, 0.92f) : new Color(0.1f, 0.1f, 0.12f, 0.92f), pill, Kit.Cond, 21, gold ? (dim ? new Color(1, 1, 1, 0.4f) : Kit.Accent) : dim ? new Color(1, 1, 1, 0.4f) : Teal);

@@ -108,7 +108,7 @@ public partial class DeckSelect : RiftMenu
             var pr = DeckRules.Problem(d, P, key);
             var l = Put(detail, $"{name} {(pr == null ? "✓" : "✕")}", Title, 20, pr == null ? Silver : new Color(1f, 0.55f, 0.5f), new Vector2(lx, y + 22));
             if (pr != null) l.TooltipText = pr;
-            lx += Title.GetStringSize(l.Text, HorizontalAlignment.Left, -1, Z(20)).X + 34;
+            lx += Title.GetStringSize(Lang.Tr(l.Text), HorizontalAlignment.Left, -1, Z(20)).X + 34;
         }
         var why = DeckRules.Problem(d, P);
         if (why != null) Put(detail, why, Body, 17, new Color(1f, 0.6f, 0.55f), new Vector2(tx, y + 56), new Vector2(W - tx - 60, 24)).ClipText = true;
@@ -177,7 +177,7 @@ public partial class DeckSelect : RiftMenu
     void Delete()
     {
         var d = sel!;
-        Ask($"Delete {d.Name}?", ("DELETE", () =>
+        Ask(Lang.F("Delete {0}?", d.Name), ("DELETE", () =>
         {
             CloseToast();
             Session.Decks.Remove(d);
@@ -209,7 +209,7 @@ public partial class DeckSelect : RiftMenu
         d.Name = UniqueName(d.Name);
         Session.Decks.Add(d); Session.Save(); sel = d; Refresh();
         // Cards you don't own show in the deck's ban-list line until you get them.
-        Ask(unknown > 0 ? $"Imported {d.Name}. {unknown} card{(unknown == 1 ? "" : "s")} in the file aren't in this game and were skipped." : $"Imported {d.Name}.");
+        Ask(unknown > 0 ? Lang.F("Imported {0}. {1} card(s) in the file aren't in this game and were skipped.", d.Name, unknown) : Lang.F("Imported {0}.", d.Name));
     };
 
     void Export()

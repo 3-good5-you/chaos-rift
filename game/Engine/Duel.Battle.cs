@@ -230,7 +230,10 @@ public sealed partial class Duel
     bool BattleValid(ref Card a, ref Card? t)
     {
         if (Attacker != null && Attacker != a) { a = Attacker; a.Attacks++; } // Dark Spirit of the Silent
-        if (AttackNegated || a.Loc != Loc.Monster || (a.Controller != TurnPlayer && !BattleFlags.Contains("swapped")) || !a.FaceUp) return false;
+        // an attacker switched to Defense Position mid-attack (Kunai with Chain) stops attacking (user playtest 2026-11-14),
+        // unless it may attack from Defense (Total Defense Shogun, Rampart Blaster): the same rule as declaring (CanAttack)
+        if (AttackNegated || a.Loc != Loc.Monster || (a.Controller != TurnPlayer && !BattleFlags.Contains("swapped")) || !a.FaceUp
+            || (a.Defense && !Allowed(Q.AttackFromDefense, a))) return false;
         // A lock put on the attacker mid-attack (Spellbinding Circle on the attack) stops this attack too, as the PoC CPU plays it.
         int lock_ = a.Uid + 1;
         if (FieldCards.Any(f => f.FaceUp && f.Var("target") == lock_) && Forbidden(Q.Attack, a)) return false;

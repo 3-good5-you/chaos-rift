@@ -229,7 +229,7 @@ public static class Chips
         // Long labels shrink to stay inside the chip; past 14 px they break onto more lines (broken here: Label's
         // autowrap didn't take on these free-standing chips).
         float room = size.X - 24;
-        float Wide(string s, int fs) => font.GetStringSize(s, HorizontalAlignment.Left, -1, fs).X;
+        float Wide(string s, int fs) => font.GetStringSize(Lang.Tr(s), HorizontalAlignment.Left, -1, fs).X;
         while (fontSize > 14 && Wide(text, fontSize) > room) fontSize--;
         if (Wide(text, fontSize) > room)
             for (; fontSize >= 10; fontSize--)

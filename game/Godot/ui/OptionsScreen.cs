@@ -25,7 +25,8 @@ public partial class OptionsScreen : RiftMenu
         Back();
         Put(this, "OPTIONS", Title, 60, Ink, new Vector2(80, 70));
         Hair(this, new Vector2(82, 146), 200, GoldC);
-        float y = 300;
+        float y = 260;
+        Row(ref y, "LANGUAGE", Lang.All.Select(l => l.Name).ToArray(), () => Lang.Index, i => { Lang.Set(Lang.All[i].Code); Session.Save(); Transition.Go(this, "res://ui/Options.tscn"); });
         Row(ref y, "BAN LIST", DeckRules.Formats.Select(f => f.Name).ToArray(), () => Settings.Format, i => Settings.Format = i);
         Row(ref y, "DUEL SPEED", Settings.Speeds.Select(s => s.Name).ToArray(), () => Settings.Speed, i => Settings.Speed = i);
         Slider(ref y, "MUSIC", () => Settings.Music, v => { Settings.Music = v; Settings.Apply(false); });
@@ -33,6 +34,7 @@ public partial class OptionsScreen : RiftMenu
         Row(ref y, "SCREEN", new[] { "FULLSCREEN", "WINDOW" }, () => Settings.Fullscreen ? 0 : 1, i => { Settings.Fullscreen = i == 0; Settings.Apply(); });
         Profile();
         Button(this, "DONE", new Vector2(W - 240, H - 100), OnBack);
+        Put(this, Lang.F("VERSION {0}", Updater.Current), Thin, 15, Mist, new Vector2(W - 420, 40), new Vector2(360, 24), HorizontalAlignment.Right);   // which build this is (QoL 2026-11-14)
         if (Demo.Arg("state") == "pictures") GetTree().CreateTimer(0.4).Timeout += Pictures;
         if (Demo.Arg("state") == "frames") GetTree().CreateTimer(0.4).Timeout += Frames;
     }
@@ -66,7 +68,7 @@ public partial class OptionsScreen : RiftMenu
             x += w + 46;
         }
         refresh.Add(() => { for (int i = 0; i < setters.Count; i++) setters[i](get() == i); });
-        y += 112;
+        y += 100;
     }
 
     void Slider(ref float y, string name, Func<float> get, Action<float> set)
@@ -90,7 +92,7 @@ public partial class OptionsScreen : RiftMenu
             if (e is InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: true } mb) At(mb.Position.X);
             else if (e is InputEventMouseMotion { ButtonMask: MouseButtonMask.Left } mm) At(mm.Position.X);
         };
-        y += 112;
+        y += 100;
     }
 
     protected override void OnFocus(int old, int now)
@@ -132,7 +134,7 @@ public partial class OptionsScreen : RiftMenu
         {
             var l = Put(profile, s, Title, 17, Graphite, new Vector2(x, 72));
             Click(l, act, h => l.AddThemeColorOverride("font_color", h ? GoldDeep : Graphite));
-            x += Title.GetStringSize(s, HorizontalAlignment.Left, -1, Z(17)).X + 34;
+            x += Title.GetStringSize(Lang.Tr(s), HorizontalAlignment.Left, -1, Z(17)).X + 34;
         }
     }
 
@@ -182,7 +184,7 @@ public partial class OptionsScreen : RiftMenu
         var owned = Shop.Frames.Where(f => Shop.Owns(P, f)).ToList();
         Picker("FRAME", owned.Count, 150, 6, i =>
         {
-            var c = new Control { Size = new Vector2(150, 150), TooltipText = owned[i].Name };
+            var c = new Control { Size = new Vector2(150, 150), TooltipText = Lang.Cosmetic(owned[i].Name) };
             c.AddChild(Cosmetics.Framed(Avatar, owned[i].Key, 150));
             return c;
         }, i => owned[i].Key == P.Frame, i => Shop.Equip(P, owned[i]), owned.Count < Shop.Frames.Length ? "MORE FRAMES IN THE SHOP" : null);

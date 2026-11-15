@@ -68,7 +68,7 @@ void fragment() {
 			float y = y0 + i * step;
 			float cx = Mathf.Lerp(Top, Bottom, y) * W;
 			var l = T(this, Menu[i].ToUpperInvariant(), Title, MenuSize, new Vector2(cx - 400, y * H - MenuSize * 0.75f), new Vector2(800, MenuSize * 1.5f), HorizontalAlignment.Center, 0.9f);
-			float tw = Title.GetStringSize(l.Text, HorizontalAlignment.Left, -1, MenuSize).X;
+			float tw = Title.GetStringSize(Lang.Tr(l.Text), HorizontalAlignment.Left, -1, MenuSize).X;
 			l.Position = new Vector2(cx - tw / 2 - 20, l.Position.Y); l.Size = new Vector2(tw + 40, l.Size.Y);   // hover area = the word
 			Hook(l, i);
 			rows.Add((l, y));
@@ -79,7 +79,7 @@ void fragment() {
 		introPlayed = true;
 		if (intro) Intro(); else RandomPair();
 		GetTree().CreateTimer(intro ? 4.6 : 0.6).Timeout += () => { if (Focus < 0) SetFocus(0); };
-		Updater.Check(this, v => GetTree().CreateTimer(intro ? 5.0 : 0.5).Timeout += () => { if (starter == null) Ask($"Chaos Rift {v} is out (you have {Updater.Current}).", ("UPDATE", () => { CloseToast(); OS.ShellOpen(Updater.Page); }), ("LATER", CloseToast)); });
+		Updater.Check(this, v => GetTree().CreateTimer(intro ? 5.0 : 0.5).Timeout += () => { if (starter == null) { Ask(Lang.F("Chaos Rift {0} is out (you have {1}).", v, Updater.Current), ("UPDATE", () => Update(v)), ("LATER", CloseToast)); if (OS.GetCmdlineUserArgs().Contains("--doupdate")) Update(v); } });   // --doupdate (dev): press UPDATE
 		if (Session.NeedsStarter && (!Shooting || OS.GetCmdlineUserArgs().Contains("--starter"))) GetTree().CreateTimer(intro ? 5.0 : 1.0).Timeout += StarterPick;
 	}
 
@@ -106,7 +106,7 @@ void fragment() {
 		AddChild(root);
 		root.AddChild(Cosmetics.Framed(Avatar, P.Frame, 70));
 		var name = Put(root, Settings.PlayerName.ToUpperInvariant(), Title, 22, Ink, new Vector2(84, 10));
-		Put(root, $"{P.Dp:N0} DP", Thin, 17, Ink * new Color(1, 1, 1, 0.55f), new Vector2(85, 42));
+		Put(root, Lang.F("{0:N0} DP", P.Dp), Thin, 17, Ink * new Color(1, 1, 1, 0.55f), new Vector2(85, 42));
 		Click(root, () => Transition.Go(this, "res://ui/Options.tscn"), h => name.AddThemeColorOverride("font_color", h ? GoldDeep : Ink));
 	}
 
@@ -132,7 +132,7 @@ void fragment() {
 		if (now < 0) return;
 		var (l, y) = rows[now];
 		bg.P("focus_y", y);
-		float w = Title.GetStringSize(l.Text, HorizontalAlignment.Left, -1, MenuSize).X;
+		float w = Title.GetStringSize(Lang.Tr(l.Text), HorizontalAlignment.Left, -1, MenuSize).X;
 		float cx = Mathf.Lerp(Top, Bottom, y) * W;
 		for (int s = 0; s < 2; s++)
 		{
@@ -272,5 +272,15 @@ void fragment() {
 		var tw = CreateTween();
 		tw.TweenProperty(s, "modulate:a", 0f, 0.35);
 		tw.TweenCallback(Callable.From(s.QueueFree));
+	}
+
+	/// UPDATE: installs it from inside the game where it can (Updater.CanInstall), else opens the download page.
+	void Update(string v)
+	{
+		if (!Updater.CanInstall) { CloseToast(); OS.ShellOpen(Updater.Page); return; }
+		Ask(Lang.F("Downloading Chaos Rift {0}...", v));
+		toastKeep = true;
+		Updater.Install(this, text => { if (toastText != null) toastText.Text = text; },
+			() => { toastKeep = false; Ask("The update could not be downloaded here.", ("DOWNLOAD PAGE", () => { CloseToast(); OS.ShellOpen(Updater.Page); }), ("LATER", CloseToast)); });
 	}
 }

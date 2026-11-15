@@ -934,7 +934,7 @@ void fragment() {
             // VICTORY slams in / DEFEAT crashes down; the subtitle names a special end (Exodia, deck out...).
             string them = ThemName.ToUpperInvariant(), why = D.EndReason == "LP reached 0" ? "" : D.EndReason.ToUpperInvariant();
             await EndTitle(w == 0 ? "VICTORY" : w == 1 ? "DEFEAT" : "DRAW", w == 1 ? Bad : RivalPanels.Gold, w != 1,
-                why.Length > 0 ? why : w == 0 ? $"{them} DEFEATED" : w == 1 ? $"{them} WINS" : "");
+                why.Length > 0 ? why : w == 0 ? Lang.F("{0} DEFEATED", them) : w == 1 ? Lang.F("{0} WINS", them) : "");
             await Wait(0.15);   // was 2 s of nothing after the title had already gone (playtest 2026-11-12)
             if (selftest || backToLab) { GetTree().ReloadCurrentScene(); return; }
             if (Watch != null) { LeaveReplay(); return; }
@@ -969,7 +969,7 @@ void fragment() {
     void ChaosLine(string text)
     {
         chaosLine ??= Put(hud, "", Cond, 22, new Color(0.8f, 0.68f, 1f), new Vector2(0, 8), new Vector2(W, 30), HorizontalAlignment.Center, 6);
-        chaosLine.Text = "CHAOS RULE:  " + text.ToUpperInvariant();
+        chaosLine.Text = Lang.Tr("CHAOS RULE:") + "  " + text.ToUpperInvariant();
     }
 
     Step Snap(Ev? e)
@@ -1033,7 +1033,7 @@ void fragment() {
             ZoneWave(s.Tp, FxGold, spells: true, cue: s.Tp == 0 ? "turn_wave" : "turn_wave_rival");   // the turn player's side wakes up
             await Wait(0.15);
             // The words ride in with the wave, lying on the turn player's half of the field.
-            FieldTitle(s.Tp == 0 ? "YOUR TURN" : $"{ThemName.ToUpperInvariant()}'S TURN", s.Tp, s.Tp == 0 ? RivalPanels.Gold : Pm.Them, s.Tp == 0 ? 150 : 130);
+            FieldTitle(s.Tp == 0 ? "YOUR TURN" : Lang.F("{0}'S TURN", ThemName.ToUpperInvariant()), s.Tp, s.Tp == 0 ? RivalPanels.Gold : Pm.Them, s.Tp == 0 ? 150 : 130);
             await Wait(1.2);
         }
         else if (s.Phase != shownPhase)
@@ -1052,15 +1052,15 @@ void fragment() {
         {
             puzzleShown = true;
             ChaosLine($"{pz.Name}  ·  {pz.Limit}");
-            chaosLine!.Text = $"CHALLENGE:  {pz.Name}  ·  {pz.Limit}  ·  {pz.Goal.ToUpperInvariant()}";
+            chaosLine!.Text = Lang.F("CHALLENGE:  {0}  ·  {1}  ·  {2}", pz.Name, pz.Limit, Lang.Duel(pz.Goal).ToUpperInvariant());
         }
         if (s.Chaos != shownChaos && s.Chaos >= 0)
         {
             // Chaos Duel: the rift announces the new rule, then it stays as a line at the top of the screen
             shownChaos = s.Chaos;
             var (cn, ct) = Duel.ChaosRules[s.Chaos];
-            await Banner(cn, new Color(0.75f, 0.6f, 1f), "CHAOS RULE  ·  " + ct.ToUpperInvariant());
-            ChaosLine(cn + "  ·  " + ct);
+            await Banner(Lang.Tr(cn), new Color(0.75f, 0.6f, 1f), Lang.Tr("CHAOS RULE") + "  ·  " + Lang.Tr(ct).ToUpperInvariant());
+            ChaosLine(Lang.Tr(cn) + "  ·  " + Lang.Tr(ct));
         }
         if (handLine != null && settle) await SettleHand(s);   // a revealed hand: its picked card leaves from the line, the rest go back
         // Cards whose leaving plays as an effect where they stood; the real card moves to the Graveyard unseen.
@@ -1302,7 +1302,7 @@ void fragment() {
                     // A second Battle Phase (Weather Report): the phase doesn't change, so say it and wake the attackers.
                     int side = Side(e.Player);
                     Cue("phase_battle");
-                    FieldTitle($"BATTLE PHASE {e.Arg + 1}", side, FxEmber, 110);
+                    FieldTitle(Lang.F("BATTLE PHASE {0}", e.Arg + 1), side, FxEmber, 110);
                     ZoneWave(side, FxEmber, spells: false, 0.7, cue: "battle_wave");
                     return 1.4;
                 }
@@ -1380,7 +1380,7 @@ void fragment() {
                     if (key == lastReveal) return 0;
                     lastReveal = key;
                     bool mine = Side(shown[0].Owner) == 0;
-                    string title = $"{(mine ? "YOUR" : ThemName.ToUpperInvariant() + "'S")} CARDS  ·  REVEALED";
+                    string title = (mine ? Lang.Tr("YOUR CARDS  ·  REVEALED") : Lang.F("{0}'S CARDS  ·  REVEALED", ThemName.ToUpperInvariant()));
                     var vs = shown.Select(V).OfType<View>().ToList();
                     if (vs.Count == shown.Count && vs.All(v => v.S.Loc == Loc.Hand && v.S.Side == 1 && v.S.Up) && handShown[1 - Me]) return 0;   // already kept face-up (Mind on Air)
                     // Picked in the FX lab 2026-11-12: a whole hand rises in a line (and stays for a pick from it), cards

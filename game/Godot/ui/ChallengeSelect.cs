@@ -23,12 +23,12 @@ public partial class ChallengeSelect : RiftMenu
         Back("MODES");
         Put(this, "CHALLENGES", Title, 40, Ink, new Vector2(80, 58));
         Hair(this, new Vector2(82, 108), 160, GoldC);
-        Put(this, $"SOLVED {Puzzles.All.Count(z => P.Solved.Contains(z.Id))} / {Puzzles.All.Length}", Thin, 18, GoldDeep, new Vector2(84, 124));
+        Put(this, Lang.F("SOLVED {0} / {1}", Puzzles.All.Count(z => P.Solved.Contains(z.Id)), Puzzles.All.Length), Thin, 18, GoldDeep, new Vector2(84, 124));
         float y = H * 0.2f;
         for (int i = 0; i < Puzzles.All.Length; i++)
         {
             var z = Puzzles.All[i];
-            var l = Put(this, $"{i + 1:00}   {z.Name}", Title, 30, Ink * new Color(1, 1, 1, 0.6f), new Vector2(130, y), new Vector2(640, 46));
+            var l = Put(this, $"{i + 1:00}   {Lang.Tr(z.Name)}", Title, 30, Ink * new Color(1, 1, 1, 0.6f), new Vector2(130, y), new Vector2(640, 46));
             Hook(l, i);
             l.MouseDefaultCursorShape = CursorShape.PointingHand;
             if (P.Solved.Contains(z.Id)) Pip(this, new Vector2(104, y + 22), 10);
@@ -63,7 +63,7 @@ public partial class ChallengeSelect : RiftMenu
             cx += 134;
         }
         bool solved = P.Solved.Contains(z.Id);
-        Put(detail, solved ? "SOLVED" : $"REWARD  {z.Dp} DP", Title, 18, GoldLight, new Vector2(x, H * 0.16f + 530));
+        Put(detail, solved ? "SOLVED" : Lang.F("REWARD  {0} DP", z.Dp), Title, 18, GoldLight, new Vector2(x, H * 0.16f + 530));
         Button(detail, solved ? "PLAY AGAIN" : "START", new Vector2(x + 180, H - 100), () => Choose(sel), 28);
     }
 

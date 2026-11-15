@@ -44,7 +44,7 @@ public static class Settings
     /// The options as the save file holds them.
     public static SaveData.Options Saved
     {
-        get => new() { Name = PlayerName, Picture = Picture, Music = Music, Sound = Sound, Speed = Speed, Fullscreen = Fullscreen, BanList = DeckRules.LimitGame };
+        get => new() { Name = PlayerName, Picture = Picture, Music = Music, Sound = Sound, Speed = Speed, Fullscreen = Fullscreen, BanList = DeckRules.LimitGame, Lang = Lang.Code };
         set
         {
             var n = value.Name.Trim();
@@ -54,6 +54,7 @@ public static class Settings
             Speed = Math.Clamp(value.Speed, 0, Speeds.Length - 1);
             Fullscreen = value.Fullscreen;
             DeckRules.LimitGame = value.BanList;
+            Lang.Set(value.Lang ?? "en");   // older saves: null → English
         }
     }
 

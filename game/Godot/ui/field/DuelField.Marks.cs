@@ -151,8 +151,8 @@ public partial class DuelField
     string DetailText(Card c)
     {
         if (c != borrowCard) { borrowCard = c; borrowTab = 0; }
-        if (CopiedFrom(c) is { } from && borrowTab == 0) return from.Desc;
-        return CoinSplit(c) is { } cs ? cs.Intro : c.Data.Desc;
+        if (CopiedFrom(c) is { } from && borrowTab == 0) return Lang.Card(from) ?? from.Desc;
+        return CoinSplit(c) is { } cs ? cs.Intro : Lang.Card(c.Data) ?? c.Data.Desc;
     }
 
     /// Under ATK/DEF: "AS <NAME> · until End Phase", and NOW / OWN TEXT tabs when it copies an effect. Returns the height.
@@ -162,7 +162,7 @@ public partial class DuelField
         string? name = c.Loc == Loc.Monster && c.FaceUp ? c.TempName ?? from?.Name : null;
         if (name == null) return 0;
         var x = DetailExtra();
-        Put(x, $"AS {name.ToUpperInvariant()}  ·  until End Phase", Cond, 20, Borrowed, new Vector2(20, y), new Vector2(DetailW - 40, 26)).ClipText = true;
+        Put(x, Lang.F("AS {0}  ·  until End Phase", name.ToUpperInvariant()), Cond, 20, Borrowed, new Vector2(20, y), new Vector2(DetailW - 40, 26)).ClipText = true;
         if (from == null) return 30;
         float tw = (DetailW - 48) / 2;
         for (int i = 0; i < 2; i++)
@@ -172,7 +172,7 @@ public partial class DuelField
             var tab = new Panel { Position = new Vector2(20 + i * (tw + 8), y + 32), Size = new Vector2(tw, 36), MouseFilter = MouseFilterEnum.Stop };
             tab.AddThemeStyleboxOverride("panel", Pill(on ? new Color(Borrowed, 0.2f) : new Color(1, 1, 1, 0.04f), on ? Borrowed : new Color(1, 1, 1, 0.15f), 10, 0, null, 0, on ? 2 : 1));
             x.AddChild(tab);
-            var l = Put(tab, i == 0 ? $"NOW  ·  {from.Name.ToUpperInvariant()}" : "OWN TEXT", Cond, 17, Colors.White, Vector2.Zero, tab.Size, HorizontalAlignment.Center);
+            var l = Put(tab, i == 0 ? Lang.F("NOW  ·  {0}", from.Name.ToUpperInvariant()) : "OWN TEXT", Cond, 17, Colors.White, Vector2.Zero, tab.Size, HorizontalAlignment.Center);
             l.VerticalAlignment = VerticalAlignment.Center; l.ClipText = true;
             tab.GuiInput += e => { if (e is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } && borrowTab != k) { borrowTab = k; UiSound("cursor"); Focus(c); } };
         }
@@ -277,7 +277,7 @@ public partial class DuelField
         CloseSheet();
         sheet = Box(hud, new Rect2(W / 2 - w / 2, H / 2 - h / 2, w, h), Pill(new Color(0.03f, 0.03f, 0.05f, 0.95f), RivalPanels.Gold, 18, 0, new Color(RivalPanels.Gold, 0.25f), 12, 2));
         sheet.MouseFilter = MouseFilterEnum.Stop;
-        Put(sheet, (p.Source?.Name ?? p.Text).ToUpperInvariant(), Impact, 30, Colors.White, new Vector2(28, 18), new Vector2(w - 56, 40), outline: 5).ClipText = true;
+        Put(sheet, (p.Source?.Name ?? Lang.Duel(p.Text)).ToUpperInvariant(), Impact, 30, Colors.White, new Vector2(28, 18), new Vector2(w - 56, 40), outline: 5).ClipText = true;
         Put(sheet, sub, Cond, 19, new Color(1, 1, 1, 0.55f), new Vector2(28, 58), new Vector2(w - 56, 26));
         return sheet;
     }
@@ -308,7 +308,7 @@ public partial class DuelField
     {
         const float cw = 150, gap = 16; const int cols = 5, rows = 2;
         float w = cols * cw + (cols - 1) * gap + 56, h = 172 + rows * (cw * CardH + gap) + 64;
-        var s = DeclareBase(p, p.Text, w, h);
+        var s = DeclareBase(p, Lang.Duel(p.Text), w, h);
         // Names the prompt offers (in its order); other options (e.g. "(a card not in your Deck)") become a chip.
         var names = texts.Select((t, i) => (t, i)).Where(x => CardDb.Shared.ByName.ContainsKey(x.t)).ToList();
         var other = texts.Select((t, i) => (t, i)).Where(x => !CardDb.Shared.ByName.ContainsKey(x.t)).ToList();
@@ -347,7 +347,7 @@ public partial class DuelField
                 OnClick(pic, () => { sel = i; Draw(); });
                 pic.MouseEntered += () => Focus(new Card(-1, CardDb.Shared.Named(t), 0));   // its text in the details
             }
-            go.Text = sel >= 0 ? $"DECLARE  ·  {texts[sel].ToUpperInvariant()}" : "NO MATCH";
+            go.Text = sel >= 0 ? Lang.F("DECLARE  ·  {0}", Lang.Tr(texts[sel]).ToUpperInvariant()) : "NO MATCH";
             FitText(go, 20, 12);
         }
         e.TextChanged += _ => Draw();
@@ -387,7 +387,7 @@ public partial class DuelField
                 OnClick(t, () => { sel = k; Draw(); });
                 Put(row, a, Cond, 20, i == sel ? col : new Color(1, 1, 1, 0.65f), at + new Vector2(-10, s + 12), new Vector2(s + 20, 26), HorizontalAlignment.Center);
             }
-            if (sel >= 0) go.Text = $"DECLARE  ·  {texts[sel]}";
+            if (sel >= 0) go.Text = Lang.F("DECLARE  ·  {0}", Lang.Tr(texts[sel]));
         }
         Draw();
     }
@@ -417,7 +417,7 @@ public partial class DuelField
                 Put(c, texts[i], Ui, 18, on ? RivalPanels.Gold : Colors.White, Vector2.Zero, c.Size, HorizontalAlignment.Center).VerticalAlignment = VerticalAlignment.Center;
                 OnClick(c, () => { sel = k; Draw(); });
             }
-            if (sel >= 0) go.Text = $"DECLARE  ·  {texts[sel].ToUpperInvariant()}";
+            if (sel >= 0) go.Text = Lang.F("DECLARE  ·  {0}", Lang.Tr(texts[sel]).ToUpperInvariant());
         }
         Draw();
     }

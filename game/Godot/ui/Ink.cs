@@ -134,7 +134,7 @@ void fragment() {
         Pic(logo, new Vector2(50 * k, top), new Vector2(lw, lh), host);
         int ts = (int)(64 * Math.Max(0.75f, k));
         Kit.Put(host, title, Kit.Cond, ts, ink, new Vector2(lw + 110 * k, top + lh / 2 - ts * 0.69f));
-        float tw = Kit.Cond.GetStringSize(title, HorizontalAlignment.Left, -1, ts).X + 40;
+        float tw = Kit.Cond.GetStringSize(Lang.Tr(title), HorizontalAlignment.Left, -1, ts).X + 40;
         Brush(new Vector2(lw + 100 * k, top + lh / 2 + ts * 0.53f), new Vector2(Math.Max(tw, 520 * k), 16 * Math.Max(0.75f, k)), ink * new Color(1, 1, 1, 0.55f), host);
         var dim = ink * new Color(1, 1, 1, 0.75f);
         var b = Kit.Put(host, "‹  BACK", Kit.Cond, 40, dim, new Vector2(w - 230, top + lh / 2 - 28));
@@ -149,7 +149,7 @@ void fragment() {
     /// returns its width.
     public static float TabWord(Control host, string text, Vector2 pos, Action click, out Action<bool> lit)
     {
-        float w = Kit.Cond.GetStringSize(text, HorizontalAlignment.Left, -1, 40).X + 40;
+        float w = Kit.Cond.GetStringSize(Lang.Tr(text), HorizontalAlignment.Left, -1, 40).X + 40;
         var root = new Control { Position = pos, Size = new Vector2(w, 68), MouseFilter = Control.MouseFilterEnum.Stop, MouseDefaultCursorShape = Control.CursorShape.PointingHand };
         host.AddChild(root);
         var b = Brush(new Vector2(-18, 0), new Vector2(w + 36, 68), Cream, root);

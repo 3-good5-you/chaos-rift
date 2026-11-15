@@ -23,10 +23,10 @@ public partial class TournamentScreen : RiftMenu
         Back();
         Put(this, "TOURNAMENT", Title, 40, Ink, new Vector2(80, 58));
         Hair(this, new Vector2(82, 108), 160, GoldC);
-        string status = tour.Champion is { } c ? (c == Tournament.You ? "YOU ARE THE CHAMPION" : $"{Name(c)} WINS")
+        string status = tour.Champion is { } c ? (c == Tournament.You ? "YOU ARE THE CHAMPION" : Lang.F("{0} WINS", Name(c)))
             : tour.YouOut ? "KNOCKED OUT" : Tournament.RoundNames[tour.Round];
         Put(this, status, Title, 22, GoldLight, new Vector2(W - 680, 66), new Vector2(600, 30), HorizontalAlignment.Right);
-        if (tour.Foe != null) Put(this, $"NEXT: VS {tour.Foe.Name}", Thin, 17, Mist, new Vector2(W - 680, 102), new Vector2(600, 24), HorizontalAlignment.Right);
+        if (tour.Foe != null) Put(this, Lang.F("NEXT: VS {0}", tour.Foe.Name), Thin, 17, Mist, new Vector2(W - 680, 102), new Vector2(600, 24), HorizontalAlignment.Right);
 
         const float d0 = 104;
         var (cols, champ) = Mirror(60 + d0 / 2, 210, 170, H * 0.62f, H * 0.42f);
@@ -153,7 +153,7 @@ public partial class TournamentScreen : RiftMenu
             float cx = x0 + (i + 0.5f) * colW;
             bool lit = i == 0 || i == place;
             T(this, Tournament.PlaceNames[i], Title, 15, new Vector2(cx - 115, centre.Y - 32), new Vector2(230, 22), HorizontalAlignment.Center, 0.9f).Mat().P("lit", lit ? 1f : 0f);
-            var dp = T(this, $"{Tournament.Ladder[i].Dp:N0} DP", Title, i == 0 ? 34 : 26, new Vector2(cx - 115, centre.Y - 6), new Vector2(230, 44), HorizontalAlignment.Center);
+            var dp = T(this, Lang.F("{0:N0} DP", Tournament.Ladder[i].Dp), Title, i == 0 ? 34 : 26, new Vector2(cx - 115, centre.Y - 6), new Vector2(230, 44), HorizontalAlignment.Center);
             if (lit) dp.Mat().P("lit", 1f);
             if (i == place) Pip(this, new Vector2(cx, centre.Y + 50), 9);
         }

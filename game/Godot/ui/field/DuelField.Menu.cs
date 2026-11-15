@@ -109,7 +109,7 @@ public partial class DuelField
         pct.Text = v <= 0.001f ? "OFF" : $"{Mathf.RoundToInt(v * 100)}%";
     }
 
-    static string SpeedText() => $"DUEL SPEED: {Settings.Speeds[Settings.Speed].Name}";
+    static string SpeedText() => Lang.F("DUEL SPEED: {0}", Lang.Tr(Settings.Speeds[Settings.Speed].Name));
 
     void CloseDuelMenu()
     {
@@ -146,7 +146,7 @@ public partial class DuelField
         }
         await FieldShatters(0);   // giving up: your monsters break, as an LP loss would
         Sfx("SE_DUEL_LOSE");
-        await EndTitle("DEFEAT", Bad, false, $"SURRENDER  ·  {surrenderThem.ToUpperInvariant()} WINS");
+        await EndTitle("DEFEAT", Bad, false, Lang.F("SURRENDER  ·  {0} WINS", surrenderThem.ToUpperInvariant()));
         await Wait(1.5);
         if (backToLab) { GetTree().ReloadCurrentScene(); return; }
         if (lan) { Transition.Go(this, "res://ui/LanLobby.tscn"); return; }

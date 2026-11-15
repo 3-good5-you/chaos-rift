@@ -207,7 +207,7 @@ public partial class DuelField
             tw.TweenProperty(c, "modulate:a", 0f, 0.25);
             tw.TweenCallback(Callable.From(c.QueueFree));
         }
-        float tw0 = Cond.GetStringSize("REVEALED", HorizontalAlignment.Left, -1, 18).X + 28;
+        float tw0 = Cond.GetStringSize(Lang.Tr("REVEALED"), HorizontalAlignment.Left, -1, 18).X + 28;
         var tag = Track(Box(hud, new Rect2(W - 34 - tw0, y - cw * CardH / 2 - 38, tw0, 28), Pill(new Color(0.03f, 0.03f, 0.05f, 0.9f), edge, 14, 0, null, 0, 2)), stay + 0.5);
         tag.MouseFilter = MouseFilterEnum.Ignore;
         Put(tag, "REVEALED", Cond, 18, Colors.White, new Vector2(0, 3), new Vector2(tw0, 22), HorizontalAlignment.Center);
@@ -235,7 +235,7 @@ public partial class DuelField
     {
         var f = RiftMenu.Title;
         Color ink = light ? new Color(0.13f, 0.13f, 0.15f) : new Color(0.85f, 0.86f, 0.9f), gold = light ? new Color(0.6f, 0.45f, 0.14f) : new Color(0.95f, 0.8f, 0.45f);
-        float w = f.GetStringSize(s, HorizontalAlignment.Left, -1, size).X, bw = w + 84, bh = size * 2.1f;
+        float w = f.GetStringSize(Lang.Tr(s), HorizontalAlignment.Left, -1, size).X, bw = w + 84, bh = size * 2.1f;
         var root = new Control { Position = centre - new Vector2(bw, bh) / 2, Size = new Vector2(bw, bh), PivotOffset = new Vector2(bw, bh) / 2, MouseDefaultCursorShape = CursorShape.PointingHand };
         host.AddChild(root);
         var plate = new Panel { Size = root.Size, MouseFilter = MouseFilterEnum.Ignore };

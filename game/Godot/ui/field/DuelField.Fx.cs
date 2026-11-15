@@ -239,7 +239,7 @@ public partial class DuelField
         // green when it goes your way.
         bool good = e.Call >= 0 ? ((e.Arg & 1) != 0) == (e.Call == 1) : n == 1 ? heads == 1 : heads * 2 > n;
         bool mine = e.Player == Me;
-        string text = e.Call >= 0 ? $"{(mine ? "YOU" : ThemName.ToUpperInvariant())} CALLED {(good ? "RIGHT" : "WRONG")}" : good ? "EFFECT SUCCEEDS" : "EFFECT FAILS";
+        string text = e.Call >= 0 ? (mine ? Lang.Tr(good ? "YOU CALLED RIGHT" : "YOU CALLED WRONG") : Lang.F(good ? "{0} CALLED RIGHT" : "{0} CALLED WRONG", ThemName.ToUpperInvariant())) : good ? "EFFECT SUCCEEDS" : "EFFECT FAILS";
         if (words) After(1.7 + n * 0.15, () =>
         {
             Cue(good ? "coin_good" : "coin_bad");

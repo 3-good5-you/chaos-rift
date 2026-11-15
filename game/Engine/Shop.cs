@@ -38,7 +38,7 @@ public static class Shop
         new("20_millennium_puzzle", "Millennium Puzzle", 3500, Cosmetic.Back), new("21_sacred_geometry", "Sacred Geometry", 3500, Cosmetic.Back), new("22_red_eyes_fury", "Red-Eyes Fury", 3500, Cosmetic.Back),
         new("23_pharaoh_relic", "Pharaoh's Relic", 3500, Cosmetic.Back), new("24_slifer_scroll", "Slifer Scroll", 3500, Cosmetic.Back), new("25_golden_pharaoh", "Golden Pharaoh", 3500, Cosmetic.Back),
         new("26_yellow_puzzle", "Yellow Puzzle", 3500, Cosmetic.Back), new("27_spirit_duel", "Spirit Duel", 3500, Cosmetic.Back), new("28_neon_dragons", "Neon Dragons", 3500, Cosmetic.Back),
-        new("29_gods_tapestry", "Gods Tapestry", 3500, Cosmetic.Back), new("30_chaos_vortex", "Chaos Vortex", 3500, Cosmetic.Back),
+        new("29_gods_tapestry", "Legends", 3500, Cosmetic.Back), new("30_chaos_vortex", "Chaos Vortex", 3500, Cosmetic.Back),
     };
 
     // ponytail: rank-style frames (bronze..master) are bought too; ranked play would award them instead.

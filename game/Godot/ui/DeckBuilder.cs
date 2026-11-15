@@ -111,7 +111,7 @@ public partial class DeckBuilder : RiftMenu
         else
         {
             Button(this, "SAVE", new Vector2(W - 110, 76), () => Save(), 22);
-            Button(this, "REVERT", new Vector2(W - 270, 76), () => { deck = source.Copy(); nameEdit.Text = deck.Name; Changed(); }, 18);
+            Button(this, "REVERT", new Vector2(W - 200 - (Title.GetStringSize(Lang.Tr("SAVE"), HorizontalAlignment.Left, -1, Z(22)).X + Title.GetStringSize(Lang.Tr("REVERT"), HorizontalAlignment.Left, -1, Z(18)).X) / 2, 76), () => { deck = source.Copy(); nameEdit.Text = deck.Name; Changed(); }, 18);
         }
         Hair(this, new Vector2(dx, 238), dw, Silver * new Color(1, 1, 1, 0.12f));
         zones = new Control { Size = new Vector2(W, H), MouseFilter = MouseFilterEnum.Ignore };
@@ -144,9 +144,9 @@ public partial class DeckBuilder : RiftMenu
 
     string Why(CardData d, bool side)
     {
-        if (deck.Copies(d.Idx) >= P.Count(d.Idx)) return $"You have {P.Count(d.Idx)} {d.Name} and they're all in the deck.";
-        if (deck.CopiesNamed(d.Name) >= DeckRules.Limit(d)) return DeckRules.Limit(d) == 0 ? $"{d.Name} is forbidden." : $"{d.Name}: {DeckRules.Limit(d)} copies at most.";
-        return side ? $"The Side Deck holds {DeckRules.MaxSide} cards." : $"The Main Deck holds {DeckRules.MaxMain} cards.";
+        if (deck.Copies(d.Idx) >= P.Count(d.Idx)) return Lang.F("You have {0} {1} and they're all in the deck.", P.Count(d.Idx), d.Name);
+        if (deck.CopiesNamed(d.Name) >= DeckRules.Limit(d)) return DeckRules.Limit(d) == 0 ? Lang.F("{0} is forbidden.", d.Name) : Lang.F("{0}: {1} copies at most.", d.Name, DeckRules.Limit(d));
+        return side ? Lang.F("The Side Deck holds {0} cards.", DeckRules.MaxSide) : Lang.F("The Main Deck holds {0} cards.", DeckRules.MaxMain);
     }
 
     void OfferMaterials(CardData d)
@@ -155,8 +155,8 @@ public partial class DeckBuilder : RiftMenu
         if (missing.Count == 0) return;
         var names = string.Join(", ", missing.GroupBy(m => m.Name).Select(g => g.Count() > 1 ? $"{g.Key} ×{g.Count()}" : g.Key));
         bool any = missing.Any(m => Db.ByName[m.Name].Any(c => DeckRules.CanAdd(deck, c, P)));
-        if (any) Ask($"{d.Name} needs {names}.", ("ADD", () => { CloseToast(); var f = DeckRules.AddMaterials(deck, d, P); Changed(); if (f.Count > 0) Ask($"Not in your cards: {string.Join(", ", f.Select(x => x.Name).Distinct())}."); }), ("SKIP", CloseToast));
-        else Ask($"{d.Name} needs {names}. Not in your cards.");
+        if (any) Ask(Lang.F("{0} needs {1}.", d.Name, names), ("ADD", () => { CloseToast(); var f = DeckRules.AddMaterials(deck, d, P); Changed(); if (f.Count > 0) Ask(Lang.F("Not in your cards: {0}.", string.Join(", ", f.Select(x => x.Name).Distinct()))); }), ("SKIP", CloseToast));
+        else Ask(Lang.F("{0} needs {1}. Not in your cards.", d.Name, names));
     }
 
     bool Save(bool force = false)
@@ -164,7 +164,7 @@ public partial class DeckBuilder : RiftMenu
         var bare = DeckRules.FusionsMissingMaterials(deck);
         if (bare.Count > 0 && !force)
         {
-            Ask($"Materials missing for {string.Join(", ", bare.Select(f => f.Name))}.",
+            Ask(Lang.F("Materials missing for {0}.", string.Join(", ", bare.Select(f => f.Name))),
                 ("ADD", () => { CloseToast(); foreach (var f in bare) DeckRules.AddMaterials(deck, f, P); Changed(); }),
                 ("SAVE ANYWAY", () => { CloseToast(); Save(true); }));
             return false;
@@ -221,7 +221,7 @@ public partial class DeckBuilder : RiftMenu
         var d = Db.Get(int.Parse(data[1..]));
         if (from == 'c') { Add(d, to == 's'); return; }
         bool ok = to == 'c' ? DeckRules.Remove(deck, d, from == 's') : DeckRules.Move(deck, d, to == 's');
-        if (!ok) { Ask(to == 's' ? $"The Side Deck holds {DeckRules.MaxSide} cards." : $"The Main Deck holds {DeckRules.MaxMain} cards."); return; }
+        if (!ok) { Ask(to == 's' ? Lang.F("The Side Deck holds {0} cards.", DeckRules.MaxSide) : Lang.F("The Main Deck holds {0} cards.", DeckRules.MaxMain)); return; }
         if (to != 'c') justAdded = d.Idx;
         UiSound(false); Changed();
     }
@@ -257,7 +257,7 @@ public partial class DeckBuilder : RiftMenu
             if (kinds != null) Put(zones, kinds, Title, 14, Silver * new Color(1, 1, 1, 0.85f), new Vector2(dx + 22, y + 42));
             Pip(zones, new Vector2(dx + 6, y + 12), 9);
             Put(zones, name, Title, 20, tint, new Vector2(dx + 22, y));
-            Put(zones, count, Title, 16, Silver * new Color(1, 1, 1, 0.85f), new Vector2(dx + 22 + Title.GetStringSize(name, HorizontalAlignment.Left, -1, Z(20)).X + 24, y + 3));
+            Put(zones, count, Title, 16, Silver * new Color(1, 1, 1, 0.85f), new Vector2(dx + 22 + Title.GetStringSize(Lang.Tr(name), HorizontalAlignment.Left, -1, Z(20)).X + 24, y + 3));
             Hair(zones, new Vector2(dx, y + 34), dw, tint * new Color(1, 1, 1, 0.35f));
             y += kinds != null ? 70 : 46;
         }
@@ -290,7 +290,7 @@ public partial class DeckBuilder : RiftMenu
             }
             y += zh + 18;
         }
-        Zone("MAIN DECK", $"{main.Count} / {DeckRules.MinMain}–{DeckRules.MaxMain}", Silver, $"MONSTER {main.Count(c => c.IsMonster)}  SPELL {main.Count(c => c.IsSpell)}  TRAP {main.Count(c => c.IsTrap)}");
+        Zone("MAIN DECK", $"{main.Count} / {DeckRules.MinMain}–{DeckRules.MaxMain}", Silver, Lang.F("MONSTER {0}  SPELL {1}  TRAP {2}", main.Count(c => c.IsMonster), main.Count(c => c.IsSpell), main.Count(c => c.IsTrap)));
         Tiles(main, DeckRules.MinMain, Silver, 'm');
         Zone("SIDE DECK", $"{side.Count} / {DeckRules.MaxSide}", Teal);
         Tiles(side, DeckRules.MaxSide, Teal, 's');

@@ -96,7 +96,7 @@ void fragment() {
             BgColor = bg, CornerRadiusTopLeft = (int)(r.Size.Y / 2), CornerRadiusTopRight = (int)(r.Size.Y / 2), CornerRadiusBottomLeft = (int)(r.Size.Y / 2), CornerRadiusBottomRight = (int)(r.Size.Y / 2),
             CornerDetail = 6, AntiAliasing = true,
         }, r);
-        var ts = f.GetStringSize(text, HorizontalAlignment.Left, -1, size);
+        var ts = f.GetStringSize(Lang.Tr(text), HorizontalAlignment.Left, -1, size);
         ci.DrawString(f, new Vector2(r.Position.X + (r.Size.X - ts.X) / 2, r.Position.Y + (r.Size.Y + f.GetAscent(size) - f.GetDescent(size)) / 2), text, HorizontalAlignment.Left, -1, size, fg);
     }
 
@@ -111,7 +111,7 @@ void fragment() {
         else
         {
             var s = limit.ToString(); int fs = (int)(r * 1.5f);
-            var ts = Impact.GetStringSize(s, HorizontalAlignment.Left, -1, fs);
+            var ts = Impact.GetStringSize(Lang.Tr(s), HorizontalAlignment.Left, -1, fs);
             ci.DrawString(Impact, c + new Vector2(-ts.X / 2, (Impact.GetAscent(fs) - Impact.GetDescent(fs)) / 2), s, HorizontalAlignment.Left, -1, fs, Colors.White);
         }
     }
@@ -132,7 +132,7 @@ void fragment() {
         ci.DrawCircle(c, r, col.Darkened(0.35f) * new Color(1, 1, 1, alpha));
         ci.DrawCircle(c + new Vector2(0, -r * 0.18f), r * 0.78f, col * new Color(1, 1, 1, alpha));
         var g = AttrGlyph(attr); int fs = (int)(r * 1.15f);
-        var ts = Kanji.GetStringSize(g, HorizontalAlignment.Left, -1, fs);
+        var ts = Kanji.GetStringSize(Lang.Tr(g), HorizontalAlignment.Left, -1, fs);
         ci.DrawString(Kanji, c + new Vector2(-ts.X / 2, (Kanji.GetAscent(fs) - Kanji.GetDescent(fs)) / 2), g, HorizontalAlignment.Left, -1, fs, new Color(1, 1, 1, alpha));
     }
 
@@ -270,13 +270,13 @@ public partial class CardDetail : Panel
         name.Text = d.Name;
         if (d.IsMonster)
         {
-            type.Text = $"{d.Attribute}  ·  {d.Race.ToUpperInvariant()} / {d.Frame.ToUpperInvariant()}";
+            type.Text = $"{Lang.Tr(d.Attribute)}  ·  {Lang.Tr(d.Race).ToUpperInvariant()} / {Lang.Tr(d.Frame).ToUpperInvariant()}";
             stars.Text = new string('★', Math.Max(0, d.Level));
-            stats.Text = $"ATK {d.AtkText}    DEF {d.DefText}";
+            stats.Text = $"{Lang.Tr("ATK")} {d.AtkText}    {Lang.Tr("DEF")} {d.DefText}";
         }
         else
         {
-            type.Text = $"{d.Kind.ToString().ToUpperInvariant()}  ·  {d.Frame.ToUpperInvariant()}";
+            type.Text = $"{Lang.Tr(d.Kind.ToString()).ToUpperInvariant()}  ·  {Lang.Tr(d.Frame).ToUpperInvariant()}";
             stars.Text = ""; stats.Text = "";
         }
         owned.Text = ownedCount > 0 ? $"×{ownedCount}" : "";
@@ -287,7 +287,7 @@ public partial class CardDetail : Panel
         name.Size = new Vector2(iw - (ownedCount > 0 ? 60 : 0), 40);
         float ruleY = d.IsMonster ? y + 132 : y + 74;
         rule.Position = new Vector2(20, ruleY);
-        desc.Text = d.TcgDesc ?? d.Desc;
+        desc.Text = Lang.Desc(d);
         desc.Position = new Vector2(20, ruleY + 10);
         float descH = desc.GetLineCount() * desc.GetLineHeight();
         desc.Size = new Vector2(iw, descH);

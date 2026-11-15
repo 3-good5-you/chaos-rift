@@ -67,6 +67,23 @@ static class LabTests
             c(!offered, "not offered on an 800 ATK summon");
         });
 
+        T("Kunai with Chain", c =>
+        {
+            // user playtest 2026-11-14: the attacker went to Defense Position but its attack still went through
+            var s = new Sc(new[] { Neo }, new[] { "Kunai with Chain" }, classic: false);
+            s.EndTurn().Do(Act.SetSpell, "Kunai with Chain").EndTurn();
+            s.Do(Act.Summon, Neo).PassAll().Do(Act.ToBattle).PassAll().Do(Act.Attack, Neo);
+            Until(s, "Kunai with Chain").Opt("Change the attacker to Defense Position").PassAll();
+            var neo = s.D.P(0).Monsters.First(x => x?.Name == Neo)!;
+            c(neo.Defense, "the attacker is in Defense Position");
+            c(s.D.P(1).Lp == 8000, $"the attack stops: no damage (LP {s.D.P(1).Lp})");
+            // a monster allowed to attack from Defense keeps attacking (Total Defense Shogun, 2550 ATK)
+            var g = new Sc(new[] { "Total Defense Shogun" }, none, classic: false);
+            var shogun = Put(g, 0, "Total Defense Shogun"); shogun.Defense = true;
+            g.EndTurn().EndTurn().Do(Act.ToBattle).PassAll().Do(Act.Attack, "Total Defense Shogun").PassAll();
+            c(g.D.P(1).Lp == 8000 - shogun.Data.Atk, $"Total Defense Shogun's attack from Defense lands (LP {g.D.P(1).Lp})");
+        });
+
         T("Treeborn Frog", c =>
         {
             var frog = new Sc(new[] { "Treeborn Frog" }, none, classic: false);

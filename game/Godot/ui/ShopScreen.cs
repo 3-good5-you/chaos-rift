@@ -24,7 +24,7 @@ public partial class ShopScreen : RiftMenu
         Rift(0.62f, 0.56f);
         Back();
         Heading("SHOP", new Vector2(80, 60), 46);
-        float x = 260;
+        float x = Math.Max(260, 130 + Title.GetStringSize(Lang.Tr("SHOP"), HorizontalAlignment.Left, -1, Z(46)).X);   // longer translated headings push the tabs right
         foreach (var (key, label) in new[] { ("cards", "CARDS"), ("backs", "CARD BACKS"), ("mats", "PLAYMATS"), ("frames", "FRAMES") })
         {
             var k = key;
@@ -45,7 +45,7 @@ public partial class ShopScreen : RiftMenu
         foreach (var c in page.GetChildren()) c.QueueFree();
         detail = new Control { Size = new Vector2(W, H), MouseFilter = MouseFilterEnum.Ignore };
         page.AddChild(detail);
-        dp.Text = $"{P.Dp:N0} DP";
+        dp.Text = Lang.F("{0:N0} DP", P.Dp);
         switch (t)
         {
             case "backs": Grid(Cosmetic.Back); break;
@@ -63,7 +63,7 @@ public partial class ShopScreen : RiftMenu
         Session.Save();
         UiSound(true);
         Flash("BOUGHT");
-        dp.Text = $"{P.Dp:N0} DP";
+        dp.Text = Lang.F("{0:N0} DP", P.Dp);
     }
 
     // ---------------------------------------------------------------- cards
@@ -95,12 +95,12 @@ public partial class ShopScreen : RiftMenu
         ClearDetail();
         Card(detail, d, new Vector2(W * 0.81f, H * 0.4f), H * 0.48f, 0.04f, 1f, large: true);
         float x = W * 0.64f, w = W * 0.34f, y = H * 0.7f;
-        int ns = 24; while (ns > 16 && Title.GetStringSize(d.Name.ToUpperInvariant(), HorizontalAlignment.Left, -1, Z(ns)).X > w) ns -= 2;
+        int ns = 24; while (ns > 16 && Title.GetStringSize(Lang.Tr(d.Name.ToUpperInvariant()), HorizontalAlignment.Left, -1, Z(ns)).X > w) ns -= 2;
         Put(detail, d.Name.ToUpperInvariant(), Title, ns, Silver, new Vector2(x, y), new Vector2(w, 34), HorizontalAlignment.Center);
         // the card's text with the keywords marked, under the buy row
         CardText(detail, d, new Vector2(x, y + 176), new Vector2(w, H - y - 200), 17, light: OnLight(new Vector2(x + w / 2, y + 176)));
         int own = P.Count(d.Idx), price = Shop.Price(d);
-        Put(detail, $"{price:N0} DP EACH   ·   OWNED ×{own}", Thin, 20, GoldLight, new Vector2(x, y + 44), new Vector2(w, 28), HorizontalAlignment.Center);
+        Put(detail, Lang.F("{0:N0} DP EACH   ·   OWNED ×{1}", price, own), Thin, 20, GoldLight, new Vector2(x, y + 44), new Vector2(w, 28), HorizontalAlignment.Center);
         if (own >= 3) { Put(detail, "YOU HAVE ALL THREE", Thin, 20, Mist, new Vector2(x, y + 110), new Vector2(w, 28), HorizontalAlignment.Center); return; }
         void Buy(int n)
         {
@@ -111,7 +111,7 @@ public partial class ShopScreen : RiftMenu
         }
         if (price > P.Dp) { Put(detail, "NOT ENOUGH DP", Thin, 20, Mist, new Vector2(x, y + 110), new Vector2(w, 28), HorizontalAlignment.Center); return; }
         Button(detail, "BUY ×1", new Vector2(x + w * 0.3f, y + 130), () => Buy(1), 24);
-        if (3 - own > 1 && price * (3 - own) <= P.Dp) Button(detail, $"BUY ×{3 - own}", new Vector2(x + w * 0.72f, y + 130), () => Buy(3 - own), 24);
+        if (3 - own > 1 && price * (3 - own) <= P.Dp) Button(detail, Lang.F("BUY ×{0}", 3 - own), new Vector2(x + w * 0.72f, y + 130), () => Buy(3 - own), 24);
     }
 
     // ---------------------------------------------------------------- card backs / frames: grid + big one
@@ -131,7 +131,7 @@ public partial class ShopScreen : RiftMenu
             else { Shadow(host, at, new Vector2(tw, th), 0.22f, new Color(0.12f, 0.12f, 0.15f), new Vector2(6, 10)); pic = Pic(host, UI.Cosmetics.Back(it.Key, 256), at, new Vector2(tw, th)); }
             if (have) pic.Modulate = new Color(1, 1, 1, 0.45f);
             Put(host, have ? "OWNED" : $"{it.Price:N0}", Thin, 15, Graphite, at + new Vector2(-20, th + 8), new Vector2(tw + 40, 22), HorizontalAlignment.Center);
-            var hit = new Control { Position = at, Size = new Vector2(tw, th), TooltipText = it.Name };
+            var hit = new Control { Position = at, Size = new Vector2(tw, th), TooltipText = Lang.Cosmetic(it.Name) };
             host.AddChild(hit);
             pic.PivotOffset = new Vector2(tw, th) / 2;
             Click(hit, () => ItemDetail(it), h => pic.Scale = h ? new Vector2(1.04f, 1.04f) : Vector2.One);
@@ -159,9 +159,9 @@ public partial class ShopScreen : RiftMenu
             else pic.Rotation = 0.04f;
         }
         float y = c.Y + h / 2 + 36;
-        Put(detail, it.Name.ToUpperInvariant(), Title, 34, Silver, new Vector2(c.X - 400, y), new Vector2(800, 46), HorizontalAlignment.Center);
+        Put(detail, Lang.Cosmetic(it.Name).ToUpperInvariant(), Title, 34, Silver, new Vector2(c.X - 400, y), new Vector2(800, 46), HorizontalAlignment.Center);
         if (have) { Put(detail, mat || kind == Cosmetic.Back ? "OWNED  ·  EQUIP IT IN THE CARD LIST" : "OWNED  ·  EQUIP IT IN OPTIONS", Thin, 18, Mist, new Vector2(c.X - 400, y + 56), new Vector2(800, 28), HorizontalAlignment.Center); return; }
-        Put(detail, $"{it.Price:N0} DP", Thin, 26, GoldLight, new Vector2(c.X - 200, y + 54), new Vector2(400, 34), HorizontalAlignment.Center);
+        Put(detail, Lang.F("{0:N0} DP", it.Price), Thin, 26, GoldLight, new Vector2(c.X - 200, y + 54), new Vector2(400, 34), HorizontalAlignment.Center);
         if (it.Price > P.Dp) { Put(detail, "NOT ENOUGH DP", Thin, 18, Mist, new Vector2(c.X - 200, y + 100), new Vector2(400, 28), HorizontalAlignment.Center); return; }
         Button(detail, "BUY", new Vector2(c.X, y + 130), () => { if (Shop.Buy(P, it)) { Bought(); Show(tab); ItemDetail(it); } });
     }
@@ -177,8 +177,8 @@ public partial class ShopScreen : RiftMenu
             var it = mats[i];
             bool have = Shop.Owns(P, it);
             float y = at.Y, priceX = W * 0.36f;
-            var l = Put(host, it.Name.ToUpperInvariant(), Thin, 24, have ? Graphite * new Color(1, 1, 1, 0.5f) : Ink, new Vector2(20, y));
-            float lx = 20 + Thin.GetStringSize(l.Text, HorizontalAlignment.Left, -1, 24).X + 16;
+            var l = Put(host, Lang.Cosmetic(it.Name).ToUpperInvariant(), Thin, 24, have ? Graphite * new Color(1, 1, 1, 0.5f) : Ink, new Vector2(20, y));
+            float lx = 20 + Thin.GetStringSize(Lang.Tr(l.Text), HorizontalAlignment.Left, -1, 24).X + 16;
             for (float dx = lx; dx < priceX - 10; dx += 14) Hair(host, new Vector2(dx, y + 22), 3, Ink * new Color(1, 1, 1, 0.25f), 2);
             Put(host, have ? "OWNED" : $"{it.Price:N0}", Thin, 22, Graphite, new Vector2(priceX, y + 2), new Vector2(130, 30), HorizontalAlignment.Right);
             var hit = new Control { Position = new Vector2(0, y - 10), Size = new Vector2(priceX + 140, 50) };

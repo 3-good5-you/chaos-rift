@@ -158,7 +158,7 @@ public partial class LanLobby : RiftMenu
         _ = Beacon.Announce(Settings.PlayerName, token);
         try { Lan.Link = await LanLink.Host(token); }
         catch (OperationCanceledException) { return; }
-        catch (SocketException e) { Note($"Can't host: {e.Message}"); ShowFind(); return; }
+        catch (SocketException e) { Note(Lang.F("Can't host: {0}", e.Message)); ShowFind(); return; }
         cts.Cancel();   // stop announcing
         Connected(fresh: true);
     }
@@ -173,14 +173,14 @@ public partial class LanLobby : RiftMenu
         mode = Mode.Joining;
         cts?.Cancel();
         cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
-        status.Text = $"CONNECTING TO {to}…";
+        status.Text = Lang.F("CONNECTING TO {0}…", to);
         SetGo("CANCEL");
         try { Lan.Link = await LanLink.Join(to, cts.Token, port); }
         catch (Exception e) when (e is OperationCanceledException or SocketException)
         {
             if (mode != Mode.Joining) return;   // cancelled by hand
             ShowFind();
-            Note($"No duel found at {to}.");
+            Note(Lang.F("No duel found at {0}.", to));
             return;
         }
         Connected(fresh: true);
@@ -230,7 +230,7 @@ public partial class LanLobby : RiftMenu
         them.Position = new Vector2(Rx - size / 2, 230);
         right.AddChild(them);
         var list = DeckRules.Formats.FirstOrDefault(f => f.Key == Lan.List).Name ?? "?";
-        Dark($"{Lan.Link!.Peer}   ·   BAN LIST {list}{(Lan.Link.IsHost ? "" : " (HOST'S)")}", Thin, 15, Mist, 230 + size + 40);
+        Dark($"{Lan.Link!.Peer}   ·   {Lang.Tr("BAN LIST")} {list}{(Lan.Link.IsHost ? "" : Lang.Tr(" (HOST'S)"))}", Thin, 15, Mist, 230 + size + 40);
         float vy = H * 0.42f;
         T(right, "VS", Title, 64, new Vector2(CrackX(vy) - 100, vy - 44), new Vector2(200, 88), HorizontalAlignment.Center);
         TheirStatus();

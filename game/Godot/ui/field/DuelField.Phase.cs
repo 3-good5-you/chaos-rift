@@ -47,7 +47,7 @@ public partial class DuelField
         int now = (int)p;
         bool newTurn = turn != lastTurn;
         lastTurn = turn;
-        phaseTurn.Text = "TURN " + turn;
+        phaseTurn.Text = Lang.F("TURN {0}", turn);
         phaseTurn.AddThemeColorOverride("font_color", c);
         phaseName.Text = PhaseNames[now];
         phaseCircle.AddThemeStyleboxOverride("panel", Pill(new Color(0.03f, 0.03f, 0.045f, 0.92f), c, 75, 0, new Color(c, 0.4f), 18, 3));

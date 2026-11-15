@@ -12,7 +12,7 @@ public static class SaveData
     /// Player options (the game layer maps them to its settings).
     public sealed class Options
     {
-        public string Name = "Player", BanList = "joey";
+        public string Name = "Player", BanList = "joey", Lang = "en";
         public int Picture, Speed;
         public float Music, Sound;
         public bool Fullscreen;

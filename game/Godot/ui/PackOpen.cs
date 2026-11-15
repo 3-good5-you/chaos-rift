@@ -47,8 +47,8 @@ public partial class PackOpen : RiftMenu
             }
         var monsters = t.Packs.SelectMany(x => x).Count(i => Db.Get(i).IsMonster);
         Put(this, "54 CARDS", Title, 30, Silver, new Vector2(W - 400, 220), new Vector2(340, 40), HorizontalAlignment.Right);
-        Put(this, $"{monsters} MONSTERS", Thin, 18, Mist, new Vector2(W - 400, 270), new Vector2(340, 24), HorizontalAlignment.Right);
-        Put(this, $"{54 - monsters} SPELLS & TRAPS", Thin, 18, Mist, new Vector2(W - 400, 298), new Vector2(340, 24), HorizontalAlignment.Right);
+        Put(this, Lang.F("{0} MONSTERS", monsters), Thin, 18, Mist, new Vector2(W - 400, 270), new Vector2(340, 24), HorizontalAlignment.Right);
+        Put(this, Lang.F("{0} SPELLS & TRAPS", 54 - monsters), Thin, 18, Mist, new Vector2(W - 400, 298), new Vector2(340, 24), HorizontalAlignment.Right);
         Button(this, "BUILD DECK", new Vector2(W - 230, H - 100), () => Transition.Go(this, "res://ui/DeckBuilder.tscn"), 28);
     }
 }

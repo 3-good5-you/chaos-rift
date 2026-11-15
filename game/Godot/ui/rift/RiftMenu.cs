@@ -176,7 +176,7 @@ void fragment() {
     protected void Heading(string s, Vector2 at, int size = 48)
     {
         T(this, s, Title, size, at);
-        float w = Title.GetStringSize(s, HorizontalAlignment.Left, -1, Z(size)).X;
+        float w = Title.GetStringSize(Lang.Tr(s), HorizontalAlignment.Left, -1, Z(size)).X;
         Hair(this, new Vector2(at.X, at.Y + size * 1.25f), w * 0.6f, GoldC with { A = 0.8f });
         Pip(this, new Vector2(at.X + w * 0.6f + 10, at.Y + size * 1.25f), 9);
     }
@@ -219,7 +219,7 @@ void fragment() {
     /// darker inks for the light side of the rift.
     protected static RichTextLabel CardText(Control host, CardData d, Vector2 pos, Vector2 box, int size, bool light, int min = 12)
     {
-        string text = d.TcgDesc ?? d.Desc;
+        string text = Lang.Desc(d);
         while (size > min && BodyRegular.GetMultilineStringSize(text, HorizontalAlignment.Left, box.X, size).Y * 1.12f > box.Y) size--;
         var rt = new RichTextLabel { BbcodeEnabled = true, Text = LabText.Card(text, light), Position = pos, Size = box, ScrollActive = false, MouseFilter = MouseFilterEnum.Ignore };
         rt.AddThemeFontOverride("normal_font", BodyRegular); rt.AddThemeFontOverride("bold_font", BodyBold);
@@ -239,10 +239,10 @@ void fragment() {
         float nh = Title.GetMultilineStringSize(d.Name.ToUpperInvariant(), HorizontalAlignment.Left, pw, 22).Y;
         Kit.Put(host, d.Name.ToUpperInvariant(), Title, 22, Ink, new Vector2(0, y), new Vector2(pw, nh), wrap: true);
         y += nh + 4;
-        string line = d.IsMonster ? $"{d.Attribute} · {d.Race} / {d.Frame} · ★{d.Level}" : $"{d.Kind} · {d.Frame}";
+        string line = d.IsMonster ? $"{Lang.Tr(d.Attribute)} · {Lang.Tr(d.Race)} / {Lang.Tr(d.Frame)} · ★{d.Level}" : $"{Lang.Tr(d.Kind.ToString())} · {Lang.Tr(d.Frame)}";
         Put(host, line, BodyBold, 17, Graphite, new Vector2(0, y), new Vector2(pw, 24)).ClipText = true;
         y += 26;
-        if (d.IsMonster) { Put(host, $"ATK {d.AtkText}    DEF {d.DefText}", BodyBold, 20, Ink, new Vector2(0, y)); y += 32; }
+        if (d.IsMonster) { Put(host, $"{Lang.Tr("ATK")} {d.AtkText}    {Lang.Tr("DEF")} {d.DefText}", BodyBold, 20, Ink, new Vector2(0, y)); y += 32; }
         Hair(host, new Vector2(0, y), pw, GoldDeep with { A = 0.6f });
         y += 10;
         CardText(host, d, new Vector2(0, y), new Vector2(pw, H - 44 - host.Position.Y - y), 19, light: true);
@@ -272,7 +272,7 @@ void fragment() {
     protected (float W, Action<bool> Set) Word(Control host, string s, Vector2 at, int size, bool on, Action click, Font? f = null)
     {
         f ??= Title;
-        float w = f.GetStringSize(s, HorizontalAlignment.Left, -1, Z(size)).X;
+        float w = f.GetStringSize(Lang.Tr(s), HorizontalAlignment.Left, -1, Z(size)).X;
         var l = T(host, s, f, size, at, default, HorizontalAlignment.Left, 0.55f);
         var pip = Pip(host, new Vector2(at.X + w / 2, at.Y + size * 1.55f), 7);
         void Set(bool v) { l.Mat().P("lit", v ? 1f : 0f); pip.Visible = v; }
@@ -285,7 +285,7 @@ void fragment() {
     /// two diamonds with lines above and below).
     protected Control Button(Control host, string s, Vector2 centre, Action click, int size = 26)
     {
-        float w = Title.GetStringSize(s, HorizontalAlignment.Left, -1, Z(size)).X;
+        float w = Title.GetStringSize(Lang.Tr(s), HorizontalAlignment.Left, -1, Z(size)).X;
         var root = new Control { Position = centre - new Vector2(w / 2 + 50, size), Size = new Vector2(w + 100, size * 2) };
         host.AddChild(root);
         var l = T(root, s, Title, size, new Vector2(10, size * 0.28f), new Vector2(w + 80, size * 1.45f), HorizontalAlignment.Center);
@@ -324,7 +324,7 @@ void fragment() {
     /// Back link, top left: "‹  NAME".
     protected void Back(string to = "MENU")
     {
-        var l = T(this, "‹  " + to, Title, 18, new Vector2(62, 30), default, HorizontalAlignment.Left, 0.7f);
+        var l = T(this, "‹  " + Lang.Tr(to), Title, 18, new Vector2(62, 30), default, HorizontalAlignment.Left, 0.7f);
         Click(l, OnBack, h => l.Mat().P("lit", h ? 1f : 0f));
         // on top of whatever the screen adds after it: a full-size layer over it (the Deck Builder's drop area)
         // swallowed its clicks (playtest 2026-11-12)
@@ -374,13 +374,15 @@ void fragment() {
         return (page, pages) =>
         {
             root.Visible = pages > 1;
-            text.Text = $"PAGE {page + 1} / {pages}";
+            text.Text = Lang.F("PAGE {0} / {1}", page + 1, pages);
             prev.Modulate = new Color(1, 1, 1, page > 0 ? 1 : 0.25f); next.Modulate = new Color(1, 1, 1, page < pages - 1 ? 1 : 0.25f);
         };
     }
 
     /// A one-line message with up to two choices, centred at the bottom of the screen (replaces the old toasts).
     protected Control? toast;
+    protected Label? toastText;   // the message line of the current toast
+    protected bool toastKeep;     // a toast with no choices that stays (a download in progress)
     protected void Ask(string text, params (string Label, Action Do)[] choices)
     {
         CloseToast();
@@ -388,13 +390,14 @@ void fragment() {
         AddChild(toast);
         toast.AddChild(new ColorRect { Size = toast.Size, Color = new Color(0.02f, 0.02f, 0.03f, 0.92f), MouseFilter = MouseFilterEnum.Stop });
         Hair(toast, Vector2.Zero, W, GoldC with { A = 0.6f });
-        Put(toast, text, Body, 24, Silver, new Vector2(80, 30), new Vector2(W - 160, 36), HorizontalAlignment.Center);
+        toastText = Put(toast, text, Body, 24, Silver, new Vector2(80, 30), new Vector2(W - 160, 36), HorizontalAlignment.Center);
         float x = W / 2 - (choices.Length - 1) * 160;
         foreach (var (label, act) in choices) { Button(toast, label, new Vector2(x, 100), act, 22); x += 320; }
         Darken(toast);
-        if (choices.Length == 0) GetTree().CreateTimer(1.6).Timeout += CloseToast;
+        var mine = toast;
+        if (choices.Length == 0) GetTree().CreateTimer(1.6).Timeout += () => { if (!toastKeep && toast == mine) CloseToast(); };
     }
-    protected void CloseToast() { toast?.QueueFree(); toast = null; }
+    protected void CloseToast() { toast?.QueueFree(); toast = null; toastKeep = false; }
 
     /// Two-tone text inside a dark bar (toasts, name prompts) keeps the dark-side colours wherever the rift runs.
     static void Darken(Node n)

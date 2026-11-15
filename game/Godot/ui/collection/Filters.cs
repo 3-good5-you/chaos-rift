@@ -16,7 +16,7 @@ public sealed class Filters
 
     public bool Match(CardData d)
     {
-        if (Query.Length > 0 && !d.Name.Contains(Query, StringComparison.OrdinalIgnoreCase) && !d.Desc.Contains(Query, StringComparison.OrdinalIgnoreCase)) return false;
+        if (Query.Length > 0 && !d.Name.Contains(Query, StringComparison.OrdinalIgnoreCase) && !Lang.Tr(d.Name).Contains(Query, StringComparison.OrdinalIgnoreCase) && !d.Desc.Contains(Query, StringComparison.OrdinalIgnoreCase) && !Lang.Desc(d).Contains(Query, StringComparison.OrdinalIgnoreCase)) return false;
         if (Kind != null && d.Kind != Kind) return false;
         if (Attribute != null && d.Attribute != Attribute) return false;
         if (Race != null && d.Race != Race) return false;
@@ -133,7 +133,7 @@ public sealed class Filters
     {
         for (int i = 0; i < kinds.Count; i++) Chips.SetOn(kinds[i], i == 0 ? Kind == null : Kind == (Kind)(i - 1));
         foreach (var o in orbs) o.QueueRedraw();
-        lvChip.GetNode<Label>("Text").Text = Level > 0 ? $"LV {Level}" : "LEVEL";
+        lvChip.GetNode<Label>("Text").Text = Level > 0 ? $"{Lang.Tr("LV")} {Level}" : "LEVEL";
         Chips.SetOn(lvChip, Level > 0);
         typeChip.GetNode<Label>("Text").Text = Race?.ToUpperInvariant() ?? "TYPE";
         Chips.SetOn(typeChip, Race != null);

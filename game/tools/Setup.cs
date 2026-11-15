@@ -4,6 +4,8 @@
 // A window (2026-11-09; it was a console prompt): the logo, the folder (Browse), shortcut and launch options,
 // a progress bar, then PLAY. `Setup.exe --shot=<png> [--page=done]` draws the window to a file and quits (screenshots);
 // `--silent=<folder>` installs there with no window, shortcuts or launch.
+// `--update=<folder>` (2026-11-14, started by the game's UPDATE): waits for the game to close, installs over that
+// folder with the progress window (shortcuts and saves untouched), then starts the game again.
 // Clean install (2026-11-09): the uninstaller is this same window program (uninstall.exe, the installer without the
 // game inside, run with --uninstall), listed in Settings > Apps for the current user. Saves are never touched
 // (%APPDATA%\Godot).
@@ -24,6 +26,7 @@ static class Setup
     const string App = "APPNAME", Folder = "APPNAME", Exe = "APPNAME.exe";
     static string Version { get { return "VERSION"; } }
     static bool quiet;
+    public static bool UpdateMode;   // --update: the Apps entry is only refreshed for the install it already lists
 
     [STAThread]
     static int Main(string[] args)
@@ -38,6 +41,8 @@ static class Setup
                 try { quiet = true; Install(a.Substring(9), false, false, delegate { }); return 0; }
                 catch (Exception e) { Console.Error.WriteLine(e.Message); return 2; }
             }
+        foreach (var a in args)
+            if (a.StartsWith("--update=")) form.ForUpdate(a.Substring(9));
         foreach (var a in args)
         {
             if (a.StartsWith("--page=done")) form.ShowDone();
@@ -100,6 +105,10 @@ static class Setup
             // Settings > Apps (per user, no admin); not for --silent test installs
             if (!quiet) try
             {
+                if (UpdateMode)
+                    using (var old = Registry.CurrentUser.OpenSubKey(UninstallKey))
+                        if (old == null || !string.Equals(Path.GetFullPath((string)old.GetValue("InstallLocation", "")).TrimEnd(Path.DirectorySeparatorChar), Path.GetFullPath(dest).TrimEnd(Path.DirectorySeparatorChar),StringComparison.OrdinalIgnoreCase))
+                            throw new OperationCanceledException();   // another copy (a test folder): leave the listed install alone
                 using (var k = Registry.CurrentUser.CreateSubKey(UninstallKey))
                 {
                     k.SetValue("DisplayName", App);
@@ -209,6 +218,33 @@ class SetupForm : Form
 
     void Add(Control c) { Controls.Add(c); }
 
+    bool updating;
+
+    /// The game's UPDATE: no choices to make; the install starts at once (once the game has closed) and the game
+    /// starts again when it is done.
+    public void ForUpdate(string dir)
+    {
+        updating = true; Setup.UpdateMode = true;
+        folder.Text = dir;
+        desk.Checked = menu.Checked = false; launch.Checked = true;
+        foreach (Control c in new Control[] { folder, browse, desk, menu, launch }) c.Visible = false;
+        Controls.Add(new Label { Text = "Updating to version " + Setup.Ver + ". Your saves and decks are kept.", ForeColor = Color.White, Font = new Font("Segoe UI", 11f),
+            Location = new Point(400, 170), AutoSize = true, BackColor = Color.Transparent });
+        Shown += delegate { Go(); };
+    }
+
+    /// The game may take a moment to close after starting the update: wait until its exe is free (up to a minute).
+    static void WaitForGame(string dir)
+    {
+        string exe = Path.Combine(dir, Setup.Exe_);
+        for (int i = 0; i < 120 && File.Exists(exe); i++)
+        {
+            try { using (File.Open(exe, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) return; }
+            catch (IOException) { Thread.Sleep(500); }
+            catch (UnauthorizedAccessException) { Thread.Sleep(500); }
+        }
+    }
+
     void Check(CheckBox c, string text, int y)
     {
         c.Text = text; c.Checked = true; c.ForeColor = Color.White; c.Font = new Font("Segoe UI", 10f); c.Location = new Point(400, y); c.AutoSize = true; c.BackColor = Color.Transparent;
@@ -241,11 +277,12 @@ class SetupForm : Form
         }
         install.Enabled = cancel.Enabled = browse.Enabled = folder.Enabled = desk.Enabled = menu.Enabled = false;
         bar.Visible = true;
-        bool d1 = desk.Checked, m1 = menu.Checked;
+        bool d1 = desk.Checked, m1 = menu.Checked, wait = updating;
         var t = new Thread(delegate ()
         {
             try
             {
+                if (wait) { BeginInvoke((Action)delegate { status.Text = "Waiting for the game to close..."; }); WaitForGame(dest); }
                 Setup.Install(dest, d1, m1, delegate (int p, string msg) { BeginInvoke((Action)delegate { bar.Value = p; status.Text = msg; }); });
                 BeginInvoke((Action)delegate { Finished(dest); });
             }
@@ -320,7 +357,7 @@ class SetupForm : Form
         using (var f = new Font("Segoe UI", 9f)) using (var b = new SolidBrush(Graphite))
             g.DrawString("VERSION " + Setup.Ver, f, b, 32, ClientSize.Height - 40);
         var title = FontFamilyExists("Perpetua Titling MT") ? new Font("Perpetua Titling MT", 24f, FontStyle.Bold) : new Font("Segoe UI Semibold", 22f);
-        using (title) using (var b = new SolidBrush(Color.White)) g.DrawString(done ? "READY TO DUEL" : "SETUP", title, b, 398, 50);
+        using (title) using (var b = new SolidBrush(Color.White)) g.DrawString(done ? "READY TO DUEL" : updating ? "UPDATE" : "SETUP", title, b, 398, 50);
         using (var p = new Pen(Gold, 1.5f)) g.DrawLine(p, 400, 112, 520, 112);
         base.OnPaint(e);
     }

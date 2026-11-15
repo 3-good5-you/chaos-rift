@@ -14,7 +14,7 @@ public abstract partial class RiftMenu
         public string? Attribute, Frame, Race;
         public int Extra => (Attribute != null ? 1 : 0) + (Frame != null ? 1 : 0) + (Race != null ? 1 : 0);
         public bool Match(CardData d) =>
-            (Text.Length == 0 || d.Name.Contains(Text, StringComparison.OrdinalIgnoreCase) || d.Desc.Contains(Text, StringComparison.OrdinalIgnoreCase))
+            (Text.Length == 0 || d.Name.Contains(Text, StringComparison.OrdinalIgnoreCase) || Lang.Tr(d.Name).Contains(Text, StringComparison.OrdinalIgnoreCase) || d.Desc.Contains(Text, StringComparison.OrdinalIgnoreCase) || Lang.Desc(d).Contains(Text, StringComparison.OrdinalIgnoreCase))
             && (Kind == null || d.Kind == Kind) && (Attribute == null || d.Attribute == Attribute) && (Frame == null || d.Frame == Frame) && (Race == null || d.Race == Race);
         public static string[] Frames(Kind? k) => k switch
         {
@@ -114,20 +114,25 @@ public abstract partial class RiftMenu
             var search = new LineEdit { Text = Q.Text, Position = new Vector2(28, -6), Size = new Vector2(Compact ? 130 : 170, 40), Flat = true, PlaceholderText = "SEARCH", ClearButtonEnabled = true };
             search.AddThemeFontOverride("font", Body); search.AddThemeFontSizeOverride("font_size", 20);
             search.AddThemeColorOverride("font_color", ink); search.AddThemeColorOverride("font_placeholder_color", dim); search.AddThemeColorOverride("caret_color", ink);
-            search.TextChanged += t => { Q.Text = t.Trim(); list = Sorted(source().Where(Q.Match)).ToList(); Page = 0; BuildGrid(); count.Text = $"{list.Count:N0} CARDS"; };
+            search.TextChanged += t => { Q.Text = t.Trim(); list = Sorted(source().Where(Q.Match)).ToList(); Page = 0; BuildGrid(); count.Text = Lang.F("{0:N0} CARDS", list.Count); };
             bar.AddChild(search);
             Hair(bar, new Vector2(0, 32), Compact ? 160 : 200, ink * new Color(1, 1, 1, 0.3f));
             float x = Compact ? 188 : 236;
             var kinds = new (string, Kind?)[] { ("ALL", null), ("MONSTER", PoC.Engine.Kind.Monster), ("SPELL", PoC.Engine.Kind.Spell), ("TRAP", PoC.Engine.Kind.Trap) };
+            // longer translated words: the kind row shrinks until it is no wider than the English one, so FILTERS
+            // stays on this side of the rift
+            float Row(Func<string, string> tr, int size) => kinds.Sum(kv => Title.GetStringSize(tr(kv.Item1), HorizontalAlignment.Left, -1, Z(size)).X + (Compact ? 14 : 24));
+            int ks = 17;
+            while (ks > 12 && Row(Lang.Tr, ks) > Row(s => s, 17) + 8) ks--;
             foreach (var (label, k) in kinds)
             {
                 var kk = k;
-                x += m.Word(bar, label, new Vector2(x, 2), 17, Q.Kind == k, () => { Q.Kind = kk; if (kk != PoC.Engine.Kind.Monster) { Q.Attribute = null; Q.Race = null; } Q.Frame = null; Refresh(); }).W + (Compact ? 14 : 24);
+                x += m.Word(bar, label, new Vector2(x, 2), ks, Q.Kind == k, () => { Q.Kind = kk; if (kk != PoC.Engine.Kind.Monster) { Q.Attribute = null; Q.Race = null; } Q.Frame = null; Refresh(); }).W + (Compact ? 14 : 24);
             }
             var ft = Put(bar, (open ? "FILTERS ▴" : "FILTERS ▾") + (Q.Extra > 0 ? $"  {Q.Extra}" : ""), Title, 16, gold, new Vector2(x + 6, 3));
             Click(ft, () => { open = !open; BuildBar(); BuildGrid(); });
-            x += 6 + Title.GetStringSize(ft.Text, HorizontalAlignment.Left, -1, Z(16)).X + 26;
-            var sort = Put(bar, (Compact ? "SORT: " : "") + sorts[Sort] + " ▾", Title, 16, Compact ? gold : dim, new Vector2(x, 3));
+            x += 6 + Title.GetStringSize(Lang.Tr(ft.Text), HorizontalAlignment.Left, -1, Z(16)).X + 26;
+            var sort = Put(bar, (Compact ? Lang.Tr("SORT:") + " " : "") + Lang.Tr(sorts[Sort]) + " ▾", Title, 16, Compact ? gold : dim, new Vector2(x, 3));
             sort.TooltipText = "Sort";
             Click(sort, () => { Sort = (Sort + 1) % sorts.Length; Refresh(); });
             float y = 48;
@@ -156,21 +161,23 @@ public abstract partial class RiftMenu
                 y += 46;
                 if (Q.Kind is null or PoC.Engine.Kind.Monster)
                 {
-                    var tl = Put(bar, "TYPE  " + (Q.Race?.ToUpperInvariant() ?? "ANY") + "  ▾", Title, 15, Q.Race != null ? gold : dim, new Vector2(0, y));
+                    var tl = Put(bar, Lang.Tr("TYPE") + "  " + Lang.Tr(Q.Race ?? "ANY").ToUpperInvariant() + "  ▾", Title, 15, Q.Race != null ? gold : dim, new Vector2(0, y));
                     Click(tl, () => TypePopup(new Vector2(0, y + 30)));
                     y += 40;
                 }
                 Hair(bar, new Vector2(0, y), area.Size.X, GoldC with { A = 0.45f });
                 y += 10;
             }
-            count = Put(bar, $"{list.Count:N0} CARDS", Thin, 15, dim, new Vector2(0, y + 4));
+            count = Put(bar, Lang.F("{0:N0} CARDS", list.Count), Thin, 15, dim, new Vector2(0, y + 4));
             if (Q.Extra > 0)
             {
                 // CLEAR sits on the count line, never among the filter words
-                var cl = Put(bar, "CLEAR FILTERS", Title, 14, gold, new Vector2(Thin.GetStringSize(count.Text, HorizontalAlignment.Left, -1, Z(15)).X + 30, y + 4));
+                var cl = Put(bar, "CLEAR FILTERS", Title, 14, gold, new Vector2(Thin.GetStringSize(Lang.Tr(count.Text), HorizontalAlignment.Left, -1, Z(15)).X + 30, y + 4));
                 Click(cl, () => { Q.Attribute = Q.Frame = Q.Race = null; Refresh(); });
             }
-            if (Compact) sort.Position = new Vector2(area.Size.X - 470, y + 3);   // narrow bar: the sort sits on the count line
+            float sortEnd = sort.Position.X + Title.GetStringSize(sort.Text, HorizontalAlignment.Left, -1, Z(16)).X;
+            if (Compact) sort.Position = new Vector2(area.Size.X - 290 - (sortEnd - sort.Position.X), y + 3);   // narrow bar: the sort sits on the count line
+            else if (sortEnd > area.Size.X) sort.Position = new Vector2(area.Size.X - 290 - (sortEnd - sort.Position.X), y + 3);   // longer translated words: same, left of the pager
             setPage = Pager(bar, new Vector2(area.Size.X - 260, y), Turn, dark);
             grid.Position = new Vector2(area.Position.X, area.Position.Y + y + 40);
             grid.Size = new Vector2(area.Size.X, area.End.Y - grid.Position.Y);

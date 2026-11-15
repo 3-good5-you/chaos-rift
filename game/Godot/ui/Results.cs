@@ -182,25 +182,25 @@ public partial class Results : RiftMenu
         if (Won) head.Mat().P("lit", 1f);
         Appear(head, 0.1, new Vector2(-60, 0));
         string who = rival.Name.ToUpperInvariant();
-        string sub = outcome switch { 1 => $"{who} DEFEATED", 0 => $"{who} WINS", _ => "NO ONE WINS" };
+        string sub = outcome switch { 1 => Lang.F("{0} DEFEATED", who), 0 => Lang.F("{0} WINS", who), _ => "NO ONE WINS" };
         if (Session.Mode != GameMode.Regular && Session.Tour == null) sub += "  ·  " + Modes.Of(Session.Mode).Name;
-        if (Session.Tour is { } tour) sub += "  ·  " + (tour.Place is int pl ? Tournament.PlaceNames[pl] : Tournament.RoundNames[Math.Min(2, tour.Round - 1)]);
+        if (Session.Tour is { } tour) sub += "  ·  " + Lang.Tr(tour.Place is int pl ? Tournament.PlaceNames[pl] : Tournament.RoundNames[Math.Min(2, tour.Round - 1)]);
         Appear(T(this, sub, Thin, 26, new Vector2(96, 210), new Vector2(1000, 34), HorizontalAlignment.Left, 0.8f), 0.4);
         Hair(this, new Vector2(98, 256), 200, GoldC); Pip(this, new Vector2(310, 257), 10);
         // the numbers
         var stats = new List<string>();
-        if (Session.LastDp > 0) stats.Add($"+{Session.LastDp} DP");
-        if (match) stats.Add($"MATCH  {scoreYou} – {scoreThem}");
-        if (Session.Run is { } run && !run.Over) stats.Add($"{run.Lp} LP CARRIED");
-        if (Session.LastStarter is { } st) stats.Add($"{st.Name.ToUpperInvariant()} UNLOCKED");
-        if (Session.LastMat is { } lm) stats.Add($"{lm.Name.ToUpperInvariant()} PLAYMAT");
+        if (Session.LastDp > 0) stats.Add(Lang.F("+{0} DP", Session.LastDp));
+        if (match) stats.Add(Lang.F("MATCH  {0} – {1}", scoreYou, scoreThem));
+        if (Session.Run is { } run && !run.Over) stats.Add(Lang.F("{0} LP CARRIED", run.Lp));
+        if (Session.LastStarter is { } st) stats.Add(Lang.F("{0} UNLOCKED", st.Name.ToUpperInvariant()));
+        if (Session.LastMat is { } lm) stats.Add(Lang.F("{0} PLAYMAT", Lang.Cosmetic(lm.Name).ToUpperInvariant()));
         for (int i = 0; i < stats.Count; i++) Appear(T(this, stats[i], Title, 30, new Vector2(98 + i * 330, 290), new Vector2(320, 40)), 0.6 + i * 0.12);
         // the cards (a match not yet over: dim backs for the cards still to win)
         int n = Math.Max(cards.Count, MatchOn ? prize : 0);
         // fit the row into the light side
         float gap = 34, ch = Math.Min(380, ((W * 0.56f + gap) / Math.Max(1, n) - gap) / 0.686f);
         if (n > 0) Deal(this, n, new Vector2(W * 0.31f, H * 0.6f), ch, gap, 0.8);
-        else Appear(T(this, MatchOn ? $"WIN THE MATCH TO EARN {prize} CARDS" : "NO CARDS THIS TIME", Thin, 28, new Vector2(98, H * 0.55f), new Vector2(1100, 36), HorizontalAlignment.Left, 0.7f), 0.8);
+        else Appear(T(this, MatchOn ? Lang.F("WIN THE MATCH TO EARN {0} CARDS", prize) : "NO CARDS THIS TIME", Thin, 28, new Vector2(98, H * 0.55f), new Vector2(1100, 36), HorizontalAlignment.Left, 0.7f), 0.8);
         // the rival on the dark side: sad when you win, happy when you lose
         string mood = outcome switch { 1 => "_sad", 0 => "_happy", _ => "" };
         Standing(rival, mood, H * 0.9f, new Vector2(W * 0.82f, H + 10), 0.2);
@@ -219,7 +219,7 @@ public partial class Results : RiftMenu
         var head = T(this, "CHAMPION", Title, 90, new Vector2(0, 40), new Vector2(W, 110), HorizontalAlignment.Center);
         head.Mat().P("lit", 1f);
         Appear(head, 1.6);
-        Appear(T(this, $"+{Session.LastDp:N0} DP  ·  {cards.Count} CARDS", Thin, 24, new Vector2(0, 150), new Vector2(W, 32), HorizontalAlignment.Center, 0.8f), 1.8);
+        Appear(T(this, Lang.F("+{0:N0} DP  ·  {1} CARDS", Session.LastDp, cards.Count), Thin, 24, new Vector2(0, 150), new Vector2(W, 32), HorizontalAlignment.Center, 0.8f), 1.8);
         (RivalPanels.Rival? who, string place, float x, float h, double at)[] steps =
             { (second, "2", W * 0.27f, H * 0.2f, 0.3), (null, "1", W * 0.5f, H * 0.32f, 1.0), (third, "3", W * 0.73f, H * 0.13f, 0.6) };
         foreach (var (who, place, x, h, at) in steps)
@@ -283,7 +283,7 @@ public partial class Results : RiftMenu
         head.Mat().P("lit", 1f);
         Appear(head, 0.5 + 0.55 * n);
         Burst(0.5 + 0.55 * n);
-        Appear(T(this, $"FOUR RIVALS, ONE DECK  ·  +{Session.LastDp:N0} DP  ·  {cards.Count} CARDS", Thin, 24, new Vector2(0, H * 0.1f + 100), new Vector2(W, 32), HorizontalAlignment.Center), 0.7 + 0.55 * n);
+        Appear(T(this, Lang.F("FOUR RIVALS, ONE DECK  ·  +{0:N0} DP  ·  {1} CARDS", Session.LastDp, cards.Count), Thin, 24, new Vector2(0, H * 0.1f + 100), new Vector2(W, 32), HorizontalAlignment.Center), 0.7 + 0.55 * n);
         PrizeButton(new Vector2(W / 2, H - 160));
         Buttons(new Vector2(W / 2 - 230, H - 70), 460);
     }
@@ -327,8 +327,8 @@ public partial class Results : RiftMenu
         }
         int idx = Array.IndexOf(Puzzles.All, z) + 1;
         float below = y0 + rows * (th + gap) + 20;
-        Appear(T(this, $"{idx:00}  ·  {z.Name}", Title, 34, new Vector2(0, below), new Vector2(W, 44), HorizontalAlignment.Center), 1.1);
-        Appear(T(this, $"FIRST SOLVE  ·  +{Session.LastDp} DP  ·  {P.Solved.Count} OF {count}", Thin, 24, new Vector2(0, below + 54), new Vector2(W, 32), HorizontalAlignment.Center, 0.8f), 1.3);
+        Appear(T(this, $"{idx:00}  ·  {Lang.Tr(z.Name)}", Title, 34, new Vector2(0, below), new Vector2(W, 44), HorizontalAlignment.Center), 1.1);
+        Appear(T(this, Lang.F("FIRST SOLVE  ·  +{0} DP  ·  {1} OF {2}", Session.LastDp, P.Solved.Count, count), Thin, 24, new Vector2(0, below + 54), new Vector2(W, 32), HorizontalAlignment.Center, 0.8f), 1.3);
         Buttons(new Vector2(W / 2 - 230, H - 70), 460);
     }
 
@@ -370,7 +370,7 @@ public partial class Results : RiftMenu
         AddChild(layer);
         layer.AddChild(new ColorRect { Size = new Vector2(W, H), Color = new Color(0.02f, 0.02f, 0.03f, 0.9f), MouseFilter = MouseFilterEnum.Ignore });
         Put(layer, "YOUR PRIZE", Title, 56, GoldLight, new Vector2(0, 90), new Vector2(W, 70), HorizontalAlignment.Center);
-        Put(layer, $"{cards.Count} CARDS  ·  CLICK ONE TO SEE IT", Thin, 22, Mist, new Vector2(0, 170), new Vector2(W, 30), HorizontalAlignment.Center);
+        Put(layer, Lang.F("{0} CARDS  ·  CLICK ONE TO SEE IT", cards.Count), Thin, 22, Mist, new Vector2(0, 170), new Vector2(W, 30), HorizontalAlignment.Center);
         Deal(layer, cards.Count, new Vector2(W / 2, H * 0.5f), cards.Count > 4 ? 330 : 400, 40, 0.1);
         Button(layer, "CLOSE", new Vector2(W / 2, H - 90), () => layer.QueueFree(), 26);
     }

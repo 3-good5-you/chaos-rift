@@ -47,7 +47,7 @@ public partial class DuelField
     /// The one result chip coins and dice share: a dark pill under the field's middle, sized to its text.
     void ResultChip(string text, Color c, double life = 2.2)
     {
-        float w = Impact.GetStringSize(text, HorizontalAlignment.Left, -1, 28).X + 80;
+        float w = Impact.GetStringSize(Lang.Tr(text), HorizontalAlignment.Left, -1, 28).X + 80;
         var p = Track(Box(hud, new Rect2(W / 2 - w / 2, H * 0.66f, w, 64), Pill(new Color(c.R * 0.05f, c.G * 0.05f, c.B * 0.05f, 0.92f), c, 32, 0, new Color(c, 0.4f), 18, 2)), life);
         p.MouseFilter = MouseFilterEnum.Ignore;
         Put(p, text, Impact, 28, c, new Vector2(0, 12), new Vector2(w, 40), HorizontalAlignment.Center, 5);
@@ -58,7 +58,7 @@ public partial class DuelField
     /// A caption pill across the field (reveals, the attack target hint); `life` 0 = the caller frees it.
     Panel Caption(string text, Color edge, float y = 0.56f, double life = 0)
     {
-        float w = Cond.GetStringSize(text, HorizontalAlignment.Left, -1, 24).X + 80;
+        float w = Cond.GetStringSize(Lang.Tr(text), HorizontalAlignment.Left, -1, 24).X + 80;
         var cap = Track(Box(hud, new Rect2(W / 2 - w / 2, H * y, w, 50), Pill(new Color(0.03f, 0.03f, 0.05f, 0.9f), edge, 25, 0, null, 0, 2)), life);
         cap.MouseFilter = MouseFilterEnum.Ignore;
         Put(cap, text, Cond, 24, Colors.White, new Vector2(0, 10), new Vector2(w, 30), HorizontalAlignment.Center);
@@ -140,7 +140,7 @@ public partial class DuelField
     }
 
     /// Field words for a turn or a phase, smaller for long names so they stay on the mat.
-    void FieldTitle(string text, int side, Color c, int max) => FieldWords(text, side, c, Math.Min(max, 1400 / Math.Max(1, text.Length)), 0);
+    void FieldTitle(string text, int side, Color c, int max) { text = Lang.Tr(text); FieldWords(text, side, c, Math.Min(max, 1400 / Math.Max(1, text.Length)), 0); }   // sized by the shown (translated) words
 
     // ---------------------------------------------------------------- activation: the card glows in place
 
@@ -199,8 +199,8 @@ public partial class DuelField
         sheet = Box(hud, new Rect2(0, 0, W, H), new StyleBoxEmpty());
         sheet.MouseFilter = MouseFilterEnum.Ignore;
         sheetChips.Clear(); sheetCards.Clear(); sheetLabels.Clear();
-        string text = $"{p.Text.ToUpperInvariant()}  ·  CLICK A ZONE";
-        float tw = Cond.GetStringSize(text, HorizontalAlignment.Left, -1, 24).X + 80;
+        string text = $"{Lang.Duel(p.Text).ToUpperInvariant()}  ·  {Lang.Tr("CLICK A ZONE")}";
+        float tw = Cond.GetStringSize(Lang.Tr(text), HorizontalAlignment.Left, -1, 24).X + 80;
         var hint = Box(sheet, new Rect2(W / 2 - tw / 2, H * 0.69f, tw, 50), Pill(new Color(0.03f, 0.03f, 0.05f, 0.9f), RivalPanels.Gold, 25, 0, null, 0, 2));
         hint.MouseFilter = MouseFilterEnum.Ignore;
         Put(hint, text, Cond, 24, Colors.White, new Vector2(0, 10), new Vector2(tw, 30), HorizontalAlignment.Center);
@@ -229,7 +229,7 @@ public partial class DuelField
         var c = p.Source!;
         const float cw = 170, ch = cw * CardH, w = 120 + cw + ch + 40;
         float cellH = ch + 72;
-        var sh = PromptSheet(w, 58 + cellH + 20, p.Text.ToUpperInvariant());
+        var sh = PromptSheet(w, 58 + cellH + 20, Lang.Duel(p.Text).ToUpperInvariant());
         for (int i = 0; i < p.Options.Count; i++)
         {
             int k = i;
@@ -244,7 +244,7 @@ public partial class DuelField
             if (def) art.Rotation = -Mathf.Pi / 2;
             cell.AddChild(art);
             Put(cell, def ? "DEFENSE" : "ATTACK", Cond, 22, def ? FxIce : RivalPanels.Gold, new Vector2(0, ch + 20), new Vector2(size.X + 28, 28), HorizontalAlignment.Center);
-            Put(cell, def ? $"DEF {c.Data.Def}" : $"ATK {c.Data.Atk}", Cond, 17, new Color(1, 1, 1, 0.7f), new Vector2(0, ch + 44), new Vector2(size.X + 28, 22), HorizontalAlignment.Center);
+            Put(cell, def ? $"{Lang.Tr("DEF")} {c.Data.Def}" : $"{Lang.Tr("ATK")} {c.Data.Atk}", Cond, 17, new Color(1, 1, 1, 0.7f), new Vector2(0, ch + 44), new Vector2(size.X + 28, 22), HorizontalAlignment.Center);
             cell.MouseEntered += () => { cell.AddThemeStyleboxOverride("panel", Look(true)); UiSound("cursor"); };
             cell.MouseExited += () => cell.AddThemeStyleboxOverride("panel", Look(false));
             System.Action press = () => Answer(k);
@@ -262,7 +262,7 @@ public partial class DuelField
         int n = opts.Count;
         float cw = n == 1 ? 200 : Math.Min(130, (W * 0.8f - 60) / n - 44), cellW = cw + 28, cellH = cw * CardH + 52, gap = 16;
         float rowW = n * cellW + (n - 1) * gap, w = Math.Max(n == 1 ? 380 : 560, rowW + 60);
-        var sh = PromptSheet(w, 52 + cellH + 16 + 46 + 18, $"CHAIN TO {What(D.Window)}?");
+        var sh = PromptSheet(w, 52 + cellH + 16 + 46 + 18, Lang.F("CHAIN TO {0}?", Lang.Tr(What(D.Window))));
         for (int j = 0; j < n; j++)
         {
             int i = opts[j];
@@ -281,7 +281,7 @@ public partial class DuelField
         if (p.Source is not { } src || p.Kind is not (Ask.YesNo or Ask.Choose)) return false;
         Focus(src);
         int n = p.Options.Count;
-        string title = p.Text.ToUpperInvariant();
+        string title = Lang.Duel(p.Text).ToUpperInvariant();
         if (p.Kind == Ask.Choose && n > 4)
         {
             const float w = 960, cw = 250, ch = cw * CardH;
@@ -309,8 +309,8 @@ public partial class DuelField
     void AttackHint(int uid, int direct)
     {
         CloseSheet();
-        string text = $"{views[uid].Card.Name.ToUpperInvariant()}  ·  CHOOSE A TARGET  ·  RIGHT-CLICK TO CANCEL";
-        float tw = Cond.GetStringSize(text, HorizontalAlignment.Left, -1, 24).X + 80, cw = direct >= 0 ? 230 : 0, w = tw + cw;
+        string text = Lang.F("{0}  ·  CHOOSE A TARGET  ·  RIGHT-CLICK TO CANCEL", views[uid].Card.Name.ToUpperInvariant());
+        float tw = Cond.GetStringSize(Lang.Tr(text), HorizontalAlignment.Left, -1, 24).X + 80, cw = direct >= 0 ? 230 : 0, w = tw + cw;
         sheet = Box(hud, new Rect2(W / 2 - w / 2, H * 0.69f, w, 50), Pill(new Color(0.03f, 0.03f, 0.05f, 0.9f), RivalPanels.Gold, 25, 0, null, 0, 2));
         sheet.MouseFilter = MouseFilterEnum.Ignore;
         Put(sheet, text, Cond, 24, Colors.White, new Vector2(0, 10), new Vector2(tw, 30), HorizontalAlignment.Center);
@@ -376,7 +376,7 @@ public partial class DuelField
     {
         var l = handLine!;
         if (l.Cap != null) l.Cap.QueueFree();
-        l.Cap = Caption($"{(p.Source?.Name ?? p.Text).ToUpperInvariant()}  ·  CHOOSE 1", RivalPanels.Gold, l.Side == 1 ? 0.5f : 0.3f);
+        l.Cap = Caption($"{(p.Source?.Name ?? Lang.Duel(p.Text)).ToUpperInvariant()}  ·  {Lang.F("CHOOSE {0}", 1)}", RivalPanels.Gold, l.Side == 1 ? 0.5f : 0.3f);
         sheetCards.Clear();
         for (int i = 0; i < l.Flats.Count; i++)
         {

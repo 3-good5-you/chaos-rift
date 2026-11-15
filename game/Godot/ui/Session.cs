@@ -133,6 +133,7 @@ public static class Session
             Settings.Saved = s.Options;
         }
         if (UnlockAll) Unlock();
+        if (Demo.Arg("lang") is { Length: > 0 } lang) Lang.Set(lang);   // dev: `-- --lang=es` previews a language
     }
 
     static void Unlock()

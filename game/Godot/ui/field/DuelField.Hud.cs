@@ -105,13 +105,13 @@ void fragment() { float r = length((UV - 0.5) * vec2(1.6, 1.0)); COLOR = vec4(co
         detailName.Text = d.Name;
         if (d.IsMonster)
         {
-            detailType.Text = $"{d.Attribute}  ·  {d.Race.ToUpperInvariant()} / {d.Frame.ToUpperInvariant()}";
+            detailType.Text = $"{Lang.Tr(d.Attribute)}  ·  {Lang.Tr(d.Race).ToUpperInvariant()} / {Lang.Tr(d.Frame).ToUpperInvariant()}";
             detailStars.Text = new string('★', Math.Max(0, d.Level));
-            detailStats.Text = $"ATK {d.AtkText}    DEF {d.DefText}";
+            detailStats.Text = $"{Lang.Tr("ATK")} {d.AtkText}    {Lang.Tr("DEF")} {d.DefText}";
         }
         else
         {
-            detailType.Text = $"{d.Kind.ToString().ToUpperInvariant()}  ·  {d.Frame.ToUpperInvariant()}";
+            detailType.Text = $"{Lang.Tr(d.Kind.ToString()).ToUpperInvariant()}  ·  {Lang.Tr(d.Frame).ToUpperInvariant()}";
             detailStars.Text = "";
             detailStats.Text = "";
         }
@@ -170,7 +170,11 @@ void fragment() {
 
         float x = 150;
         Put(p, side == 0 ? Settings.PlayerName.ToUpperInvariant() : ThemName, Impact, 34, c, new Vector2(x, 12), new Vector2(ProfW - x - 16, 44), outline: 6);
-        Put(p, "LP", Cond, 22, RivalPanels.Gold, new Vector2(x + 2, 80), new Vector2(40, 28));
+        // the label takes the room left of the LP number (wide enough for "نقاط الحياة"), shrinking only if it must
+        float room = ProfW - 18 - Impact.GetStringSize("8000", HorizontalAlignment.Left, -1, 56).X - 16 - (x + 2);
+        int ls = 22;
+        while (ls > 14 && Cond.GetStringSize(Lang.Tr("LP"), HorizontalAlignment.Left, -1, ls).X > room) ls--;
+        Put(p, "LP", Cond, ls, RivalPanels.Gold, new Vector2(x + 2, 80 + (22 - ls) * 0.5f), new Vector2(room, 28));
         lpText[side] = Put(p, "8000", Impact, 56, Colors.White, new Vector2(x + 20, 44), new Vector2(ProfW - x - 38, 74), HorizontalAlignment.Right, 8);
         var bar = Box(p, new Rect2(x, 122, BarW, 12), new StyleBoxFlat { BgColor = new Color(0.1f, 0.1f, 0.13f, 1), CornerRadiusTopLeft = 6, CornerRadiusTopRight = 6, CornerRadiusBottomLeft = 6, CornerRadiusBottomRight = 6 });
         bar.ClipChildren = ClipChildrenMode.AndDraw;
@@ -247,7 +251,7 @@ void fragment() { vec3 c = mix(col.rgb * 0.7, col.rgb * 1.25, UV.x) + vec3(0.25)
     {
         promptToken++;
         foreach (var c in promptChips.GetChildren()) c.QueueFree();
-        promptTitle.Text = p.Kind == Ask.Respond ? $"CHAIN TO {What(D.Window)}?" : p.Text.ToUpperInvariant();
+        promptTitle.Text = p.Kind == Ask.Respond ? Lang.F("CHAIN TO {0}?", Lang.Tr(What(D.Window))) : Lang.Duel(p.Text).ToUpperInvariant();
         FitText(promptTitle, 30);
         var chips = new List<Panel>();
         int n = Math.Min(p.Options.Count, 4);
@@ -255,7 +259,7 @@ void fragment() { vec3 c = mix(col.rgb * 0.7, col.rgb * 1.25, UV.x) + vec3(0.25)
         for (int i = 0; i < n; i++)
         {
             var o = p.Options[i];
-            var label = o.Act == Act.Pass ? "PASS" : o.Card?.Name ?? o.Text ?? o.ToString();
+            var label = o.Act == Act.Pass ? "PASS" : o.Card?.Name ?? (o.Text != null ? Lang.Duel(o.Text) : o.ToString());
             var chip = Chips.Make(label, new Vector2(i * (w + 12), 0), new Vector2(w, 46), () => { }, 20);
             chip.MouseFilter = MouseFilterEnum.Ignore;
             promptChips.AddChild(chip);
@@ -314,7 +318,7 @@ void fragment() { vec3 c = mix(col.rgb * 0.7, col.rgb * 1.25, UV.x) + vec3(0.25)
         var f = l.GetThemeFont("font");
         float w = l.HasMeta("box") ? (float)l.GetMeta("box") : l.Size.X;
         int size = max;
-        while (size > min && f.GetStringSize(l.Text, HorizontalAlignment.Left, -1, size).X > w) size--;
+        while (size > min && f.GetStringSize(Lang.Tr(l.Text), HorizontalAlignment.Left, -1, size).X > w) size--;
         l.AddThemeFontSizeOverride("font_size", size);
         l.Size = new Vector2(w, l.Size.Y);   // back to its box (centred text centres again)
     }

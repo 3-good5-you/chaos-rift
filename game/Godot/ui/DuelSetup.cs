@@ -50,7 +50,7 @@ public partial class DuelSetup : RiftMenu
     string Earns(bool match)
     {
         var (count, fresh) = Rewards.For(Session.Pick.Level, match);
-        return $"win {count} card{(count == 1 ? "" : "s")}{(fresh > 0 ? $", {fresh} new" : "")}";
+        return (fresh > 0 ? Lang.F("win {0} card(s), {1} new", count, fresh) : Lang.F("win {0} card(s)", count));
     }
 
     void Modes()
@@ -61,8 +61,8 @@ public partial class DuelSetup : RiftMenu
         {
             var info = PoC.Engine.Modes.Of(Session.Mode);
             Put(modes, info.Name, Title, 40, GoldDeep, new Vector2(110, 170));
-            string line = Session.Run is { } run ? $"Rival {run.Index + 1} of {run.Order.Length}   ·   your LP {run.Lp:N0}"
-                : Session.Rule is { } rule ? $"{rule.Name}   ·   both start at {rule.Lp:N0} LP" : info.Line;
+            string line = Session.Run is { } run ? Lang.F("Rival {0} of {1}   ·   your LP {2:N0}", run.Index + 1, run.Order.Length, run.Lp)
+                : Session.Rule is { } rule ? Lang.F("{0}   ·   both start at {1:N0} LP", rule.Name, rule.Lp) : info.Line;
             if (Session.Match) line += "   ·   best of three";
             Put(modes, line, Body, 22, Graphite, new Vector2(112, 226));
             return;
@@ -74,7 +74,7 @@ public partial class DuelSetup : RiftMenu
             return;
         }
         string[] names = { "SINGLE DUEL", "MATCH" };
-        string[] sub = { $"One duel  ·  {Earns(false)}", $"Best of three, side deck between duels  ·  {Earns(true)}" };
+        string[] sub = { Lang.F("One duel  ·  {0}", Earns(false)), Lang.F("Best of three, side deck between duels  ·  {0}", Earns(true)) };
         for (int i = 0; i < 2; i++)
         {
             bool m = i == 1, on = Session.Match == m;
@@ -82,7 +82,7 @@ public partial class DuelSetup : RiftMenu
             var l = Put(modes, names[i], Title, on ? 40 : 34, on ? GoldDeep : Ink * new Color(1, 1, 1, 0.5f), at);
             var s = Put(modes, sub[i], Body, 20, Graphite * new Color(1, 1, 1, on ? 0.9f : 0.5f), at + new Vector2(2, 56), new Vector2(400, 50));
             s.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-            if (on) Hair(modes, at + new Vector2(0, 50), Title.GetStringSize(names[i], HorizontalAlignment.Left, -1, 40).X, GoldC, 2.5f);
+            if (on) Hair(modes, at + new Vector2(0, 50), Title.GetStringSize(Lang.Tr(names[i]), HorizontalAlignment.Left, -1, 40).X, GoldC, 2.5f);
             Click(l, () => { Session.Match = m; UiSound(false); Modes(); });
         }
     }
@@ -97,7 +97,7 @@ public partial class DuelSetup : RiftMenu
             const float mw = 150; float mh = mw * 1.458f;
             if (md.CoverCard() >= 0) Card(decks, Db.Get(md.CoverCard()), new Vector2(130 + mw / 2, 420 + mh / 2), mh, -0.02f, 1.2f);
             Put(decks, md.Name, Title, 22, GoldDeep, new Vector2(320, 440));
-            Put(decks, $"{md.Main.Count} CARDS   ·   FOR THIS DUEL ONLY", Thin, 16, Graphite, new Vector2(322, 476));
+            Put(decks, Lang.F("{0} CARDS   ·   FOR THIS DUEL ONLY", md.Main.Count), Thin, 16, Graphite, new Vector2(322, 476));
             var rb = Put(decks, "REBUILD", Title, 18, GoldDeep, new Vector2(322, 520));
             Click(rb, () => Transition.Go(this, "res://ui/DeckBuilder.tscn"), h => rb.AddThemeColorOverride("font_color", h ? Ink : GoldDeep));
             return;

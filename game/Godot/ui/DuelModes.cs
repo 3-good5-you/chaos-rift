@@ -65,13 +65,13 @@ public partial class DuelModes : RiftMenu
         line.Text = m.Line;
         extra.Text = m.Mode switch
         {
-            GameMode.Limited => "TODAY:  " + Modes.Today(DateTime.Today).Name + "\n" + Modes.Today(DateTime.Today).Text,
+            GameMode.Limited => Lang.Tr("TODAY:  ") + Lang.Tr(Modes.Today(DateTime.Today).Name) + "\n" + Lang.Duel(Modes.Today(DateTime.Today).Text),
             GameMode.Gauntlet => string.Join("   ›   ", new Gauntlet(Session.Picks).Order.Select(p => RivalPanels.All.First(r => r.File == p.Rival).Name)),
             _ => "",
         };
         extra.AddThemeFontOverride("font", m.Mode == GameMode.Limited ? Body : Title);
         extra.AddThemeFontSizeOverride("font_size", m.Mode == GameMode.Limited ? 22 : 20);
-        reward.Text = m.Ready ? m.Reward.ToUpperInvariant() : "COMING NEXT";
+        reward.Text = m.Ready ? Lang.Tr(m.Reward).ToUpperInvariant() : "COMING NEXT";
         reward.AddThemeColorOverride("font_color", m.Ready ? GoldLight : Mist);
         reward.Position = new Vector2(reward.Position.X, H * 0.28f + (extra.Text.Length > 0 ? 300 : 200));
     }

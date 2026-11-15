@@ -48,12 +48,15 @@ public partial class Replays : RiftMenu
             bool on = i == sel;
             if (on) Pip(host, at + new Vector2(-24, 20), 10);
             var l = Put(host, r.Title.ToUpperInvariant(), Title, 24, on ? GoldDeep : Ink, at, new Vector2(W * 0.4f, 36));
-            Put(host, $"{Result(r)}  ·  {r.Mode}  ·  {r.When}", Body, 17, Graphite, at + new Vector2(0, 38), new Vector2(W * 0.4f, 26));
+            Put(host, $"{Res(r)}  ·  {Lang.Tr(r.Mode)}  ·  {r.When}", Body, 17, Graphite, at + new Vector2(0, 38), new Vector2(W * 0.4f, 26));
             int k = i;
             Click(l, () => { sel = k; Refresh(); }, h => l.AddThemeColorOverride("font_color", h || k == sel ? GoldDeep : Ink));
         }, new Vector2(110, H - 100));
         Detail(all[sel]);
     }
+
+    /// The result in the game language ("DRAW" alone would read as the draw-a-card word).
+    static string Res(Replay r) => r.Winner is 0 or 1 || Lang.Code == "en" ? Lang.Tr(Result(r)) : Lang.Tr("TIE");
 
     static string Result(Replay r) => r.Winner switch { 0 => "WON", 1 => "LOST", _ => "DRAW" };
 
@@ -62,9 +65,9 @@ public partial class Replays : RiftMenu
         var r = e.R;
         float x = W * 0.6f, w = W - x - 80, y = H * 0.16f;
         Put(detail, r.Title.ToUpperInvariant(), Title, 40, Silver, new Vector2(x, y - 70), new Vector2(w, 60));
-        Put(detail, $"{r.You.ToUpperInvariant()}  VS  {r.Them.ToUpperInvariant()}", Title, 26, Mist, new Vector2(x, y + 10), new Vector2(w, 40));
-        Put(detail, $"{Result(r)}  ·  {r.Reason}", Title, 22, r.Winner == 0 ? GoldLight : Mist, new Vector2(x, y + 76), new Vector2(w, 34));
-        Put(detail, $"{r.Mode}  ·  {r.Turns} turns  ·  {r.When}", Body, 20, Mist, new Vector2(x, y + 120), new Vector2(w, 30));
+        Put(detail, $"{r.You.ToUpperInvariant()}  {Lang.Tr("VS")}  {r.Them.ToUpperInvariant()}", Title, 26, Mist, new Vector2(x, y + 10), new Vector2(w, 40));
+        Put(detail, $"{Res(r)}  ·  {Lang.Tr(r.Reason)}", Title, 22, r.Winner == 0 ? GoldLight : Mist, new Vector2(x, y + 76), new Vector2(w, 34));
+        Put(detail, Lang.F("{0}  ·  {1} turns  ·  {2}", Lang.Tr(r.Mode), r.Turns, r.When), Body, 20, Mist, new Vector2(x, y + 120), new Vector2(w, 30));
         bool plays = r.Plays();
         if (plays) Button(detail, "WATCH", new Vector2(x + 140, H - 160), () => Watch(r), 30);
         else Put(detail, "Saved by an older version: cards have changed since, so it can't be played back.", Body, 20, Mist, new Vector2(x, H - 190), new Vector2(w, 60)).AutowrapMode = TextServer.AutowrapMode.WordSmart;

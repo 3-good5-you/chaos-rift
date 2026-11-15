@@ -91,7 +91,7 @@ public partial class SideDeck : RiftMenu
         // the way on, big, at the bottom of the dark side (at the top right it read as a label: playtest 2026-11-12)
         Hair(this, new Vector2(dx, H - 150), dw, Silver * new Color(1, 1, 1, 0.12f));
         Button(this, "UNDO SWAPS", new Vector2(dx + dw * 0.2f, H - 84), Reset, 20);
-        Button(this, $"START DUEL {Session.MatchWins + Session.MatchLosses + 1}  ›", new Vector2(dx + dw * 0.68f, H - 84), Next, 30);
+        Button(this, Lang.F("START DUEL {0}  ›", Session.MatchWins + Session.MatchLosses + 1), new Vector2(dx + dw * 0.68f, H - 84), Next, 30);
         y = 256;
         sideHost = Zone("SIDE DECK", $"{deck.Side.Count} / {DeckRules.MaxSide}", Teal, dx, ref y, dw, (DeckRules.MaxSide + sideCols - 1) / sideCols);
     }
@@ -101,7 +101,7 @@ public partial class SideDeck : RiftMenu
     {
         Pip(this, new Vector2(x + 6, y + 12), 9);
         Put(this, name, Title, 20, tint, new Vector2(x + 22, y));
-        Put(this, count, Title, 16, tint * new Color(1, 1, 1, 0.75f), new Vector2(x + 22 + Title.GetStringSize(name, HorizontalAlignment.Left, -1, Z(20)).X + 24, y + 3));
+        Put(this, count, Title, 16, tint * new Color(1, 1, 1, 0.75f), new Vector2(x + 22 + Title.GetStringSize(Lang.Tr(name), HorizontalAlignment.Left, -1, Z(20)).X + 24, y + 3));
         Hair(this, new Vector2(x, y + 34), w, tint * new Color(1, 1, 1, 0.35f));
         var h = new Control { Position = new Vector2(x, y + 46), MouseFilter = MouseFilterEnum.Ignore };
         AddChild(h);

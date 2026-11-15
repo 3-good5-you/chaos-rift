@@ -26,7 +26,7 @@ public partial class CardList : RiftMenu
         cards = Db.ByIdx.Values.Where(d => (d.PackMask != 0 || P.Count(d.Idx) > 0) && Db.Canon(d.Idx) == d.Idx && d.Name.Length > 0).OrderBy(d => d.Kind).ThenBy(d => d.IsFusion).ThenBy(d => d.Name).ToList();
         Back();
         Heading("CARD LIST", new Vector2(80, 60), 46);
-        float x = 420;
+        float x = Math.Max(420, 130 + Title.GetStringSize(Lang.Tr("CARD LIST"), HorizontalAlignment.Left, -1, Z(46)).X);   // longer translated headings push the tabs right
         foreach (var (key, label) in new[] { ("cards", "CARDS"), ("backs", "CARD BACKS"), ("mats", "PLAYMATS") })
         {
             var k = key;
@@ -69,7 +69,7 @@ public partial class CardList : RiftMenu
         var first = cards.FirstOrDefault(c => P.Count(c.Idx) > 0 && browser.Q.Match(c)) ?? cards[0];
         browser.Selected = first; browser.BuildGrid();
         Detail(first);
-        Put(page, $"OWNED {cards.Count(c => P.Count(c.Idx) > 0)} / {cards.Count}", Thin, 18, Graphite, new Vector2(80, H - 40));
+        Put(page, Lang.F("OWNED {0} / {1}", cards.Count(c => P.Count(c.Idx) > 0), cards.Count), Thin, 18, Graphite, new Vector2(80, H - 40));
     }
 
     void Detail(CardData d)
@@ -80,16 +80,16 @@ public partial class CardList : RiftMenu
         if (P.Fresh.Remove(d.Idx)) Session.Save();
         Card(detail, d, new Vector2(W * 0.81f, H * 0.36f), H * 0.46f, 0.04f, 1f, large: true);
         float x = W * 0.66f, w = W * 0.3f, y = H * 0.64f;
-        int ns = 30; while (ns > 18 && Title.GetStringSize(d.Name.ToUpperInvariant(), HorizontalAlignment.Left, -1, Z(ns)).X > w) ns -= 2;
+        int ns = 30; while (ns > 18 && Title.GetStringSize(Lang.Tr(d.Name.ToUpperInvariant()), HorizontalAlignment.Left, -1, Z(ns)).X > w) ns -= 2;
         Put(detail, d.Name.ToUpperInvariant(), Title, ns, Silver, new Vector2(x, y + (30 - ns) / 2f), new Vector2(w, 44));
-        string type = d.IsMonster ? $"{d.Attribute}  ·  {d.Race}  ·  LEVEL {d.Level}" : $"{d.Frame} {d.Kind}";
+        string type = d.IsMonster ? $"{Lang.Tr(d.Attribute)}  ·  {Lang.Tr(d.Race)}  ·  {Lang.Tr("LEVEL")} {d.Level}" : $"{Lang.Tr(d.Frame)} {Lang.Tr(d.Kind.ToString())}";
         Put(detail, type.ToUpperInvariant(), Thin, 18, Mist, new Vector2(x, y + 50));
         float ty = y + 86;
-        if (d.IsMonster) { Put(detail, $"ATK {d.AtkText}    DEF {d.DefText}", Title, 24, GoldLight, new Vector2(x, ty)); ty += 44; }
+        if (d.IsMonster) { Put(detail, $"{Lang.Tr("ATK")} {d.AtkText}    {Lang.Tr("DEF")} {d.DefText}", Title, 24, GoldLight, new Vector2(x, ty)); ty += 44; }
         CardText(detail, d, new Vector2(x, ty), new Vector2(w, H - ty - 70), 20, light: false, min: 14);
         int own = P.Count(d.Idx);
         int inDecks = Session.Decks.Count(k => k.Copies(d.Idx) > 0);
-        Put(detail, own > 0 ? $"OWNED ×{own}   ·   IN {inDecks} DECK{(inDecks == 1 ? "" : "S")}" : "NOT OWNED YET", Thin, 18, own > 0 ? Silver : Mist, new Vector2(x, H - 50));
+        Put(detail, own > 0 ? (inDecks == 1 ? Lang.F("OWNED ×{0}   ·   IN 1 DECK", own) : Lang.F("OWNED ×{0}   ·   IN {1} DECKS", own, inDecks)) : "NOT OWNED YET", Thin, 18, own > 0 ? Silver : Mist, new Vector2(x, H - 50));
     }
 
     // ---------------------------------------------------------------- card backs / playmats: equip what you own
@@ -110,9 +110,9 @@ public partial class CardList : RiftMenu
             var pic = Pic(host, mat ? UI.Cosmetics.MatPreview(it.Key) : UI.Cosmetics.Back(it.Key, 256), at, new Vector2(tw, th));
             if (mat) pic.Material = Kit.RoundedMat(tw / th, 0.04f);
             if (!have) pic.Modulate = new Color(1, 1, 1, 0.35f);
-            Put(host, have ? it.Name.ToUpperInvariant() : "IN THE SHOP", Thin, 15, on ? GoldDeep : Graphite, at + new Vector2(-20, th + 8), new Vector2(tw + 40, 22), HorizontalAlignment.Center);
+            Put(host, have ? Lang.Cosmetic(it.Name).ToUpperInvariant() : "IN THE SHOP", Thin, 15, on ? GoldDeep : Graphite, at + new Vector2(-20, th + 8), new Vector2(tw + 40, 22), HorizontalAlignment.Center);
             if (on) Pip(host, at + new Vector2(tw / 2, -12), 10);
-            var hit = new Control { Position = at, Size = new Vector2(tw, th), TooltipText = it.Name };
+            var hit = new Control { Position = at, Size = new Vector2(tw, th), TooltipText = Lang.Cosmetic(it.Name) };
             host.AddChild(hit);
             Click(hit, () => Preview(it, kind), h => pic.SelfModulate = h ? new Color(1.08f, 1.08f, 1.08f) : Colors.White);
         }, new Vector2(W * 0.53f - 210, H - 50));
@@ -130,9 +130,9 @@ public partial class CardList : RiftMenu
         Shadow(detail, c - new Vector2(w, h) / 2, new Vector2(w, h), 0.5f, new Color(0.35f, 0.36f, 0.45f));
         var pic = Pic(detail, mat ? UI.Cosmetics.MatPreview(it.Key) : UI.Cosmetics.Back(it.Key), c - new Vector2(w, h) / 2, new Vector2(w, h));
         if (mat) pic.Material = Kit.RoundedMat(w / h, 0.03f);
-        Put(detail, it.Name.ToUpperInvariant(), Title, 34, Silver, new Vector2(c.X - 400, c.Y + h / 2 + 30), new Vector2(800, 46), HorizontalAlignment.Center);
+        Put(detail, Lang.Cosmetic(it.Name).ToUpperInvariant(), Title, 34, Silver, new Vector2(c.X - 400, c.Y + h / 2 + 30), new Vector2(800, 46), HorizontalAlignment.Center);
         if (on) Put(detail, "EQUIPPED", Title, 20, GoldLight, new Vector2(c.X - 200, c.Y + h / 2 + 90), new Vector2(400, 30), HorizontalAlignment.Center);
         else if (have) Button(detail, "EQUIP", new Vector2(c.X, c.Y + h / 2 + 110), () => { if (Shop.Equip(P, it)) { Session.Save(); Show(tab); } });
-        else Put(detail, it.Price < 0 ? "WIN A TOURNAMENT TO EARN IT" : $"{it.Price:N0} DP IN THE SHOP", Thin, 20, Mist, new Vector2(c.X - 300, c.Y + h / 2 + 90), new Vector2(600, 30), HorizontalAlignment.Center);
+        else Put(detail, it.Price < 0 ? "WIN A TOURNAMENT TO EARN IT" : Lang.F("{0:N0} DP IN THE SHOP", it.Price), Thin, 20, Mist, new Vector2(c.X - 300, c.Y + h / 2 + 90), new Vector2(600, 30), HorizontalAlignment.Center);
     }
 }

@@ -33,7 +33,7 @@ public partial class DeckUnlock : RiftMenu
         Rift(0.5f, 0.5f);
         bg.P("focus_y", 0.5f);
         var rival = RivalPanels.All[Math.Clamp(Session.Selected, 0, RivalPanels.All.Length - 1)];
-        T(this, $"{rival.Name} DEFEATED", Thin, 26, new Vector2(0, 70), new Vector2(W, 34), HorizontalAlignment.Center);
+        T(this, Lang.F("{0} DEFEATED", rival.Name), Thin, 26, new Vector2(0, 70), new Vector2(W, 34), HorizontalAlignment.Center);
         Stack();
     }
 
@@ -125,9 +125,9 @@ public partial class DeckUnlock : RiftMenu
         var head = T(this, "NEW DECK UNLOCKED", Title, 64, new Vector2(0, y), new Vector2(W, 80), HorizontalAlignment.Center);
         head.Mat().P("lit", 1f);
         var name = T(this, deck.Name.ToUpperInvariant(), Title, 40, new Vector2(0, y + 92), new Vector2(W, 50), HorizontalAlignment.Center);
-        float nw = Title.GetStringSize(deck.Name.ToUpperInvariant(), HorizontalAlignment.Left, -1, 40).X;
+        float nw = Title.GetStringSize(Lang.Tr(deck.Name.ToUpperInvariant()), HorizontalAlignment.Left, -1, 40).X;
         Pip(this, new Vector2(W / 2 - nw / 2 - 34, y + 118), 11); Pip(this, new Vector2(W / 2 + nw / 2 + 34, y + 118), 11);
-        T(this, $"{deck.Main.Count} CARDS  ·  ADDED TO YOUR DECKS", Thin, 22, new Vector2(0, y + 154), new Vector2(W, 30), HorizontalAlignment.Center, 0.75f);
+        T(this, Lang.F("{0} CARDS  ·  ADDED TO YOUR DECKS", deck.Main.Count), Thin, 22, new Vector2(0, y + 154), new Vector2(W, 30), HorizontalAlignment.Center, 0.75f);
         var b1 = Button(this, "USE THIS DECK", new Vector2(W / 2 - 230, H - 110), Use, 28);
         var b2 = Button(this, "CONTINUE", new Vector2(W / 2 + 230, H - 110), Next, 28);
         foreach (var c in new Control[] { head, name, b1, b2 })

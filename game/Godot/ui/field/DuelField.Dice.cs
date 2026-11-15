@@ -127,7 +127,7 @@ void fragment() { ALBEDO = vec3(0); ALPHA = a * (1. - smoothstep(.1, .5, length(
         tw.TweenCallback(Callable.From(() => { cup.QueueFree(); dieRoot.QueueFree(); shadow.QueueFree(); }));
 
         // The result in the coin's chip (no badge by the die, no words outside it).
-        if (words) After(2.4, () => ResultChip($"{(e.Other?.Name ?? "DIE ROLL").ToUpperInvariant()}  ·  ROLLED {r}", RivalPanels.Gold, 1.6));
+        if (words) After(2.4, () => ResultChip(Lang.F("{0}  ·  ROLLED {1}", (e.Other?.Name ?? Lang.Tr("DIE ROLL")).ToUpperInvariant(), r), RivalPanels.Gold, 1.6));
         return 3.6;
     }
 }

@@ -60,7 +60,7 @@ public partial class MatUnlock : RiftMenu
         var head = T(this, "NEW PLAYMAT", Title, 64, new Vector2(0, at.Y + h + 40), new Vector2(W, 80), HorizontalAlignment.Center);
         head.Mat().P("lit", 1f);
         Appear(head, 1.2);
-        Appear(T(this, $"{mat.Name.ToUpperInvariant()}  ·  CHAMPION PRIZE", Title, 28, new Vector2(0, at.Y + h + 124), new Vector2(W, 36), HorizontalAlignment.Center), 1.4);
+        Appear(T(this, Lang.F("{0}  ·  CHAMPION PRIZE", Lang.Cosmetic(mat.Name).ToUpperInvariant()), Title, 28, new Vector2(0, at.Y + h + 124), new Vector2(W, 36), HorizontalAlignment.Center), 1.4);
         Appear(Button(this, "EQUIP", new Vector2(W / 2 - 200, H - 70), Equip, 28), 1.6);
         Appear(Button(this, "CONTINUE", new Vector2(W / 2 + 200, H - 70), Next, 24), 1.6);
     }
