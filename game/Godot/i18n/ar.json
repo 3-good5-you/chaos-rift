@@ -870,5 +870,18 @@
   "Win 3 tournaments": "اربح 3 بطولات",
   "Win 5 tournaments": "اربح 5 بطولات",
   "Win 10 tournaments": "اربح 10 بطولات",
-  "Win 20 tournaments": "اربح 20 بطولة"
+  "Win 20 tournaments": "اربح 20 بطولة",
+  "SAVE FILE": "ملف الحفظ",
+  "IMPORT": "استيراد",
+  "Chaos Rift save": "حفظ Chaos Rift",
+  "SAVE EXPORTED": "تم تصدير الحفظ",
+  "Saved to {0}. Copy it to your other PC and choose IMPORT there.": "حُفظ في {0}. انسخه إلى جهازك الآخر واختر استيراد هناك.",
+  "COULDN'T EXPORT": "تعذّر التصدير",
+  "CAN'T IMPORT": "لا يمكن الاستيراد",
+  "This save was changed outside the game, so it can't be loaded.": "تم تعديل هذا الحفظ خارج اللعبة، لذا لا يمكن تحميله.",
+  "That file isn't a Chaos Rift save, or it's from a newer version of the game.": "هذا الملف ليس حفظًا من Chaos Rift، أو أنه من إصدار أحدث من اللعبة.",
+  "REPLACE YOUR SAVE?": "استبدال حفظك؟",
+  "{0}: {1} DP, {2} cards, {3} decks.": "{0}: {1} DP، {2} بطاقة، {3} مجموعات.",
+  "Your current progress will be replaced by this save.": "سيُستبدل تقدّمك الحالي بهذا الحفظ.",
+  "REPLACE": "استبدال"
 }

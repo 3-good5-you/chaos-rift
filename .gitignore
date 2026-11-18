@@ -10,3 +10,6 @@ game/Godot/cards/
 game/Godot/assets/*
 !game/Godot/assets/fonts/
 builds/
+
+# release save-signing key, never published
+game/Engine/SaveKey.local.cs

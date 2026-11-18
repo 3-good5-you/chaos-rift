@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>PoC.Engine</RootNamespace>
     <NoWarn>CS1998</NoWarn>
+    <!-- The release save key (git-ignored). Without it the engine uses a dev key (SaveData.cs). -->
+    <DefineConstants Condition="Exists('SaveKey.local.cs')">$(DefineConstants);SAVEKEY</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Engine.Check" />

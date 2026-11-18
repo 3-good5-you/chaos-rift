@@ -3,9 +3,10 @@ using System.Text.Json;
 
 namespace PoC.Engine;
 
-/// The save file: profile, decks and options as readable JSON. Cards are stored by idx, not konami id:
+/// The save file: profile, decks and options as JSON, stored signed and scrambled (Pack) so it can't be read or
+/// edited by hand. Cards are stored by idx, not konami id:
 /// alternate-art printings (two Blue-Eyes, two Polymerization) share a konami id, so only idx says which one you own.
-public static class SaveData
+public static partial class SaveData
 {
     public const int Version = 1;
 
@@ -146,29 +147,99 @@ public static class SaveData
     }
 
     /// Write to a temp file, flush it to disk, then replace the save, so a crash mid-write leaves the old save whole.
+    /// The save it replaces is kept as `<path>.bak` (Read falls back to it).
     public static void Write(string path, State s)
     {
         var tmp = path + ".tmp";
         using (var fs = new FileStream(tmp, FileMode.Create, FileAccess.Write))
         {
-            fs.Write(Encoding.UTF8.GetBytes(ToJson(s)));
+            fs.Write(Encoding.ASCII.GetBytes(Pack(ToJson(s))));
             fs.Flush(true);
         }
+        if (File.Exists(path)) File.Copy(path, path + ".bak", overwrite: true);
         File.Move(tmp, path, overwrite: true);
     }
 
-    /// The saved state, or null for a new player. A file that can't be read is copied to `<path>.bad`
-    /// (broken = true) and also gives null, so the game starts fresh.
+    /// The saved state, or null for a new player. A file that can't be read (broken, or changed by hand) is copied
+    /// to `<path>.bad` (broken = true); the last good save `<path>.bak` is used instead, else the game starts fresh.
     public static State? Read(string path, out bool broken)
     {
         broken = false;
         if (!File.Exists(path)) return null;
-        try { return FromJson(File.ReadAllText(path)); }
+        try { return FromJson(Unpack(File.ReadAllText(path), plain: true)); }
         catch (Exception)
         {
             broken = true;
             try { File.Copy(path, path + ".bad", overwrite: true); } catch (IOException) { }
-            return null;
+            try { return File.Exists(path + ".bak") ? FromJson(Unpack(File.ReadAllText(path + ".bak"), plain: true)) : null; }
+            catch (Exception) { return null; }
+        }
+    }
+
+    /// A save file someone picked to import: only a signed Chaos Rift save; throws Changed (edited outside the game)
+    /// or InvalidDataException (not a save, another version, unknown cards) on anything else.
+    public static State Import(string path)
+    {
+        var text = new FileInfo(path).Length <= 8 << 20 ? File.ReadAllText(path) : throw new InvalidDataException("too big for a save");
+        return FromJson(Unpack(text, plain: false));
+    }
+
+    // ---------------------------------------------------------------- signed + scrambled file
+    // "CHAOSRIFT-SAVE-1:<base64 of the gzipped JSON, XOR-masked>.<HMAC-SHA256 of those bytes>". The key lives in
+    // the git-ignored SaveKey.local.cs, so the public source can't forge saves; builds without it use a dev key.
+    // ponytail: the key ships inside the game, so a determined hacker can still dig it out; only a server stops that.
+
+    const string Magic = "CHAOSRIFT-SAVE-1:";
+
+    /// Thrown for a save whose signature doesn't match: changed outside the game (or by another build's key).
+    public sealed class Changed() : IOException("this save was changed outside the game");
+
+    public static string Pack(string json)
+    {
+        using var ms = new MemoryStream();
+        using (var z = new System.IO.Compression.GZipStream(ms, System.IO.Compression.CompressionLevel.Optimal)) z.Write(Encoding.UTF8.GetBytes(json));
+        var b = ms.ToArray();
+        Mask(b);
+        return Magic + Convert.ToBase64String(b) + "." + Convert.ToHexString(System.Security.Cryptography.HMACSHA256.HashData(Key, b));
+    }
+
+    /// The JSON inside a packed save. `plain` also lets an old readable save (2.0 and before) through.
+    public static string Unpack(string text, bool plain)
+    {
+        text = text.Trim();
+        if (!text.StartsWith(Magic, StringComparison.Ordinal))
+            return plain && text.StartsWith('{') ? text : throw new InvalidDataException("not a Chaos Rift save");
+        int dot = text.LastIndexOf('.');
+        if (dot < Magic.Length) throw new InvalidDataException("not a Chaos Rift save");
+        byte[] b, tag;
+        try { (b, tag) = (Convert.FromBase64String(text[Magic.Length..dot]), Convert.FromHexString(text[(dot + 1)..])); }
+        catch (FormatException) { throw new Changed(); }
+        if (!System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(tag, System.Security.Cryptography.HMACSHA256.HashData(Key, b))) throw new Changed();
+        Mask(b);
+        using var z = new System.IO.Compression.GZipStream(new MemoryStream(b), System.IO.Compression.CompressionMode.Decompress);
+        using var r = new StreamReader(z, Encoding.UTF8);
+        return r.ReadToEnd();
+    }
+
+    /// XOR with a key-derived stream (SHA-256 in counter mode): the file isn't plain base64 + gzip to anyone who
+    /// recognises those. Applying it twice gives the bytes back.
+    static void Mask(byte[] b)
+    {
+        var block = new byte[Key.Length + 4];
+        Key.CopyTo(block, 0);
+        for (int i = 0; i < b.Length; i += 32)
+        {
+            BitConverter.TryWriteBytes(block.AsSpan(Key.Length), i);
+            var pad = System.Security.Cryptography.SHA256.HashData(block);
+            for (int j = 0; j < 32 && i + j < b.Length; j++) b[i + j] ^= pad[j];
         }
     }
 }
+
+#if !SAVEKEY
+public static partial class SaveData
+{
+    // Dev key for builds without SaveKey.local.cs (GitHub clones): their saves don't load in release builds.
+    static readonly byte[] Key = Encoding.ASCII.GetBytes("chaos-rift-dev-save-key-not-secret");
+}
+#endif

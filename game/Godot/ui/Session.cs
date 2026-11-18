@@ -170,11 +170,29 @@ public static class Session
         Profile.Dp = Math.Max(Profile.Dp, 999_999);
     }
 
+    static SaveData.State Current => new() { Profile = Profile, Decks = Decks.ToList(), Playing = Playing == null ? -1 : Decks.IndexOf(Playing), Options = Settings.Saved };
+
     public static void Save()
     {
         if (NoSave) return;
-        try { SaveData.Write(SavePath, new SaveData.State { Profile = Profile, Decks = Decks.ToList(), Playing = Playing == null ? -1 : Decks.IndexOf(Playing), Options = Settings.Saved }); }
+        try { SaveData.Write(SavePath, Current); }
         catch (Exception e) { GD.PushError($"Save failed: {e.Message}"); }
+    }
+
+    /// Options EXPORT SAVE: your progress as a signed, scrambled file (the same format as the save) at `path`.
+    public static void Export(string path) => File.WriteAllText(path, SaveData.Pack(SaveData.ToJson(Current)));
+
+    /// Options IMPORT SAVE, once the player confirmed: the imported progress replaces yours (yours stays as
+    /// save.json.bak until the next save).
+    public static void Use(SaveData.State s)
+    {
+        Profile = s.Profile;
+        Decks.Clear(); Decks.AddRange(s.Decks);
+        Playing = s.Playing >= 0 ? Decks[s.Playing] : null;
+        MatchDeck = null;
+        Settings.Saved = s.Options;
+        if (UnlockAll) Unlock();
+        Save();
     }
 
     public static Color TierColor(int level) => level switch

@@ -558,6 +558,26 @@ static class Program
         Check(SaveData.Read(path, out broken) == null && broken && File.Exists(path + ".bad"), "save: broken file kept as .bad, starts fresh");
         File.WriteAllText(path, json.Replace("\"Version\": 1", "\"Version\": 9"));
         Check(SaveData.Read(path, out broken) == null && broken, "save: unknown version rejected");
+
+        // Signed + scrambled (2026-11-18): unreadable on disk, a hand edit is refused, the last good save takes over.
+        foreach (var f in Directory.GetFiles(dir)) File.Delete(f);
+        File.WriteAllText(path, json);   // a 2.0 save (plain JSON) still loads...
+        Check(SaveData.Read(path, out broken) is { } old2 && !broken && SaveData.ToJson(old2) == json, "save: an old readable save still loads");
+        SaveData.Write(path, s);         // ...and is signed from its next save on, the old one kept as .bak
+        var packed = File.ReadAllText(path);
+        Check(packed.StartsWith("CHAOSRIFT-SAVE-1:") && !packed.Contains("Owned") && !packed.Contains("Seto") && File.Exists(path + ".bak"), "save: written scrambled, nothing readable, previous save kept as .bak");
+        Check(SaveData.Import(path) is { } imp && SaveData.ToJson(imp) == json, "save: an exported save imports back the same");
+        int body = packed.IndexOf(':') + 10;
+        var flipped = packed[..body] + (packed[body] == 'A' ? 'B' : 'A') + packed[(body + 1)..];
+        bool refused; try { SaveData.Import(WriteTo("edited.json", flipped)); refused = false; } catch (SaveData.Changed) { refused = true; }
+        Check(refused, "save: one changed character = 'changed outside the game'");
+        var plainDp = json.Replace($"\"Dp\": {s.Profile.Dp}", "\"Dp\": 999999");
+        try { SaveData.Import(WriteTo("plain.json", plainDp)); refused = false; } catch (InvalidDataException) { refused = true; }
+        Check(refused, "save: a readable (hand-made) file can't be imported");
+        SaveData.Write(path, s);
+        File.WriteAllText(path, flipped);
+        Check(SaveData.Read(path, out broken) is { } bak && broken && SaveData.ToJson(bak) == json && File.Exists(path + ".bad"), "save: an edited save falls back to the last good one (.bak)");
+        string WriteTo(string name, string text) { var p = Path.Combine(dir, name); File.WriteAllText(p, text); return p; }
     }
 
     static void DeckChecks()

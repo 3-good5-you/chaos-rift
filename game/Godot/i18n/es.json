@@ -826,5 +826,18 @@
   "Win 3 tournaments": "Gana 3 torneos",
   "Win 5 tournaments": "Gana 5 torneos",
   "Win 10 tournaments": "Gana 10 torneos",
-  "Win 20 tournaments": "Gana 20 torneos"
+  "Win 20 tournaments": "Gana 20 torneos",
+  "SAVE FILE": "PARTIDA GUARDADA",
+  "IMPORT": "IMPORTAR",
+  "Chaos Rift save": "Partida de Chaos Rift",
+  "SAVE EXPORTED": "PARTIDA EXPORTADA",
+  "Saved to {0}. Copy it to your other PC and choose IMPORT there.": "Guardada en {0}. Cópiala a tu otro PC y elige IMPORTAR allí.",
+  "COULDN'T EXPORT": "NO SE PUDO EXPORTAR",
+  "CAN'T IMPORT": "NO SE PUEDE IMPORTAR",
+  "This save was changed outside the game, so it can't be loaded.": "Esta partida se modificó fuera del juego, así que no se puede cargar.",
+  "That file isn't a Chaos Rift save, or it's from a newer version of the game.": "Ese archivo no es una partida de Chaos Rift, o es de una versión más nueva del juego.",
+  "REPLACE YOUR SAVE?": "¿REEMPLAZAR TU PARTIDA?",
+  "{0}: {1} DP, {2} cards, {3} decks.": "{0}: {1} DP, {2} cartas, {3} mazos.",
+  "Your current progress will be replaced by this save.": "Tu progreso actual será reemplazado por esta partida.",
+  "REPLACE": "REEMPLAZAR"
 }

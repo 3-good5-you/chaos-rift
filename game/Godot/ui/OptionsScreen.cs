@@ -31,6 +31,7 @@ public partial class OptionsScreen : RiftMenu
         Slider(ref y, "MUSIC", () => Settings.Music, v => { Settings.Music = v; Settings.Apply(false); });
         Slider(ref y, "SOUND", () => Settings.Sound, v => { Settings.Sound = v; Settings.Apply(false); });
         Row(ref y, "SCREEN", new[] { "FULLSCREEN", "WINDOW" }, () => Settings.Fullscreen ? 0 : 1, i => { Settings.Fullscreen = i == 0; Settings.Apply(); });
+        Row(ref y, "SAVE FILE", new[] { "EXPORT", "IMPORT" }, () => -1, i => { if (i == 0) ExportSave(); else ImportSave(); });
         Profile();
         Button(this, "DONE", new Vector2(W - 240, H - 100), OnBack);
         Put(this, Lang.F("VERSION {0}", Updater.Current), Thin, 15, Mist, new Vector2(W - 420, 40), new Vector2(360, 24), HorizontalAlignment.Right);   // which build this is (QoL 2026-11-14)
@@ -167,6 +168,63 @@ public partial class OptionsScreen : RiftMenu
     }
 
     void ClosePicker() { picker?.QueueFree(); picker = null; }
+
+    // ---------------------------------------------------------------- save file (2026-11-18)
+    // EXPORT writes your progress (signed + scrambled, Engine/SaveData.cs Pack) where you choose: carry it to
+    // another PC and IMPORT it there. A file edited by hand, or anything that isn't a save, is refused.
+
+    /// The system's own open / save window.
+    void FileWindow(bool save, Action<string> picked)
+    {
+        var d = new FileDialog
+        {
+            FileMode = save ? FileDialog.FileModeEnum.SaveFile : FileDialog.FileModeEnum.OpenFile,
+            Access = FileDialog.AccessEnum.Filesystem, UseNativeDialog = true, Filters = new[] { "*.crsave ; " + Lang.Tr("Chaos Rift save") },
+            CurrentFile = save ? $"ChaosRift-{string.Concat(Settings.PlayerName.Where(c => !Path.GetInvalidFileNameChars().Contains(c)))}-{DateTime.Now:yyyy-MM-dd}.crsave" : "",
+            CurrentDir = OS.GetSystemDir(OS.SystemDir.Documents),
+        };
+        d.FileSelected += p => { d.QueueFree(); picked(p); };
+        d.Canceled += d.QueueFree;
+        AddChild(d);
+        d.PopupCentered();
+    }
+
+    void ExportSave() => FileWindow(true, p =>
+    {
+        try { Session.Export(p); Sheet("SAVE EXPORTED", Lang.F("Saved to {0}. Copy it to your other PC and choose IMPORT there.", p), null); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { Sheet("COULDN'T EXPORT", e.Message, null); }
+    });
+
+    void ImportSave() => FileWindow(false, p =>
+    {
+        SaveData.State s;
+        try { s = SaveData.Import(p); }
+        catch (SaveData.Changed) { Sheet("CAN'T IMPORT", "This save was changed outside the game, so it can't be loaded.", null); return; }
+        catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException or System.Text.Json.JsonException)
+        { Sheet("CAN'T IMPORT", "That file isn't a Chaos Rift save, or it's from a newer version of the game.", null); return; }
+        var q = s.Profile;
+        Sheet("REPLACE YOUR SAVE?",
+            Lang.F("{0}: {1} DP, {2} cards, {3} decks.", s.Options.Name, q.Dp, q.Owned.Values.Sum(), s.Decks.Count) + "\n" +
+            Lang.Tr("Your current progress will be replaced by this save."),
+            () => { Session.Use(s); Transition.Go(this, "res://ui/MainMenu.tscn"); });
+    });
+
+    /// A message over a dark sheet; with `yes`, a REPLACE button too.
+    void Sheet(string title, string text, Action? yes)
+    {
+        ClosePicker();
+        picker = new Control { Size = new Vector2(W, H), ZIndex = 20 };
+        picker.SetMeta("dark", true);
+        picker.AddChild(new ColorRect { Size = picker.Size, Color = new Color(0.02f, 0.02f, 0.03f, 0.95f), MouseFilter = MouseFilterEnum.Stop });
+        AddChild(picker);
+        Put(picker, title, Title, 40, Silver, new Vector2(0, H * 0.32f), new Vector2(W, 60), HorizontalAlignment.Center);
+        Hair(picker, new Vector2(W / 2 - 100, H * 0.32f + 62), 200, GoldC);
+        var t = Put(picker, text, Body, 24, Mist, new Vector2(W / 2 - 520, H * 0.32f + 100), new Vector2(1040, 140), HorizontalAlignment.Center);
+        t.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        if (yes == null) { Button(picker, "OK", new Vector2(W / 2, H * 0.72f), ClosePicker, 24); return; }
+        Button(picker, "REPLACE", new Vector2(W / 2 - 160, H * 0.72f), () => { ClosePicker(); yes(); }, 24);
+        Button(picker, "CANCEL", new Vector2(W / 2 + 160, H * 0.72f), ClosePicker, 24);
+    }
 
     void Pictures()
     {
