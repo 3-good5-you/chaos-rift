@@ -27,7 +27,6 @@ public partial class OptionsScreen : RiftMenu
         Hair(this, new Vector2(82, 146), 200, GoldC);
         float y = 260;
         Row(ref y, "LANGUAGE", Lang.All.Select(l => l.Name).ToArray(), () => Lang.Index, i => { Lang.Set(Lang.All[i].Code); Session.Save(); Transition.Go(this, "res://ui/Options.tscn"); });
-        Row(ref y, "BAN LIST", DeckRules.Formats.Select(f => f.Name).ToArray(), () => Settings.Format, i => Settings.Format = i);
         Row(ref y, "DUEL SPEED", Settings.Speeds.Select(s => s.Name).ToArray(), () => Settings.Speed, i => Settings.Speed = i);
         Slider(ref y, "MUSIC", () => Settings.Music, v => { Settings.Music = v; Settings.Apply(false); });
         Slider(ref y, "SOUND", () => Settings.Sound, v => { Settings.Sound = v; Settings.Apply(false); });
@@ -143,6 +142,7 @@ public partial class OptionsScreen : RiftMenu
     {
         ClosePicker();
         picker = new Control { Size = new Vector2(W, H), ZIndex = 20 };
+        picker.SetMeta("dark", true);
         var shade = new ColorRect { Size = picker.Size, Color = new Color(0.02f, 0.02f, 0.03f, 0.95f), MouseFilter = MouseFilterEnum.Stop };
         shade.GuiInput += e => { if (e is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right }) ClosePicker(); };
         shade.SetMeta("rmb", true); picker.AddChild(shade);

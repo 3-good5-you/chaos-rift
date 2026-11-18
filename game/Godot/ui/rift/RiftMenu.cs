@@ -181,6 +181,38 @@ void fragment() {
         Pip(this, new Vector2(at.X + w * 0.6f + 10, at.Y + size * 1.25f), 9);
     }
 
+    /// Tabs as one pill (the Single / Match toggle picked in the Menu Lab, 2026-11-16): equal halves, the open one ink with
+    /// gold text and a soft shadow. The text shrinks until the pill fits `maxW` (Spanish / Arabic run longer).
+    /// Returns the pill's size.
+    protected Vector2 Pill(Control host, string[] labels, int on, Vector2 at, Action<int> pick, float maxW, int size = 18)
+    {
+        int fs = size;
+        float Seg(int s) => labels.Max(l => Title.GetStringSize(Lang.Tr(l), HorizontalAlignment.Left, -1, Z(s)).X) + 56;
+        while (fs > 11 && Seg(fs) * labels.Length > maxW) fs--;
+        float seg = Seg(fs), h = MathF.Round(Z(size) * 2.6f), pw = seg * labels.Length;
+        var track = new Panel { Position = at, Size = new Vector2(pw, h), MouseFilter = MouseFilterEnum.Ignore };
+        track.AddThemeStyleboxOverride("panel", Box(new Color(0, 0, 0, 0.06f), Ink * new Color(1, 1, 1, 0.14f), 1.5f, 99));
+        host.AddChild(track);
+        var knob = new Panel { Position = at + new Vector2(on * seg + 4, 4), Size = new Vector2(seg - 8, h - 8), MouseFilter = MouseFilterEnum.Ignore };
+        knob.AddThemeStyleboxOverride("panel", Box(Ink, default, 0, 99, 10, new Color(0, 0, 0, 0.25f), new Vector2(0, 3)));
+        host.AddChild(knob);
+        for (int i = 0; i < labels.Length; i++)
+        {
+            int k = i;
+            var dim = Ink * new Color(1, 1, 1, 0.6f);
+            var l = Put(host, labels[i], Title, fs, i == on ? GoldLight : dim, at + new Vector2(i * seg, Z(fs) * 0.12f), new Vector2(seg, h), HorizontalAlignment.Center);
+            l.VerticalAlignment = VerticalAlignment.Center;
+            Click(l, () => { if (k == on) return; UiSound(false); pick(k); }, hv => { if (k != on) l.AddThemeColorOverride("font_color", hv ? Ink : dim); });
+        }
+        return new Vector2(pw, h);
+    }
+
+    /// Two screens sharing one main-menu entry (2026-11-17: ACHIEVEMENTS | REPLAYS): a pill in place of the heading.
+    protected void HeadTabs((string Label, string Scene)[] tabs, int on, Vector2 at) =>
+        Pill(this, tabs.Select(t => t.Label).ToArray(), on, at, i => Transition.Go(this, tabs[i].Scene), CrackX(at.Y) - at.X - 60, 20);
+
+    protected static readonly (string, string)[] RecordTabs = { ("ACHIEVEMENTS", "res://ui/Achievements.tscn"), ("REPLAYS", "res://ui/Replays.tscn") };
+
     /// Soft drop shadow with no visible edge.
     protected static ColorRect Shadow(Control host, Vector2 pos, Vector2 size, float strength, Color col, Vector2 offset = default)
     {
@@ -281,29 +313,86 @@ void fragment() {
         return (w, Set);
     }
 
-    /// A text button: just the word, a gold line sweeps in under it on hover (FX lab pick 2026-11-12, replacing the
-    /// two diamonds with lines above and below).
-    protected Control Button(Control host, string s, Vector2 centre, Action click, int size = 26)
+    /// A button (Menu Lab pick 2026-11-16, replacing the bare word with a gold line under it: players didn't see it was
+    /// a button): a soft capsule with a gold arrow badge on the right. On the light side a white capsule with an ink
+    /// rim, on the dark side a smoked one; the main action of a screen (`primary`, by default any button of size 28
+    /// and up) is solid: ink with gold text on the light side, gold with ink text on the dark side.
+    protected Control Button(Control host, string s, Vector2 centre, Action click, int size = 26, bool? primary = null)
     {
-        float w = Title.GetStringSize(Lang.Tr(s), HorizontalAlignment.Left, -1, Z(size)).X;
-        var root = new Control { Position = centre - new Vector2(w / 2 + 50, size), Size = new Vector2(w + 100, size * 2) };
+        bool main = primary ?? size >= 28;
+        bool dark = false;
+        for (Node? n = host; n != null; n = n.GetParent()) if (n.HasMeta("dark")) { dark = true; break; }
+        var at = (host.IsInsideTree() ? host.GlobalPosition : host.Position) + centre;
+        bool light = !dark && OnLight(at);
+        int fs = Z(Math.Min(size, 26));
+        float tw = Title.GetStringSize(Lang.Tr(s), HorizontalAlignment.Left, -1, fs).X;
+        float h = MathF.Round(fs * 2.1f + (main ? 6 : 0)), w = tw + h * 2.0f;
+        var root = new Control { Position = centre - new Vector2(w, h) / 2, Size = new Vector2(w, h), PivotOffset = new Vector2(w, h) / 2 };
         host.AddChild(root);
-        var l = T(root, s, Title, size, new Vector2(10, size * 0.28f), new Vector2(w + 80, size * 1.45f), HorizontalAlignment.Center);
-        var bot = Hair(root, new Vector2(50, size * 1.72f), w, GoldC, 2);
-        bot.PivotOffset = new Vector2(w / 2, 0); bot.Scale = new Vector2(0, 1);
-        Click(root, () => { UiSound(true); click(); }, on =>
+        bool hov = false;
+        var face = new Control { Size = root.Size, MouseFilter = MouseFilterEnum.Ignore };
+        root.AddChild(face);
+        face.Draw += () => Capsule(face, w, h, light, main, hov);
+        var l = Put(root, s, Title, Math.Min(size, 26), Colors.White, new Vector2(-h * 0.4f, Z(Math.Min(size, 26)) * 0.12f), new Vector2(w, h), HorizontalAlignment.Center);
+        l.VerticalAlignment = VerticalAlignment.Center;
+        void Paint() => l.AddThemeColorOverride("font_color", main ? (light && !hov ? GoldLight : Ink) : hov ? (light ? GoldDeep : GoldLight) : light ? Ink : Silver);
+        Paint();
+        Click(root, () =>
+        {
+            UiSound(true);
+            var t = CreateTween();
+            t.TweenProperty(root, "scale", new Vector2(0.96f, 0.96f), 0.06);
+            t.TweenProperty(root, "scale", Vector2.One, 0.1);
+            t.TweenCallback(Callable.From(click));
+        }, on =>
         {
             if (on) UiSound(false);
-            l.Mat().P("lit", on ? 1f : 0f);
-            Ink_.Only(this, bot).TweenProperty(bot, "scale:x", on ? 1f : 0f, 0.2).SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.Out);
+            hov = on; Paint(); face.QueueRedraw();
+            Ink_.Only(this, root).TweenProperty(root, "scale", on ? new Vector2(1.03f, 1.03f) : Vector2.One, 0.14).SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.Out);
         });
         return root;
+    }
+
+    /// Lays buttons out left to right from `start` (each button's top-left), wrapping to a new row below when the next one
+    /// would pass `maxX`: translated labels run longer, so fixed button positions overlapped (2026-11-17).
+    protected static void Flow(Vector2 start, float maxX, params Control[] buttons)
+    {
+        var at = start;
+        foreach (var b in buttons)
+        {
+            if (at.X > start.X && at.X + b.Size.X > maxX) at = new Vector2(start.X, at.Y + b.Size.Y + 14);
+            b.Position = at;
+            at.X += b.Size.X + 18;
+        }
+    }
+
+    /// A rounded box (soft shadow optional) for capsules and panels.
+    public static StyleBoxFlat Box(Color bg, Color edge, float border, int radius, float shadow = 0, Color sh = default, Vector2 shOff = default)
+    {
+        var b = new StyleBoxFlat { BgColor = bg, BorderColor = edge, AntiAliasing = true, CornerDetail = 8, ShadowSize = (int)shadow, ShadowColor = sh, ShadowOffset = shOff };
+        b.SetBorderWidthAll((int)border); b.SetCornerRadiusAll(radius);
+        return b;
+    }
+
+    /// The capsule face of Button: body, rim, gold badge with a chevron (it slides a little on hover).
+    static void Capsule(Control c, float w, float h, bool light, bool main, bool hov)
+    {
+        Color gold = light ? GoldDeep : GoldLight;
+        Color fill = main ? (light ? (hov ? GoldC : Ink) : hov ? GoldLight : GoldC) : hov ? GoldC with { A = light ? 0.18f : 0.22f } : light ? new Color(1, 1, 1, 0.65f) : new Color(0, 0, 0, 0.4f);
+        var rim = main ? GoldC : (light ? Ink : Silver) with { A = hov ? 0.6f : 0.3f };
+        c.DrawStyleBox(Box(fill, rim, 1.5f, (int)(h / 2), hov ? 14 : 6, new Color(0, 0, 0, light ? 0.12f : 0.4f), new Vector2(0, 3)), new Rect2(0, 0, w, h));
+        var cc = new Vector2(w - h / 2, h / 2);
+        c.DrawCircle(cc, h * 0.34f, main ? (light && !hov ? GoldC : Ink) : hov ? GoldC : gold);
+        float a = h * 0.1f, dx = hov ? 2 : 0;
+        var arrow = main ? (light && !hov ? Ink : GoldLight) : hov ? Ink : Colors.White;
+        c.DrawPolyline(new[] { cc + new Vector2(-a * 0.6f + dx, -a), cc + new Vector2(a * 0.6f + dx, 0), cc + new Vector2(-a * 0.6f + dx, a) }, arrow, 2.5f, true);
     }
 
     /// A name box across the bottom (rename a deck, name a replay): Enter or OK keeps a non-empty name, Esc / CANCEL drops it.
     protected void NamePrompt(string title, string start, Action<string> done)
     {
         var box = new Control { Size = new Vector2(W, 170), Position = new Vector2(0, H - 170), ZIndex = 40 };
+        box.SetMeta("dark", true);
         AddChild(box);
         box.AddChild(new ColorRect { Size = box.Size, Color = new Color(0.02f, 0.02f, 0.03f, 0.94f), MouseFilter = MouseFilterEnum.Stop });
         Hair(box, Vector2.Zero, W, GoldC with { A = 0.6f });
@@ -367,14 +456,22 @@ void fragment() {
         var root = new Control { Position = at, Size = new Vector2(260, 30), MouseFilter = MouseFilterEnum.Ignore };
         host.AddChild(root);
         var gold = dark ? GoldLight : GoldDeep;
-        var prev = Put(root, "‹", Title, 34, gold, new Vector2(0, -14), new Vector2(44, 48), HorizontalAlignment.Center);
-        var text = Put(root, "", Title, 17, dark ? Silver : Ink, new Vector2(44, 2), new Vector2(172, 24), HorizontalAlignment.Center);
-        var next = Put(root, "›", Title, 34, gold, new Vector2(216, -14), new Vector2(44, 48), HorizontalAlignment.Center);
+        // the right arrow is the next page in every language (user 2026-11-17). Arabic letters sit lower in the line
+        // than Latin capitals, so there the arrows sit lower too, level with the word's middle
+        float ay = Lang.Code == "ar" ? 3 : -3;
+        var left = Put(root, "‹", Title, 34, gold, new Vector2(0, ay), new Vector2(44, 48), HorizontalAlignment.Center);
+        var text = Put(root, "", Title, 17, dark ? Silver : Ink, new Vector2(0, 2), new Vector2(260, 24), HorizontalAlignment.Center);
+        var right = Put(root, "›", Title, 34, gold, new Vector2(216, ay), new Vector2(44, 48), HorizontalAlignment.Center);
+        left.TextDirection = right.TextDirection = TextDirection.Ltr;   // Arabic mirrors ‹ › (they pointed inward)
+        var (prev, next) = (left, right);
         Click(prev, () => turn(-1)); Click(next, () => turn(1));
         return (page, pages) =>
         {
             root.Visible = pages > 1;
             text.Text = Lang.F("PAGE {0} / {1}", page + 1, pages);
+            // the arrows hug the text (PÁGINA is longer than PAGE), centred on the same spot
+            float tw = Math.Max(90, text.GetMinimumSize().X);
+            left.Position = new Vector2(130 - tw / 2 - 48, left.Position.Y); right.Position = new Vector2(130 + tw / 2 + 4, right.Position.Y);
             prev.Modulate = new Color(1, 1, 1, page > 0 ? 1 : 0.25f); next.Modulate = new Color(1, 1, 1, page < pages - 1 ? 1 : 0.25f);
         };
     }
@@ -387,6 +484,7 @@ void fragment() {
     {
         CloseToast();
         toast = new Control { Size = new Vector2(W, 150), Position = new Vector2(0, H - 150), ZIndex = 40 };
+        toast.SetMeta("dark", true);
         AddChild(toast);
         toast.AddChild(new ColorRect { Size = toast.Size, Color = new Color(0.02f, 0.02f, 0.03f, 0.92f), MouseFilter = MouseFilterEnum.Stop });
         Hair(toast, Vector2.Zero, W, GoldC with { A = 0.6f });
@@ -395,7 +493,7 @@ void fragment() {
         foreach (var (label, act) in choices) { Button(toast, label, new Vector2(x, 100), act, 22); x += 320; }
         Darken(toast);
         var mine = toast;
-        if (choices.Length == 0) GetTree().CreateTimer(1.6).Timeout += () => { if (!toastKeep && toast == mine) CloseToast(); };
+        if (choices.Length == 0) GetTree().CreateTimer(1.6).Timeout += () => { if (IsInstanceValid(this) && !toastKeep && toast == mine) CloseToast(); };
     }
     protected void CloseToast() { toast?.QueueFree(); toast = null; toastKeep = false; }
 

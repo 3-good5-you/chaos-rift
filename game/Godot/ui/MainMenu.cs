@@ -41,7 +41,7 @@ void fragment() {
 	/// The menu entries; `-- --modes` previews the menu with CHALLENGES added (game-mode samples, 2026-11-08).
 	static readonly string[] Menu = OS.GetCmdlineUserArgs().Contains("--modes")
 		? new[] { "Duel", "Tournament", "Challenges", "LAN Duel", "Deck Builder", "Card List", "Shop", "Options", "Quit" }
-		: new[] { "Duel", "Tournament", "LAN Duel", "Replays", "Deck Builder", "Card List", "Shop", "Options", "Quit" };
+		: new[] { "Duel", "Decks", "Collection", "Records", "Options", "Quit" };   // 2026-11-17: Tournament + LAN moved into DUEL, Card List | Shop and Achievements | Replays share an entry
 	protected override int ItemCount => Menu.Length;
 	const int MenuSize = 30;
 	readonly List<(Label L, float Y)> rows = new();
@@ -148,13 +148,12 @@ void fragment() {
 		if (Session.NeedsStarter && Menu[i] != "Quit" && Menu[i] != "Options") { StarterPick(); return; }
 		switch (Menu[i])
 		{
-			case "Duel": Session.Tour = null; Transition.Go(this, "res://ui/DuelModes.tscn"); break;
+			case "Duel": Transition.Go(this, "res://ui/DuelModes.tscn"); break;
 			case "Tournament": Transition.Go(this, "res://ui/Tournament.tscn"); break;
 			case "LAN Duel": Transition.Go(this, "res://ui/LanLobby.tscn"); break;
-			case "Replays": Transition.Go(this, "res://ui/Replays.tscn"); break;
-			case "Deck Builder": Transition.Go(this, "res://ui/DeckSelect.tscn"); break;
-			case "Card List": Transition.Go(this, "res://ui/CardList.tscn"); break;
-			case "Shop": Transition.Go(this, "res://ui/ShopScreen.tscn"); break;
+			case "Decks": Transition.Go(this, "res://ui/DeckSelect.tscn"); break;
+			case "Collection": Transition.Go(this, "res://ui/CardList.tscn"); break;
+			case "Records": Transition.Go(this, "res://ui/Achievements.tscn"); break;
 			case "Options": Transition.Go(this, "res://ui/Options.tscn"); break;
 			case "Quit": GetTree().CreateTimer(0.4).Timeout += () => GetTree().Quit(); break;
 		}
@@ -281,6 +280,6 @@ void fragment() {
 		Ask(Lang.F("Downloading Chaos Rift {0}...", v));
 		toastKeep = true;
 		Updater.Install(this, text => { if (toastText != null) toastText.Text = text; },
-			() => { toastKeep = false; Ask("The update could not be downloaded here.", ("DOWNLOAD PAGE", () => { CloseToast(); OS.ShellOpen(Updater.Page); }), ("LATER", CloseToast)); });
+			why => { toastKeep = false; GD.PrintErr("update failed: " + why); Ask(Lang.Tr("The update could not be downloaded here.") + " (" + why + ")", ("DOWNLOAD PAGE", () => { CloseToast(); OS.ShellOpen(Updater.Page); }), ("LATER", CloseToast)); });
 	}
 }

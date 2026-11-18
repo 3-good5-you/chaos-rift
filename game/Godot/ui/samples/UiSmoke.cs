@@ -107,16 +107,17 @@ public partial class UiSmoke : Node
         var deckTiles = Clickables().Where(c => c.GlobalPosition.X > crack + 60 && c is TextureRect).ToList();
         Check(deckTiles.Count > 0, $"deck tiles ({deckTiles.Count})");
         int before = deck.Main.Count + deck.Side.Count + deck.Extra.Count;
+        bool canDrop = deck.Main.Count > DeckRules.MinMain;   // at 40 the removal leaves 39: SAVE must refuse it
         if (deckTiles.Count > 0) { Click(deckTiles[0], right: true); await Wait(0.3); }
         await Tap("SAVE");
         if (Find("SAVE ANYWAY") != null) await Tap("SAVE ANYWAY");
-        Check(deck.Main.Count + deck.Side.Count + deck.Extra.Count == before - 1, "right-clicking a deck card takes it out");
+        Check(deck.Main.Count + deck.Side.Count + deck.Extra.Count == before - (canDrop ? 1 : 0), canDrop ? "right-clicking a deck card takes it out" : "a Main Deck under 40 cards can't be saved");
 
-        // ---- Shop
-        await Go("res://ui/ShopScreen.tscn");
+        // ---- Buying (the Shop lives in COLLECTION since 2026-11-17)
+        await Go("res://ui/CardList.tscn");
         P = Session.Profile;              // every screen reloads the save
         P.Dp = Math.Max(P.Dp, 20000);     // sandbox save only (--unlockall)
-        foreach (var k in P.Owned.Keys.Where(k => P.Owned[k] >= 3).Take(300).ToList()) P.Owned[k] = 1;   // the sandbox owns everything: make room to buy
+        foreach (var k in P.Owned.Keys.ToList()) { P.Owned[k] = 1; P.Seen.Add(k); }   // the sandbox owns everything: make room to buy (seen = for sale)
         await Tap("CARD BACKS"); await Tap("CARDS");   // redraw with the new DP
         int dp = P.Dp;
         var buy = Find("BUY ×1");
@@ -125,7 +126,9 @@ public partial class UiSmoke : Node
         await Tap("CARD BACKS"); await Shot("3_shop_backs");
         int ownedBacks = Shop.Backs.Count(b => Shop.Owns(P, b));
         if (ownedBacks == Shop.Backs.Length) GD.Print("SKIP back buy (the sandbox owns every back)");
-        else { await Tap("BUY"); Check(Shop.Backs.Count(b => Shop.Owns(P, b)) == ownedBacks + 1, "BUY a card back"); }
+        else if (Shop.Backs.FirstOrDefault(b => !Shop.Owns(P, b) && Shop.Sold(b)) is { } want && Clickables().FirstOrDefault(c => c.TooltipText == Lang.Cosmetic(want.Name)) is { } tile)
+        { Click(tile); await Wait(0.3); await Tap("BUY"); Check(Shop.Backs.Count(b => Shop.Owns(P, b)) == ownedBacks + 1, "BUY a card back"); }
+        else GD.Print("SKIP back buy (no unowned back on the first page)");
         await Tap("PLAYMATS"); await Tap("FRAMES"); await Tap("CARDS");
 
         // ---- Card List: equip a card back you own
@@ -133,10 +136,10 @@ public partial class UiSmoke : Node
         P = Session.Profile;
         // filters: open the panel, pick a monster type from the TYPE list, then spells + a category, then clear
         await Tap("FILTERS ▾");
-        await Tap("TYPE  ANY  ▾");
-        await Tap("DRAGON");
+        await Tap("TYPE:  ANY   ▾");
+        await Tap("Dragon");
         var labels = Scene.FindChildren("*", "Label", true, false).OfType<Label>().ToList();
-        Check(labels.Any(l => l.Text == "TYPE  DRAGON  ▾"), "TYPE picker sets Dragon");
+        Check(labels.Any(l => l.Text == "TYPE:  DRAGON   ▾"), "TYPE picker sets Dragon");
         await Tap("SPELL"); await Tap("EQUIP");
         await Shot("4a_cardlist_spell_filter");
         await Tap("CLEAR FILTERS");
@@ -162,7 +165,10 @@ public partial class UiSmoke : Node
         if (!Session.Decks.Any(d => DeckRules.IsLegal(d, Session.Profile))) { Session.Decks.Add(DeckRules.GrantStarter(Session.Profile, 0)); Session.Save(); }   // sandbox only
         await Go("res://ui/DuelModes.tscn");
         await Tap("GAUNTLET"); await Wait(1.2);
-        Check(Scene is DuelSetup && Session.Run != null && Labels().Any(l => l.Text == "GAUNTLET"), "GAUNTLET opens setup for rival 1 of 4");
+        Check(Scene is GauntletScreen && Session.Run is { Order.Length: 8 }, "GAUNTLET opens the eight floors");
+        await Shot("7a_gauntlet");
+        await Tap("DUEL"); await Wait(1.2);
+        Check(Scene is DuelSetup && Session.Run != null && Labels().Any(l => l.Text == "GAUNTLET"), "floor 1 DUEL opens setup");
         await Tap("START DUEL"); await Wait(2);
         Check(Scene is TurnOrder, "gauntlet START goes to the coin toss");
         await Go("res://ui/DuelModes.tscn");
@@ -172,17 +178,17 @@ public partial class UiSmoke : Node
         Check(Scene is DuelSetup && Session.Pick.Level == 7 && Session.Pick.DeckKey == "kaiba/x_lv7", "LEGEND: Kaiba at level 7 with his strongest deck");
         await Go("res://ui/DuelModes.tscn");
         await Tap("PACK DUEL"); await Wait(1.5);
-        Check(Scene is PackOpen, "PACK DUEL opens the packs");
+        Check(Scene is PackDraft && Session.Draft is { Round: 0 }, "PACK DUEL opens the draft");
         await Shot("7_packs");
-        await Tap("BUILD DECK"); await Wait(1.5);
-        Check(Scene is DeckBuilder && DeckBuilder.Temp?.Packs != null && Labels().Any(l => l.Text == "USE THIS DECK") && !Labels().Any(l => l.Text == "SAVE"), "pack deck builder: USE THIS DECK, no SAVE");
-        await Shot("8_pack_builder");
-        await Tap("USE THIS DECK");
-        Check(Session.ModeDeck == null && Scene is DeckBuilder, "an empty pack deck can't be used");
+        for (int r = 0; r <= Draft.Rounds && !Session.Draft!.Done; r++) { await Tap("AUTO"); await Wait(0.3); await Tap("LOCK IN"); await Wait(1.6); }
+        Check(Session.Draft!.Done && Labels().Any(l => l.Text == "BEST OF 3"), "the draft ends on your deck");
+        await Shot("8_pack_deck");
+        await Tap("BEST OF 3"); await Wait(1.5);
+        Check(Scene is TurnOrder && Session.Match && Session.ModeDeck is { Main.Count: >= 40 } && Session.RivalDeck?.Name == "RIVAL DRAFT", "BEST OF 3 starts a match with both drafted decks");
         int decksBefore = Session.Decks.Count;
         await Go("res://ui/DuelModes.tscn");
         await Tap("LIMITED DUEL"); await Wait(1.5);
-        Check(Scene is DeckBuilder && DeckBuilder.Temp?.Packs == null && Labels().Any(l => l.Text.Contains("FOR THIS DUEL ONLY")), "LIMITED DUEL opens the rule builder");
+        Check(Scene is DeckBuilder && Find("START DUEL") != null, "LIMITED DUEL opens the rule builder");
         await Shot("9_limited_builder");
         Check(Session.Decks.Count == decksBefore, "mode decks never join your saved decks");
         await Go("res://ui/DuelModes.tscn");
@@ -215,6 +221,17 @@ public partial class UiSmoke : Node
         await Tap("DUEL"); await Wait(1.2);
         Check(Scene is DuelSetup && Scene.FindChildren("*", "Label", true, false).OfType<Label>().Any(l => l.Text == "QUARTERFINAL"), "tournament DUEL opens step 2 with the round");
         Session.Tour = null;
+        // ---- Achievements: the list shows every goal; a done one claims once
+        Achievements.Bump(Session.Profile, "wins");
+        await Go("res://ui/Achievements.tscn");
+        Check(Scene is AchievementsScreen && Labels().Any(l => Achievements.All.Any(d => d.Name == l.Text)), "achievements list");   // any goal: claimed ones sort to the last page of the reused test save
+        await Shot("11_achievements");
+        if (!Achievements.Claimed(Achievements.All[0], Session.Profile))
+        {
+            int dpWas = Session.Profile.Dp;
+            await Tap("CLAIM"); await Wait(0.6);
+            Check(Session.Profile.Dp > dpWas, "CLAIM pays the DP");
+        }
         await Go("res://ui/MainMenu.tscn");
         await Wait(5);
         await Shot("6_menu");

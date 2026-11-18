@@ -14,24 +14,29 @@ public partial class DuelModes : RiftMenu
     ColorRect? pip;
 
     protected override string? MusicPath => Md("solo_gate");
-    protected override int ItemCount => Modes.All.Length;
+    /// The engine's modes plus the two that left the main menu on 2026-11-17 (TOURNAMENT, LAN DUEL), switched by name.
+    static readonly Modes.Info[] Items = Modes.All.Concat(new Modes.Info[]
+    {
+        new(GameMode.Regular, "TOURNAMENT", "Eight duelists, one bracket, best of three. Lose once and you are out.", "Champion: 3,000 DP + 6 cards", true),
+        new(GameMode.Regular, "LAN DUEL", "Duel a friend on the same network, or over Hamachi.", "Just you and a friend", true),
+    }).ToArray();
+    protected override int ItemCount => Items.Length;
     protected override void OnBack() => Transition.Go(this, "res://ui/MainMenu.tscn");
 
     protected override void Build()
     {
         Demo.Ensure();
-        Session.Tour = null;
-        Session.ClearMode();
+        Session.ClearMode();   // a tournament in progress is kept: TOURNAMENT reopens its bracket
         DeckBuilder.Temp = null;
-        if (Session.Picks.Length != RivalPanels.All.Length) Session.RollPicks();
+        if (Session.Picks.Length != Session.Roster.Length) Session.RollPicks();
         Rift(0.5f, 0.44f);
         Back();
         Put(this, "DUEL", Title, 40, Ink, new Vector2(80, 58));
         Hair(this, new Vector2(82, 108), 100, GoldC);
         float y = H * 0.2f;
-        for (int i = 0; i < Modes.All.Length; i++)
+        for (int i = 0; i < Items.Length; i++)
         {
-            var m = Modes.All[i];
+            var m = Items[i];
             var l = Put(this, m.Name, Title, 40, Ink * new Color(1, 1, 1, m.Ready ? 0.6f : 0.25f), new Vector2(130, y), new Vector2(620, 60));
             l.PivotOffset = new Vector2(0, 30);
             Hook(l, i);
@@ -54,19 +59,19 @@ public partial class DuelModes : RiftMenu
         if (now < 0 || now >= names.Count) return;   // a hover that lands while the list is still being built
         for (int i = 0; i < names.Count; i++)
         {
-            bool on = i == now, ready = Modes.All[i].Ready;
+            bool on = i == now, ready = Items[i].Ready;
             names[i].AddThemeColorOverride("font_color", on ? (ready ? GoldDeep : Graphite) : Ink * new Color(1, 1, 1, ready ? 0.6f : 0.25f));
             Ink_.Only(this, names[i]).TweenProperty(names[i], "scale", on ? new Vector2(1.18f, 1.18f) : Vector2.One, 0.18);
         }
         pip ??= Pip(this, Vector2.Zero, 12);
         pip.Position = names[now].Position + new Vector2(-34, 24);
-        var m = Modes.All[now];
+        var m = Items[now];
         title.Text = m.Name;
         line.Text = m.Line;
         extra.Text = m.Mode switch
         {
             GameMode.Limited => Lang.Tr("TODAY:  ") + Lang.Tr(Modes.Today(DateTime.Today).Name) + "\n" + Lang.Duel(Modes.Today(DateTime.Today).Text),
-            GameMode.Gauntlet => string.Join("   ›   ", new Gauntlet(Session.Picks).Order.Select(p => RivalPanels.All.First(r => r.File == p.Rival).Name)),
+            GameMode.Gauntlet => Lang.Tr("8 FLOORS  ·  EVERY FLOOR PAYS MORE"),
             _ => "",
         };
         extra.AddThemeFontOverride("font", m.Mode == GameMode.Limited ? Body : Title);
@@ -78,8 +83,11 @@ public partial class DuelModes : RiftMenu
 
     protected override void OnChoose(int i)
     {
-        var m = Modes.All[i];
+        var m = Items[i];
         if (!m.Ready) return;
+        if (m.Name == "TOURNAMENT") { Transition.Go(this, "res://ui/Tournament.tscn"); return; }
+        Session.Tour = null;
+        if (m.Name == "LAN DUEL") { Transition.Go(this, "res://ui/LanLobby.tscn"); return; }
         Session.Mode = m.Mode;
         switch (m.Mode)
         {
@@ -90,9 +98,9 @@ public partial class DuelModes : RiftMenu
             case GameMode.Chaos:
                 Transition.Go(this, "res://ui/RivalSelect.tscn"); break;
             case GameMode.Gauntlet:
-                Session.Run = new Gauntlet(Session.Picks);
+                Session.Run = Gauntlet.Climb(Tournament.Roster, Session.Rng);
                 Session.Match = false;
-                Transition.Go(this, "res://ui/DuelSetup.tscn"); break;
+                Transition.Go(this, "res://ui/Gauntlet.tscn"); break;
             case GameMode.Limited:
             {
                 var rule = Session.Rule = Modes.Today(DateTime.Today);
@@ -104,11 +112,7 @@ public partial class DuelModes : RiftMenu
                 Transition.Go(this, "res://ui/DeckBuilder.tscn"); break;
             }
             case GameMode.Pack:
-            {
-                var packs = Modes.OpenPacks(Session.Rng);
-                DeckBuilder.Temp = new DeckBuilder.TempBuild("PACK DECK", "BUILT FROM YOUR SIX PACKS ONLY", Modes.PoolProfile(packs.SelectMany(p => p)), "res://ui/RivalSelect.tscn", packs);
-                Transition.Go(this, "res://ui/PackOpen.tscn"); break;
-            }
+                Transition.Go(this, "res://ui/PackDraft.tscn"); break;
         }
     }
 }

@@ -275,15 +275,6 @@ public static partial class Scripts
                 if (o != null && o.Loc == Loc.Monster) await x.D.Banish(o, x.Self);
             };
         }
-        Spell("Lightning Crash", async x =>
-        {
-            var c = await x.Pick(x.My.Deck.Where(c => c.Data.IsMonster && c.Data.Race == "Thunder"), "Add which Thunder monster?");
-            x.D.Shuffle(x.Me);
-            if (c == null) return;
-            await x.D.ToHand(c, x.Self); x.D.Reveal(x.Opp, c);
-            var d = x.D; int me = x.Me; string n = c.Name;
-            d.Linger(d.Turn + 1, (q, k, p) => q is Q.NormalSummon or Q.SetMonster && p == me && k != null && k.Name == n);
-        }, x => Hopt(x) && x.My.Deck.Any(c => c.Data.IsMonster && c.Data.Race == "Thunder"), async x => UseHopt(x));
         {
             var s = Spell("Limit Reverse", async x =>
             {

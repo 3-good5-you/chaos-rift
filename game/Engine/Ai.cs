@@ -113,6 +113,11 @@ public sealed partial class Ai
     static bool IsFlip(Card c) => c.Data.Desc.StartsWith("FLIP");
     /// Exodia pieces are a win condition in hand, never field material (every brain).
     static bool IsExodia(Card c) => Duel.Exodia.Contains(c.Name);
+
+    /// Exodia is still on for this side: all five pieces in hand or deck (long-term plan, user 2026-11-16). An Exodia
+    /// Necross deck wants the pieces in the Graveyard instead: no such plan there.
+    static bool ExodiaLive(Player p) => Duel.Exodia.All(n => p.Hand.Any(c => c.Name == n) || p.Deck.Any(c => c.Name == n))
+        && !p.Hand.Concat(p.Deck).Any(c => c.Name is "Exodia Necross" or "Contract with Exodia");
     /// The look-ahead brains see a 1000 ATK body; the pieces win in hand, so their Summons are vetoed (the rule brain decides).
     static bool SummonsExodia(Prompt p, int i) => p.Kind == Ask.Main && i >= 0 && i < p.Options.Count && p.Options[i] is { Act: Act.Summon or Act.Set, Card: { } c } && IsExodia(c);
 
@@ -135,10 +140,16 @@ public sealed partial class Ai
     /// What the CPU believes a monster's guard is. Face-down DEF is underestimated early (original quirk).
     int Guard(Duel d, Card c)
     {
-        if (!c.FaceUp) return d.Turn < 15 ? c.Data.Def * (d.Turn + 5) / 20 : c.Data.Def;
+        if (!c.FaceUp)
+        {
+            // Classic+ doesn't look under the card: a Set monster is guessed at a typical Set DEF.
+            if (Brain != Brain.Classic && !Legacy) return SetGuess;
+            return d.Turn < 15 ? c.Data.Def * (d.Turn + 5) / 20 : c.Data.Def;
+        }
         return c.Defense ? d.Def(c) : d.Atk(c);
     }
 
+    const int SetGuess = 1200;   // Classic+: a Set monster's DEF, unseen (1000-1400 played alike in leagues; 1800 lost)
     int OppBestAtk(Duel d) => Opp(d).MonstersOnField.Where(c => c.FaceUp).Select(d.Atk).DefaultIfEmpty(0).Max();
     int MyBest(Duel d) => Me(d).MonstersOnField.Where(c => c.FaceUp).Select(c => Math.Max(d.Atk(c), d.Def(c))).DefaultIfEmpty(0).Max();
 
@@ -166,6 +177,13 @@ public sealed partial class Ai
     bool WantsDefense(Duel d, int atk, int def)
     {
         int oppBest = OppBestAtk(d);
+        // Exodia plan: stall. Every monster that can wall goes to Defense while the pieces come.
+        if (!Legacy && Brain != Brain.Classic && ExodiaLive(Me(d)) && Opp(d).MonstersOnField.Any() && def >= atk) return true;
+        // A wall that is also the best attacker on the field goes hunting in Main Phase 1 (user 2026-11-16: walls
+        // summoned in Defense left the player's weaker monsters alive to tribute up): it beats one of theirs now and
+        // nothing of theirs beats it.
+        if (!Legacy && Brain != Brain.Classic && d.Phase == Phase.Main1 && d.Turn > 1 && atk >= 1000 && oppBest < atk
+            && Opp(d).MonstersOnField.Any(m => atk > Guard(d, m))) return false;
         // A wall (or a weak FLIP monster) left in Attack only feeds the opponent's next attack (every brain).
         if (def > atk && atk < 1500) return true;
         if (!Opp(d).MonstersOnField.Any()) return false;
@@ -190,6 +208,13 @@ public sealed partial class Ai
             i = Find(p, o => o.Act == Act.Activate && o.Card!.Name == name && !Done("a" + o.Card.Uid) && FirstUseOk(d, o.Card));
             if (i >= 0) return Take(p, i, "a" + p.Options[i].Card!.Uid);
         }
+        // Classic+: draws and searches first, so the summon is chosen from the fuller hand.
+        if (Brain != Brain.Classic && !Legacy)
+        {
+            i = Find(p, o => o.Act == Act.Activate && o.Card is { Loc: Loc.Hand } c && !c.Data.IsMonster && !c.Data.IsTrap && !Done("a" + c.Uid)
+                && Fills(c) && PlusSpellOk(d, c));
+            if (i >= 0) return Take(p, i, "a" + p.Options[i].Card!.Uid);
+        }
         // Stage 2: summon, monster effects, spells, then normal summon / set.
         i = SummonChoice(d, p);
         if (i >= 0) return Take(p, i, "s");
@@ -197,11 +222,18 @@ public sealed partial class Ai
         if (i >= 0) return i;
         // Special Summon procedures (Spirit of Flames, Dark Necrofear, Gate Guardian...): the original held these in
         // hand forever (every brain).
-        i = Find(p, o => o.Act == Act.Special && !Done("x" + o.Card!.Uid) && o.Card.Data.Atk >= 1200);
+        i = Find(p, o => o.Act == Act.Special && !Done("x" + o.Card!.Uid) && o.Card.Data.Atk >= 1200 && (Legacy || !Spoils(d, o.Card)));
         if (i >= 0) return Take(p, i, "x" + p.Options[i].Card!.Uid);
         foreach (var name in lists.MonsterEffects)
         {
             i = Find(p, o => o.Act == Act.Activate && o.Card!.OnField && o.Card.Name == name && !Done("e" + o.Card.Uid));
+            if (i >= 0) return Take(p, i, "e" + p.Options[i].Card!.Uid);
+        }
+        // Classic+: every other monster effect is read from its text (2026-11-16 card audit: the expansion monsters
+        // never used their effects, only the named list did).
+        if (Brain != Brain.Classic && !Legacy)
+        {
+            i = Find(p, o => o.Act == Act.Activate && o.Card is { Data.IsMonster: true } c && !lists.MonsterEffects.Contains(c.Name) && !Done("e" + c.Uid) && MonsterFxOk(d, c));
             if (i >= 0) return Take(p, i, "e" + p.Options[i].Card!.Uid);
         }
         i = SpellChoice(d, p);
@@ -248,7 +280,7 @@ public sealed partial class Ai
             if (o.Act != Act.Summon || o.Card!.Data.Level < 5) continue;
             int need = d.TributesFor(o.Card);   // the Gods take 3
             // a God on the field is never one of the Tributes (playtest 2026-11-12: Ra went to the GY for Sphere Mode / Summoned Skull)
-            if (need > Me(d).MonstersOnField.Count(m => !IsGod(m))) continue;
+            if (need > Me(d).MonstersOnField.Count(m => !IsGod(m)) + (d.TurnFlags.Contains($"soulexchange{me}") ? 1 : 0)) continue;
             var rest = Me(d).MonstersOnField.OrderByDescending(TributeValue(d)).Take(Math.Max(0, Me(d).MonstersOnField.Count() - need))
                 .Where(c => c.FaceUp && !c.Defense).Select(d.Atk).ToList();
             int atk = SummonAtk(d, o.Card, rest);
@@ -258,6 +290,12 @@ public sealed partial class Ai
             if (sc > bestScore) { bestScore = sc; best = k; }
         }
         if (best >= 0 && bestScore >= baseScore) return best;
+        // A piece of a plan we hold (contact fusion, Ojama Delta Hurricane!!, Phoenix Formation) before the strongest stat.
+        if (!Legacy)
+        {
+            int piece = Find(p, o => o.Act is Act.Summon && o.Card!.Data.Level <= 4 && ComboPiece(d, o.Card));
+            if (piece >= 0) return Pos(p, piece, false);   // face-up: the plans count face-up monsters
+        }
         // Flip monsters (set) when the opponent has monsters.
         if (opp.Count > 0)
         {
@@ -380,9 +418,111 @@ public sealed partial class Ai
         {
             var o = p.Options[i];
             if (o.Act != Act.Activate || o.Card!.Data.IsMonster || o.Card.Data.IsTrap || Done("a" + o.Card.Uid)) continue;
-            if (GenericSpellOk(d, o.Card)) return Take(p, i, "a" + o.Card.Uid);
+            if (Brain == Brain.Classic || Legacy ? GenericSpellOk(d, o.Card) : PlusSpellOk(d, o.Card))
+            {
+                Take(p, i, "a" + o.Card.Uid);
+                if (o.Card.Name == "Double Summon") tried.Remove("s");   // the second Normal Summon it grants
+                return i;
+            }
         }
         return -1;
+    }
+
+    /// Classic+: most expansion cards have no effect summary, so the keyword rules above never fired them (E - Emergency
+    /// Call, Double Summon, field spells, rituals sat in hand all duel, in the look-ahead's simulated turns too). Their
+    /// own text and frame decide instead.
+    bool PlusSpellOk(Duel d, Card c)
+    {
+        var txt = c.Data.Desc.ToLowerInvariant();
+        Player mine = Me(d), opp = Opp(d);
+        // Exodia plan: never throw the pieces in hand away (Card Destruction, Morphing Jar's kind), dig deeper.
+        bool exodia = !Legacy && ExodiaLive(mine);
+        if (exodia && mine.Hand.Any(IsExodia) && Has(txt, "discard their entire hand", "discard your entire hand", "discards their entire hand", "send all cards in their hand", "shuffle their hand", "entire hand into"))
+            return false;
+        if (GenericSpellOk(d, c)) return true;
+        if (c.Name == "Double Summon") return Done("s") && mine.Hand.Any(h => h != c && h.Data.IsMonster && h.Data.Level <= 4 && !IsExodia(h)) && mine.FreeMonsterZones > 0;
+        if (txt.Contains("pay ") && mine.Lp <= 2000) return false;
+        if (c.Name == "Megamorph") return mine.Lp > opp.Lp && opp.MonstersOnField.Any(m => m.FaceUp);   // the target picker aims it at their best: halved
+        if (txt.Contains("take control")) return opp.MonstersOnField.Any(m => m.FaceUp) && mine.FreeMonsterZones > 0;
+        if (c.Data.Is("Field")) return mine.FieldZone is not { FaceUp: true };
+        if (c.Data.Is("Ritual")) return mine.FreeMonsterZones > 0;
+        // Soul Exchange (2026-11-16 card scan: never played, the battle-skip rule below held it): when one of their
+        // monsters makes up the last Tribute a big monster in hand needs, Battle Phase or not.
+        if (c.Name == "Soul Exchange") return SoulExchangeOk(d);
+        // Old cards the scan found never played (2026-11-16).
+        if (c.Name == "Shield & Sword") return SwapWins(d);
+        if (c.Name == "Polymerization" && HoldsDelta(d)) return false;   // the Ojamas are for Ojama Delta Hurricane!!, not Ojama King
+        if (c.Name == "Mesmeric Control") return opp.MonstersOnField.Any(m => m.Defense);   // their walls stay walls next turn
+        // Wipes of their side (Ojama Delta Hurricane!!, Harpie Lady Phoenix Formation: only offered once the pieces are out).
+        if (Has(txt, "destroy all cards on your opponent's side", "destroy all cards your opponent controls")) return opp.FieldCards.Any();
+        if (txt.Contains("monsters your opponent controls") && Has(txt, "destroy those targets", "destroy them")) return opp.MonstersOnField.Any();
+        if (txt.Contains("destroy that target") && txt.Contains("spell/trap")) return opp.SpellsOnField.Any();   // Stamping Destruction
+        // A card that stops our own attacks (not a token that "cannot attack": Fiend's Sanctuary).
+        if (Has(txt, "skip your battle phase", "monsters you control cannot attack", "you cannot declare an attack", "you cannot conduct your battle")) return false;
+        if (txt.Contains("add all cards in your hand to your deck"))   // Reload: a hand with no pieces, for an Exodia deck
+            return exodia && !mine.Hand.Any(IsExodia) && mine.Hand.Count >= 2;
+        if (txt.Contains("without tributing"))   // Big Evolution Pill: a big monster of the named Type waits in hand
+            return mine.Hand.Any(h => h.Data.IsMonster && h.Data.Level >= 5 && !string.IsNullOrEmpty(h.Data.Race) && txt.Contains(h.Data.Race.ToLowerInvariant()));
+        if (txt.Contains("destroy") && txt.Contains("defense position monster")) return opp.MonstersOnField.Any(m => m.Defense);   // Shield Crush
+        if (Has(txt, "destroy spell/trap", "destroy 1 spell/trap", "spell/trap cards equal")) return opp.SpellsOnField.Any();      // R - Righteous Justice
+        if (txt.Contains("banish all other cards")) return mine.Hand.Count <= 1 && mine.FieldCards.Count() <= 1;   // Card of Sanctity
+        if (Has(txt, "add them to your hand", "to your hand", "to the hand") && !txt.Contains("add all cards in your hand")) return true;   // searches, recoveries
+        if (Has(txt, "special summon", "fusion summon", "ritual summon")) return mine.FreeMonsterZones > 0;
+        if (txt.Contains("from your deck to the gy")) return true;
+        if (txt.Contains("draw") && !Has(txt, "each player", "your opponent draws", "add all cards")) return mine.Deck.Count > (exodia ? 2 : 5);
+        // Pumps for one of ours: on an attacker this Main Phase 1.
+        if (Has(txt, "gains", "gain ") && txt.Contains("atk") && !txt.Contains("opponent controls"))
+            return d.Phase == Phase.Main1 && d.Turn > 1 && mine.MonstersOnField.Any(m => m.FaceUp && !m.Defense && d.CanAttack(m));
+        return c.Data.Is("Continuous") && !txt.Contains("opponent controls");
+    }
+
+    bool SoulExchangeOk(Duel d)
+    {
+        if (Done("s") || d.Phase != Phase.Main1 || !Opp(d).MonstersOnField.Any()) return false;
+        int have = Me(d).MonstersOnField.Count(m => !IsGod(m));
+        return Me(d).Hand.Any(h => h.Data.IsMonster && d.TributesFor(h) is var need && need >= 2 && have < need && have + 1 >= need);
+    }
+
+    /// A monster's own effect (Main Phase, on the field, in hand or in the GY), judged from its text: the costs it asks
+    /// for against what it does. Unknown kinds of effect are left alone.
+    bool MonsterFxOk(Duel d, Card c)
+    {
+        var t = c.Data.Desc.ToLowerInvariant();
+        Player mine = Me(d), opp = Opp(d);
+        int spare = mine.Hand.Count(h => h != c && !IsExodia(h));
+        bool lethal = Has(t, "inflict 1000", "inflict 1,000") ? opp.Lp <= 1000 : Has(t, "inflict 500") && opp.Lp <= 500;
+        // Costs first.
+        if (Has(t, "discard 1 card", "discard 1 other card", "send 1 card from your hand") && spare == 0) return false;
+        if (t.Contains("pay ") && mine.Lp <= 2000) return false;
+        if (t.Contains("tribute this card") && !lethal) return false;   // Ancient Gear Cannon, Cyber Kirin: not as a Main Phase play
+        if (Has(t, "tribute 1 monster", "tribute 1 other monster"))
+        {
+            int fodder = mine.MonstersOnField.Where(m => m != c && !IsGod(m)).Select(m => Math.Max(d.Atk(m), d.Def(m))).DefaultIfEmpty(int.MaxValue).Min();
+            if (fodder > 1000 && !lethal) return false;   // Super Conductor Tyranno: tokens and small monsters only
+        }
+        if (t.Contains("cannot declare an attack the turn") && d.Phase == Phase.Main1 && d.Turn > 1 && c.OnField && d.CanAttack(c)
+            && opp.MonstersOnField.Any(m => d.Atk(c) > Guard(d, m))) return false;   // it has a fight to win first
+        // Then what it does.
+        if (Has(t, "draw 1 card", "draw 2 cards", "excavate", "look at 1 face-down")) return true;   // Library, Diamond Dude, Patroid
+        if (t.Contains("to your hand") && !t.Contains("return all")) return true;                     // searches (Destroyersaurus)
+        if (t.Contains("damage to your opponent")) return true;                                       // burn (Dunker, Tyranno)
+        if (t.Contains("destroy that target"))
+            return Has(t, "spell/trap", "spell or trap") ? opp.SpellsOnField.Any()
+                : t.Contains("defense position monster") ? opp.MonstersOnField.Any(m => m.Defense) : opp.MonstersOnField.Any(m => m.FaceUp && !m.Defense);
+        if (Has(t, "equip that target to this card", "take control")) return opp.MonstersOnField.Any();
+        if (t.Contains("take on the atk and def")) return opp.MonstersOnField.Any(m => m.FaceUp && d.Atk(m) > d.Atk(c));   // Relinquished: their best, face-up
+        if (t.Contains("equip this card to that target")) return c.OnField && !KeepForContact(d, c);  // Union monsters (Y-Dragon Head), not while a contact fusion needs them
+        if (t.Contains("gains 500 atk for each")) return c.OnField && d.Phase == Phase.Main1 && d.Turn > 1 && d.CanAttack(c) && mine.Deck.Count > 10;   // Card Trooper
+        if (t.Contains("change this card to face-down")) return d.Phase == Phase.Main2 && opp.MonstersOnField.Count() >= 2;   // Guardian Sphinx: flips next turn
+        if (t.Contains("special summon")) return mine.FreeMonsterZones > 0;
+        return false;
+    }
+
+    /// A spell that only adds cards to the hand (Pot of Greed, searches, recoveries).
+    static bool Fills(Card c)
+    {
+        var t = c.Data.Desc.ToLowerInvariant();
+        return c.Data.Is("Normal") && (t.Contains("draw") || t.Contains("to your hand")) && !Has(t, "discard", "each player", "banish all", "add all cards", "destroy", "special summon");
     }
 
     /// 1 in 8 "skip this activation", only while the opponent controls Magic Jammer.
@@ -467,6 +607,19 @@ public sealed partial class Ai
         // Hand trap path: Kuriboh when about to take battle damage.
         int kuri = Find(p, o => o.Card?.Name == "Kuriboh" && o.Card.Loc == Loc.Hand);
         if (kuri >= 0 && d.Attacker != null && d.Attacker.Controller != me) return kuri;
+        // Classic+: the opponent's card is about to destroy Spells/Traps: what of ours can still go off, goes off now
+        // (a Set card lost to Heavy Storm did nothing).
+        if (Brain != Brain.Classic && !Legacy && SpellsThreatened(d))
+        {
+            int save = Find(p, o => o.Act == Act.Activate && o.Card is { OnField: true, FaceUp: false } && !Doubled(d, o));
+            if (save >= 0) return save;
+        }
+        // Classic+: monster quick effects (Necro Gardna from the GY...) answer by the same text rules as traps.
+        if (Brain != Brain.Classic && !Legacy)
+        {
+            int q = Find(p, o => o.Act == Act.Activate && o.Card is { Data.IsMonster: true } mc && mc.Name != "Kuriboh" && !Doubled(d, o) && Approve(d, mc));
+            if (q >= 0) return q;
+        }
         // First face-down Spell/Trap in zone order whose approval passes.
         foreach (var c in Me(d).Spells)
         {
@@ -525,7 +678,36 @@ public sealed partial class Ai
         // there. Every brain uses the Classic+ rule for those (user: the CPU must not hold cards for nothing).
         if (Brain == Brain.Classic) return PlusApprove(d, c, incoming) is true;
         // A trap no rule knows (new cards): fire it at the event it answers (Trap Hole on a summon), not never.
-        return d.WantsThisWindow(c);
+        if (d.WantsThisWindow(c) || Legacy) return d.WantsThisWindow(c);
+        // Cards that may go off at any time (Threatening Roar, Hero Barrier, Embodiment of Apophis...) never "want" one
+        // window more than another: their text names the moment.
+        var txt = c.Data.Desc.ToLowerInvariant();
+        if (Has(txt, "cannot declare an attack", "negate 1 attack", "negate the attack", "end the battle phase", "negate the next attack"))
+            return incoming > 0 && d.Window?.Kind == EvKind.AttackDeclared && (d.AttackTarget is not { } tg ? incoming >= Math.Min(1000, mine.Lp) : incoming > Guard(d, tg));
+        // A face-down flip stops the attack (Book of Moon): on an attacker that would win.
+        if (txt.Contains("change that target to face-down"))
+            return incoming > 0 && d.Window?.Kind == EvKind.AttackDeclared && (d.AttackTarget is not { } bt ? incoming >= Math.Min(1500, mine.Lp) : incoming > Guard(d, bt));
+        // Shrink: halving their monster turns a lost fight into a won one.
+        if (c.Name == "Shrink" && d.Window?.Kind == EvKind.AttackDeclared && d.Attacker is { } sa && d.AttackTarget is { FaceUp: true } st)
+        {
+            if (sa.Controller != me && st.Controller == me) return d.Atk(sa) >= Guard(d, st) && d.Atk(sa) / 2 < Guard(d, st);   // their attack on mine
+            if (sa.Controller == me && !st.Defense) return d.Atk(sa) <= d.Atk(st) && d.Atk(sa) > d.Atk(st) / 2;               // mine on their Attack Position monster
+            return false;
+        }
+        // Equip Traps for ours (Metalmorph): when one of ours fights.
+        if (Has(txt, "equipped monster", "equipped with this card") && Has(txt, "atk +", "gains", "increases its atk"))
+            return d.Window?.Kind == EvKind.AttackDeclared && (d.Attacker?.Controller == me || d.AttackTarget is { FaceUp: true } mt && mt.Controller == me);
+        if (txt.Contains("special summon this card"))
+            return txt.Contains("during your opponent's main phase")   // Cyber Shadow Gardna: a wall on their turn
+                ? d.TurnPlayer != me && d.Phase == Phase.Main1 && mine.FreeMonsterZones > 0
+                : d.TurnPlayer == me && d.Window?.Kind == EvKind.MainStart && mine.FreeMonsterZones > 0;
+        if (txt.Contains("to your opponent's field"))   // Ojama Trio: fill their zones at the end of their turn
+            return d.TurnPlayer != me && d.Window?.Kind == EvKind.EndPhase && opp.FreeMonsterZones >= 3;
+        if (txt.Contains("special summon that target") && Has(txt, "in your gy", "in your graveyard"))   // Rite of Spirit
+            return mine.FreeMonsterZones > 0 && (d.TurnPlayer != me ? d.Window?.Kind is EvKind.EndPhase or EvKind.AttackDeclared : d.Window?.Kind == EvKind.MainStart);
+        if (txt.Contains("negate any monster effects your opponent activates"))   // Harpie's Feather Storm
+            return d.Window is { Kind: EvKind.Activated, Link: { } fl } && fl.Player != me && fl.Card.Data.IsMonster;
+        return false;
     }
 
     /// Classic+ trap rules: the original approves ~40 of the 101 traps and never fires the rest (Magic Jammer,
@@ -566,6 +748,13 @@ public sealed partial class Ai
                 return oppTurn && w?.Kind == EvKind.EndPhase && opp.Hand.Count > 0;
             case "Windstorm of Etaqua":
                 return oppTurn && w?.Kind == EvKind.BattleStart && opp.MonstersOnField.Any(m => m.FaceUp && !m.Defense && d.Atk(m) > MyBest(d));
+            case "Ring of Destruction" when !Legacy:   // the finisher, or a big attacker both sides can afford to take the damage of
+                return opp.MonstersOnField.Any(m => m.FaceUp && d.Atk(m) >= opp.Lp && d.Atk(m) < mine.Lp)
+                    || oppTurn && incoming >= Math.Max(1800, MyBest(d) + 1) && incoming < mine.Lp - 1000 && d.Atk(opp.MonstersOnField.Where(m => m.FaceUp).MaxBy(d.Atk)!) == incoming;
+            case "Shadow Spell":   // -700 on their attacker turns a lost fight into a won one, or on their best at a direct attack
+                if (d.Window?.Kind != EvKind.AttackDeclared || (d.Window.Card ?? d.Attacker) is not { } sh || sh.Controller == me
+                    || d.Atk(sh) < opp.MonstersOnField.Where(m => m.FaceUp).Select(d.Atk).DefaultIfEmpty(0).Max()) return false;
+                return d.AttackTarget is { } shT ? shT.Controller == me && (d.Atk(sh) >= Guard(d, shT) && d.Atk(sh) - 700 < Guard(d, shT) || incoming >= 1900) : incoming >= 1500;
             case "Chain Destruction":
                 return summoned != null;
             case "Time Machine":
@@ -584,10 +773,26 @@ public sealed partial class Ai
 
     /// One answer per attack (playtest 2026-11-12: Waboku and Mirror Force fired on the same attack). A second shield
     /// on a chain that already has one, or in a turn Waboku already covers, is kept for the next turn.
-    bool ShieldSpent(Duel d, Card c) => Shields.Contains(c.Name)
-        && (d.Chain.Any(l => l.Player == me && Shields.Contains(l.Card.Name)) || d.TurnFlags.Contains($"nobattledamage{me}"));
+    /// Legacy keeps the named list only; otherwise any card whose text stops an attack counts (user 2026-11-16: Mirror
+    /// Force then a chained Negate Attack, the second card does nothing).
+    bool ShieldSpent(Duel d, Card c) => Shield(c)
+        && (d.Chain.Any(l => l.Player == me && Shield(l.Card)) || d.TurnFlags.Contains($"nobattledamage{me}"));
 
-    bool Doubled(Duel d, Opt o) => o.Act == Act.Activate && o.Card is { } c && (ShieldSpent(d, c) || d.Chain.Any(l => l.Player == me && l.Card.Name == c.Name)
+    bool Shield(Card c) => Shields.Contains(c.Name) || !Legacy && c.Data.IsTrap && Has(c.Data.Desc.ToLowerInvariant(),
+        "negate the attack", "negate 1 attack", "negate an attack", "end the battle phase", "destroy all attack position",
+        "destroy the attacking monster", "take no battle damage", "battle damage you take", "battle damage becomes 0");
+
+    /// A card that only answers an attack, fired before any attack (user 2026-11-16: Waboku at the start of the
+    /// opponent's turn, then no attack came). Kept until an attack is declared, unless a card on the chain is about to
+    /// destroy it anyway. "Cannot declare an attack" cards (Threatening Roar) are meant to go off before attacks.
+    bool TooEarly(Duel d, Card c) => !Legacy && Shield(c) && d.TurnPlayer != me && d.Attacker == null
+        && d.Window?.Kind != EvKind.AttackDeclared && !c.Data.Desc.ToLowerInvariant().Contains("cannot declare an attack") && !SpellsThreatened(d);
+
+    /// The opponent's card on the chain is about to destroy Spells/Traps.
+    bool SpellsThreatened(Duel d) => d.Window is { Kind: EvKind.Activated, Link: { } l } && l.Player != me
+        && Has(l.Card.Data.Desc.ToLowerInvariant(), "destroy all spell", "destroy 1 spell", "destroy all spells", "destroy spell", "destroy all set", "spell/trap", "spell or trap");
+
+    bool Doubled(Duel d, Opt o) => o.Act == Act.Activate && o.Card is { } c && (ShieldSpent(d, c) || TooEarly(d, c) || d.Chain.Any(l => l.Player == me && l.Card.Name == c.Name)
         || c.Name == "Spellbinding Circle" && ((d.Window?.Kind == EvKind.AttackDeclared ? d.Window.Card : d.Attacker) is { } a && Bound(d, a)
             // nothing but Defense Position monsters to bind: a wasted card (every brain, look-ahead included)
             || Opp(d).MonstersOnField.Where(m => m.FaceUp).All(m => m.Defense)));
@@ -650,6 +855,11 @@ public sealed partial class Ai
         // ponytail: never its own card; a stronger CPU would bounce its own monster to shake off a lock or a harmful
         // equip (Spellbinding Circle, Paralyzing Potion) when that is worth more than another bounce of yours.
         if (hostile) n = Math.Clamp(p.Options.Count(o => Preferred(o.Card!)), p.Min, p.Max);
-        return (order.ToList(), n);
+        var list = order.ToList();
+        // Soul Exchange: their best monster is the first Tribute (only one of theirs may go).
+        if (cost && text.Contains("tribute") && d.TurnFlags.Contains($"soulexchange{me}")
+            && list.Where(i => p.Options[i].Card!.Controller != me).OrderByDescending(i => Math.Max(d.Atk(p.Options[i].Card!), d.Def(p.Options[i].Card!))).FirstOrDefault(-1) is int theirs and >= 0)
+        { list.Remove(theirs); list.Insert(0, theirs); }
+        return (list, n);
     }
 }

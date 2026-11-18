@@ -19532,26 +19532,6 @@
   ]
  },
  {
-  "idx": 2876,
-  "konami_id": 1002876,
-  "db_id": 22736,
-  "name": "Lightning Crash",
-  "passcode": 89753095,
-  "kind": "spell",
-  "frame": "Normal",
-  "attribute": "",
-  "race": "",
-  "level": 0,
-  "atk": 0,
-  "def": 0,
-  "desc": "Add 1 Thunder monster from your Deck to your hand, but you cannot Normal Summon/Set monsters with its name until the end of the next turn after this card resolves. You can only activate 1 \"Lightning Crash\" per turn.",
-  "archetype": "",
-  "rulings": [],
-  "series": [
-   "GX"
-  ]
- },
- {
   "idx": 2877,
   "konami_id": 1002877,
   "db_id": 13812,
@@ -20647,26 +20627,6 @@
   ]
  },
  {
-  "idx": 2924,
-  "konami_id": 1002924,
-  "db_id": null,
-  "name": "Ojamandala",
-  "passcode": 100000101,
-  "kind": "spell",
-  "frame": "Normal",
-  "attribute": "",
-  "race": "",
-  "level": 0,
-  "atk": 0,
-  "def": 0,
-  "desc": "Pay 1000 Life Points. Special Summon 1 \"Ojama Green\", \"Ojama Yellow\" and \"Ojama Black\" from your Graveyard.",
-  "archetype": "Ojama",
-  "rulings": [],
-  "series": [
-   "GX"
-  ]
- },
- {
   "idx": 2925,
   "konami_id": 1002925,
   "db_id": 6469,
@@ -21465,26 +21425,6 @@
   ],
   "series": [
    "DM",
-   "GX"
-  ]
- },
- {
-  "idx": 2960,
-  "konami_id": 1002960,
-  "db_id": 12539,
-  "name": "Ritual Sanctuary",
-  "passcode": 95658967,
-  "kind": "spell",
-  "frame": "Field",
-  "attribute": "",
-  "race": "",
-  "level": 0,
-  "atk": 0,
-  "def": 0,
-  "desc": "You can discard 1 Spell; add 1 LIGHT Ritual Monster or 1 Ritual Spell from your Deck to your hand. You can shuffle any number of Spells from your GY into the Deck, then target 1 LIGHT Fairy monster in your GY whose Level equals the number of cards you shuffled into the Deck; Special Summon it. You can only use each effect of \"Ritual Sanctuary\" once per turn.",
-  "archetype": "",
-  "rulings": [],
-  "series": [
    "GX"
   ]
  },
@@ -23552,26 +23492,6 @@
   "atk": 0,
   "def": 0,
   "desc": "While the equipped monster battles, your opponent cannot activate any Spell/Trap Cards until the end of the Damage Step. When an attack is declared involving the equipped monster: Face-up Spell/Trap Cards your opponent controls have their effects negated until the end of the Damage Step (even if this card leaves the field). When the equipped monster destroys an opponent's monster by battle: You can destroy all Spell and Trap Cards your opponent controls. When this face-up card in a player's Spell & Trap Zone leaves the field, that player takes 3000 damage.",
-  "archetype": "",
-  "rulings": [],
-  "series": [
-   "GX"
-  ]
- },
- {
-  "idx": 3053,
-  "konami_id": 1003053,
-  "db_id": null,
-  "name": "Wicked Canon",
-  "passcode": 100461002,
-  "kind": "spell",
-  "frame": "Continuous",
-  "attribute": "",
-  "race": "",
-  "level": 0,
-  "atk": 0,
-  "def": 0,
-  "desc": "Each time an opponent's monster declares an attack, place 1 Sinister Doctrine Counter on this card. You can only use each of the following effects of \"Wicked Canon\" once per turn. During your Main Phase, if this card was activated this turn: You can add 1 DARK Fiend monster from your Deck to your hand, then discard 1 Fiend monster. You can send this card with 4 or more Sinister Doctrine Counters to the GY; Special Summon 1 Fiend monster from your Deck, then you can add 1 \"Super Polymerization\" from your Deck to your hand.",
   "archetype": "",
   "rulings": [],
   "series": [
@@ -25962,26 +25882,6 @@
   "rulings": [],
   "series": [
    "DM"
-  ]
- },
- {
-  "idx": 3158,
-  "konami_id": 1003158,
-  "db_id": null,
-  "name": "Hope for the Future",
-  "passcode": 100461003,
-  "kind": "trap",
-  "frame": "Normal",
-  "attribute": "",
-  "race": "",
-  "level": 0,
-  "atk": 0,
-  "def": 0,
-  "desc": "If you control a \"Neos\" Fusion Monster or \"Elemental HERO Neos\": Discard 1 card; Fusion Summon 1 Fusion Monster from your Extra Deck that mentions a \"HERO\" monster as material, using monsters from your hand, Deck, or field. If you control a \"Neos\" Fusion Monster: You can banish this card from your GY, then target 1 face-up card your opponent controls; negate its effects until the end of this turn. You can only use each effect of \"Hope for the Future\" once per turn.",
-  "archetype": "",
-  "rulings": [],
-  "series": [
-   "GX"
   ]
  },
  {

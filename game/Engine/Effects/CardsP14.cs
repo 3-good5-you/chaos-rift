@@ -258,22 +258,6 @@ public static partial class Scripts
             });
         }
         {
-            static bool Neos(Ctx x) => x.MyMonsters().Any(m => m.FaceUp && (Scripts.NameOf(m) == "Elemental HERO Neos" || (m.Data.IsFusion && m.In("Neos"))));
-            static bool NeosFusion(Ctx x) => x.MyMonsters().Any(m => m.FaceUp && m.Data.IsFusion && m.In("Neos"));
-            static bool HeroMat(Card f) => System.Text.RegularExpressions.Regex.IsMatch(f.Data.Desc.Split('\n')[0], "HERO");
-            static IEnumerable<Card> Pool(Ctx x) => x.My.Hand.Concat(x.My.Deck).Concat(x.MyMonsters()).Where(c => c.Data.IsMonster);
-            var s = Spell("Hope for the Future", async x => await x.D.FusionSummon(x.Me, x.Self, pool: Pool(x), resultOk: HeroMat),
-                x => Hopt(x, "1") && Neos(x) && x.My.Hand.Any(c => c != x.Self) && x.D.FusionOptions(x.Me, pool: Pool(x), resultOk: HeroMat).Any(),
-                async x => { UseHopt(x, "1"); await x.D.Discard(x.Me, await x.PickN(x.My.Hand.Where(c => c != x.Self), 1, 1, "Discard 1 card"), x.Self); });
-            s.GraveFx = new Script
-            {
-                Speed = 2,
-                Can = x => Hopt(x, "2") && NeosFusion(x) && x.Targetable(x.Their.FieldCards.Where(c => c.FaceUp)).Any(),
-                Cost = async x => { UseHopt(x, "2"); await x.D.Banish(x.Self, x.Self); await x.Target(x.Their.FieldCards.Where(c => c.FaceUp), "Negate which card's effects this turn?"); },
-                Run = async x => { if (x.T0 is { OnField: true } t) { x.D.Flags[$"neg{t.Uid}"] = 1; var d = x.D; d.Later(d.Turn, Phase.End, async () => d.Flags.Remove($"neg{t.Uid}")); } },
-            };
-        }
-        {
             var s = S("Horned Saurus");
             s.Materials = new() { Named("Kaitoptera"), Cond("1 Dinosaur or Dragon monster", c => c.Data.IsMonster && c.Data.Race is "Dinosaur" or "Dragon") };
             s.On = async (x, e) =>

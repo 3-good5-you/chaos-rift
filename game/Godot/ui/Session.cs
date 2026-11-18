@@ -21,15 +21,23 @@ public static class Session
     public static int LastLp;            // your LP when the last duel ended (a Gauntlet carries it on)
 
     /// Back to a plain duel: no mode state left over.
-    public static void ClearMode() { Mode = GameMode.Regular; Run = null; Rule = null; ModeDeck = null; Puzzle = null; }
+    public static Draft? Draft;          // Pack Duel: the finished draft, kept for a rematch
+    public static void ClearMode() { Mode = GameMode.Regular; Run = null; Rule = null; ModeDeck = null; Puzzle = null; Draft = null; }
+
+    /// Everyone you can pick for a regular duel (Menu Lab pick 2026-11-16: all 21 tournament duelists). The four
+    /// original rivals come first, so their indexes match RivalPanels.All; the rest follow in roster order. Everyone
+    /// with ladder decks (rival/x_lvN, 2026-11-16) climbs Joey's ladder; anyone without brings their tournament deck.
+    public static RivalPanels.Rival[] Roster => roster ??= RivalPanels.All
+        .Concat(Tournament.Roster.Where(d => RivalPanels.All.All(r => r.File != d.Key)).Select(RivalPanels.Of)).ToArray();
+    static RivalPanels.Rival[]? roster;
 
     /// Who you are dueling: the tournament foe, or the rival picked on the rival select screen.
     public static RivalPanels.Rival Rival => Tour?.Foe is { } f ? RivalPanels.Of(f)
-        : Run?.Current is { } g ? RivalPanels.All.First(r => r.File == g.Rival) : RivalPanels.All[Selected < 0 ? 0 : Selected];
+        : Run?.Current is { } g ? RivalPanels.Of(Tournament.Get(g.Rival)) : Roster[Selected < 0 ? 0 : Selected];
     /// Their deck and CPU level.
     public static OpponentPick Pick => Tour?.Foe is { } f ? new OpponentPick(f.Key, f.Deck, f.Level)
         : Run?.Current is { } g ? g
-        : Mode == GameMode.Legend ? Modes.Legend(RivalPanels.All[Selected < 0 ? 0 : Selected].File)
+        : Mode == GameMode.Legend ? Modes.Legend(Roster[Selected < 0 ? 0 : Selected].File)
         : Picks[Selected < 0 ? 0 : Selected];
     public static int MatchWins, MatchLosses;   // running score of the current match
 
@@ -40,7 +48,6 @@ public static class Session
     public static Replay? Watch;         // the replay the field is playing back (Replays screen)
     public static string ReplayDir => ProjectSettings.GlobalizePath("user://replays");
     public static string? AfterUnlock;
-    public static Shop.Item? LastMat;    // the playmat the last result won (tournament champion), revealed after the results   // where the deck unlock goes on to (the Results button that led there)
     public static Deck? LastStarter;     // the rival's starter deck the last duel won you (first win against them)
     public static int LastDp;            // Duelist Points the last duel paid (Results shows them)
     public static bool Classic = true;   // PoC quirks on (the default; no toggle in the UI)
@@ -73,18 +80,20 @@ public static class Session
         LastDuel = new DuelResult(winner, reason);
         LastStarter = null;
         if (Tour != null) LastDp = 0;   // tournament prizes are paid once, by finishing place, in Results
-        else if (Run != null) LastDp = winner == 0 ? Gauntlet.DpPerWin : 0;
+        else if (Run != null) LastDp = 0;   // the run pays once, when it ends (Results)
         else if (Puzzle is { } z) { LastDp = winner == 0 && Profile.Solved.Add(z.Id) ? z.Dp : 0; }   // paid the first time only   // the Gauntlet's prize comes in Results
         else if (Mode != GameMode.Regular)
             LastDp = Shop.Earn(Pick.Level, winner == 0) + (winner == 0 ? Mode switch { GameMode.Limited => 150, GameMode.Chaos => 200, _ => 0 } : 0);
         else
         {
-            Progression.Record(Profile, RivalPanels.All[Selected].File, winner == 0, Picks.Length > Selected ? Picks[Selected].Level : 0);
+            Progression.Record(Profile, Roster[Selected].File, winner == 0, Picks.Length > Selected ? Picks[Selected].Level : 0);
             LastDp = Shop.Earn(Picks.Length > Selected ? Picks[Selected].Level : 1, winner == 0);
-            LastStarter = winner == 0 ? DeckRules.UnlockStarter(Profile, RivalPanels.All[Selected].File) : null;
+            LastStarter = winner == 0 ? DeckRules.UnlockStarter(Profile, Roster[Selected].File) : null;
             if (LastStarter != null) Decks.Add(LastStarter);
         }
         Profile.Dp += LastDp;
+        if (winner == 0 && Puzzle == null) Count(reason);
+        if (Match && winner == 0 && MatchWins + 1 >= 2) { Achievements.Bump(Profile, "matches"); if (Mode == GameMode.Pack) Achievements.Bump(Profile, "pack"); }
         Save();
         if (!Match) return false;
         if (winner == 0) MatchWins++;
@@ -92,6 +101,21 @@ public static class Session
         if (winner >= 0) YouFirst = winner == 1;
         return !MatchOver;
     }
+    /// The achievement counters a won duel moves (Engine/Achievements.cs).
+    static void Count(string reason)
+    {
+        var p = Profile;
+        Achievements.Bump(p, "wins");
+        if (LastLp >= (Rule?.Lp ?? 8000)) Achievements.Bump(p, "untouched");
+        if (LastLp > 0 && LastLp < 1000) Achievements.Bump(p, "comeback");
+        if (reason == "Exodia") Achievements.Bump(p, "exodia");
+        string who = Tour?.Foe?.Key ?? Run?.Current?.Rival ?? Roster[Selected < 0 ? 0 : Selected].File;
+        Achievements.Mark(p, "beat:" + who);
+        if (Mode == GameMode.Legend) Achievements.Mark(p, "legend:" + who);
+        if (Mode == GameMode.Chaos) Achievements.Bump(p, "chaos");
+        if (who == "yugi" && Pick.Level >= 6) Achievements.Mark(p, "expert:yugi");
+    }
+
     public static bool NeedsStarter => Profile.Owned.Count == 0;
     public static bool YouFirst;         // coin flip result -> DuelSetup.FirstPlayer
 
@@ -101,10 +125,12 @@ public static class Session
         if (OS.GetCmdlineUserArgs().Contains("--demo"))
         {
             // Screenshot/demo data showing the range of levels.
-            Picks = new[] { new OpponentPick("yugi", "yugi/cpu03", 4), new OpponentPick("kaiba", "kaiba/kaiba_kk", 6), new OpponentPick("joey", "joey/cpu_011", 2), new OpponentPick("jaden", "jaden/x_lv5", 5) };
+            Picks = new[] { new OpponentPick("yugi", "yugi/cpu03", 4), new OpponentPick("kaiba", "kaiba/kaiba_kk", 6), new OpponentPick("joey", "joey/cpu_011", 2), new OpponentPick("jaden", "jaden/x_lv5", 5) }
+                .Concat(Roster.Skip(4).Select(r => Tournament.Get(r.File)).Select(d => new OpponentPick(d.Key, d.Deck, d.Level))).ToArray();
             return;
         }
-        Picks = RivalPanels.All.Select(r => Progression.Pick(r.File, Profile, Rng)).ToArray();
+        Picks = Roster.Select(r => Progression.HasLadder(r.File) ? Progression.Pick(r.File, Profile, Rng)
+            : Tournament.Get(r.File) is var d ? new OpponentPick(d.Key, d.Deck, d.Level) : null!).ToArray();
     }
 
     // The save file (Engine/SaveData.cs) in user://. `-- --demo` neither loads nor saves; screenshot runs
@@ -121,7 +147,7 @@ public static class Session
     {
         if (loaded) return;
         loaded = true;
-        if (Demo.On) return;
+        if (Demo.On) { if (Demo.Arg("lang") is { Length: > 0 } dl) Lang.Set(dl); return; }
         var path = UnlockAll && !File.Exists(SavePath) ? ProjectSettings.GlobalizePath("user://save.json") : SavePath;
         var s = SaveData.Read(path, out bool broken);
         if (broken) GD.PushWarning($"Save file unreadable; kept as {SavePath}.bad, starting fresh.");

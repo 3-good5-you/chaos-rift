@@ -100,12 +100,9 @@ public static class DeckRules
 {
     public const int MinMain = 40, MaxMain = 80, MaxSide = 15, MaxCopies = 3;
 
-    /// Limit lists by format: the 2003 list (Kaiba's game) and the 2004 list (Joey's game).
-    // ponytail: Master Duel's list needs a source; one more line here once it exists in rule_tables.json.
-    public static readonly (string Name, string Key)[] Formats = { ("2003", "kaiba"), ("2004", "joey") };
-
-    /// Format in force for duels: a CardDb.Limits key. 2004 by default; a settings choice later.
-    public static string LimitGame = "joey";
+    /// The one limit list in force (user 2026-11-17: no 2003 / 2004 choice): Joey's game's list, a CardDb.Limits key.
+    /// It only caps copies (1 limited, 2 semi-limited); nothing is forbidden. Kaiba's list stays loaded for the checks.
+    public const string LimitGame = "joey";
 
     /// The two original starter decks (inferred from the data: kaiba/deck_k, joey/deck_j).
     // The player decks each original game ships (`deck.ydc` in its install folder; Kaiba's and Joey's match deck_k/deck_j).
@@ -134,7 +131,7 @@ public static class DeckRules
         return deck;
     }
 
-    /// Copies a limit list allows: 0 forbidden, 1 limited, 2 semi-limited, otherwise 3.
+    /// Copies a limit list allows: 1 limited, 2 semi-limited, otherwise 3.
     public static int Limit(CardData d, string? list = null) =>
         CardDb.Shared.Limits[list ?? LimitGame].TryGetValue(d.KonamiId, out var m) ? m : MaxCopies;
 
@@ -187,9 +184,7 @@ public static class DeckRules
             var d = db.Get(i);
             if (d.IsFusion ? deck.Main.Contains(i) : deck.Extra.Contains(i)) return d.IsFusion ? $"{d.Name}: Fusion Deck only" : $"{d.Name}: not a Fusion";
             if (deck.Copies(i) > p.Count(i)) return $"Not enough {d.Name}";
-            int lim = Limit(d, list);
-            if (lim == 0) return $"{d.Name} is forbidden";
-            if (deck.CopiesNamed(d.Name) > lim) return $"Too many {d.Name}";
+            if (deck.CopiesNamed(d.Name) > Limit(d, list)) return $"Too many {d.Name}";
         }
         if (deck.Main.Count > MaxMain) return $"Main Deck over {MaxMain}";
         if (deck.Side.Count > MaxSide) return $"Side Deck over {MaxSide}";

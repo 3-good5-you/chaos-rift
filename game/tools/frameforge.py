@@ -327,7 +327,124 @@ def circuit():
     f.shadow(); f.ring(166, 188, "silver"); f.line(192, 1.5, '3ae0ff', 1.0); f.line(170, 1.2, '3ae0ff', 0.6)
     return f
 
+# ---------------------------------------------------------------- prize families (samples 2026-11-17, see backforge)
+
+def p_rift(seed=361, seam_c='ffffff', metal_name="gold", tilt=-np.pi / 4):
+    """RIFT: the ring half ivory, half night, split by a glowing crack top-right to bottom-left; metal edges."""
+    f = Frame(); f.shadow()
+    split = np.cos(TH - tilt) + (fbm(seed, base=6)[:, :] - 0.5) * 0.25   # >0 on the light side
+    light = np.clip(split * 12 + 0.5, 0, 1)
+    ivory = ramp(np.clip(0.55 + 0.35 * np.cos(TH + 2.35), 0, 1), ['b8b2a6', 'fbf8f0'])
+    night = ramp(np.clip(0.3 + 0.3 * np.cos(TH + 2.35), 0, 1), ['050508', '2a2a36'])
+    body = band(166, 204)
+    f.over(ivory * light[..., None] + night * (1 - light[..., None]), body)
+    seam = np.exp(-(split * 9) ** 2) * body
+    f.add(seam * 1.5 + glow(seam, 4) * 1.0 + glow(seam, 12) * 0.6, seam_c)
+    f.ring(160, 167, metal_name, 3); f.ring(203, 211, metal_name, 7)
+    return f
+
+def p_gilded(metal_name="gold", glow_c='ffd070'):
+    """GILDED: a gold ring inside a laurel wreath, a star at the top."""
+    f = Frame(); f.shadow()
+    m = np.zeros((S, S), np.float32)
+    for side in (-1, 1):
+        for i in range(10):
+            deg = 100 + i * 15 if side < 0 else 80 - i * 15
+            a = math.radians(deg)
+            for off in (-1, 1):
+                rr = 214 + off * 12
+                cx, cy = C + rr * math.cos(a), C + rr * math.sin(a)
+                cv2.ellipse(m, (int(cx), int(cy)), (17, 7), deg + 90 + off * side * -35, 0, 360, 1.0, -1, cv2.LINE_AA)
+    f.over(ramp(np.clip(0.35 + 0.45 * np.cos(TH + 2.35), 0, 1), METAL[metal_name]), glow(m, 0.6))
+    f.ring(164, 194, metal_name, 4)
+    f.line(179, 2, METAL[metal_name][0], 0.8)
+    star = np.zeros((S, S), np.float32)
+    pts = [(C + (30 if k % 2 == 0 else 12) * math.cos(math.radians(-90 + k * 36)), C - 222 + (30 if k % 2 == 0 else 12) * math.sin(math.radians(-90 + k * 36))) for k in range(10)]
+    cv2.fillPoly(star, [np.array(pts, np.int32)], 1.0, cv2.LINE_AA)
+    f.add(glow(star, 6) * 0.6, glow_c)
+    f.over(ramp(np.full((S, S), 0.5, np.float32), METAL[metal_name]), star)
+    return f
+
+def p_prism(seed=371, shift=0.0, metal_name="silver"):
+    """PRISMATIC: a holographic foil ring between metal edges, with glints."""
+    f = Frame(); f.shadow()
+    hue = ((TH / (2 * np.pi)) * 2 + fbm(seed, base=3) * 0.4 + shift) % 1.0
+    foil = cv2.cvtColor(np.dstack([hue * 360, np.full((S, S), 0.45, np.float32), np.ones((S, S), np.float32)]).astype(np.float32), cv2.COLOR_HSV2RGB)
+    shade = (0.75 + 0.25 * np.cos(TH + 2.35))[..., None]
+    f.over(foil * shade, band(168, 200))
+    f.ring(160, 169, metal_name, 2); f.ring(199, 208, metal_name, 6)
+    g = np.zeros((S, S), np.float32)
+    for a in (-2.2, -0.4, 1.3, 2.6):
+        x, y = C + 184 * math.cos(a), C + 184 * math.sin(a)
+        cv2.line(g, (int(x - 16), int(y)), (int(x + 16), int(y)), 1.0, 2, cv2.LINE_AA); cv2.line(g, (int(x), int(y - 16)), (int(x), int(y + 16)), 1.0, 2, cv2.LINE_AA)
+    f.add(g + glow(g, 3), 'ffffff')
+    return f
+
+def p_puzzle(seed=611, seam_c='d0a0ff', metal_name="violet", n=8):
+    """RIFT, puzzle: the ring cut into ivory and night pieces like a puzzle, glowing seams between them."""
+    f = Frame(); f.shadow()
+    seg = (TH + np.pi) / (2 * np.pi) * n
+    lightside = (np.floor(seg) % 2)[..., None]
+    ivory = ramp(np.clip(0.55 + 0.35 * np.cos(TH + 2.35), 0, 1), ['b8b2a6', 'fbf8f0'])
+    night = ramp(np.clip(0.3 + 0.3 * np.cos(TH + 2.35), 0, 1), ['050508', '2a2a36'])
+    body = band(166, 204)
+    f.over(ivory * lightside + night * (1 - lightside), body)
+    d = np.abs(seg - np.round(seg)) * (2 * np.pi / n) * R            # px to the nearest cut
+    cut = np.exp(-(d / 2.2) ** 2) * body
+    f.add(cut * 1.4 + glow(cut, 3) * 0.8, seam_c)
+    tri = np.zeros((S, S), np.float32)                                 # a gold triangle on each light piece
+    for i in range(n):
+        if i % 2 == 0: continue
+        a = -np.pi + (i + 0.5) * 2 * np.pi / n
+        cx, cy = C + 185 * math.cos(a), C + 185 * math.sin(a)
+        p3 = [(cx + 11 * math.cos(a + k * 2.094), cy + 11 * math.sin(a + k * 2.094)) for k in range(3)]
+        cv2.fillConvexPoly(tri, np.array(p3, np.int32), 1.0, cv2.LINE_AA)
+    f.over(ramp(np.full((S, S), 0.55, np.float32), METAL["gold"]), tri)
+    f.ring(160, 167, metal_name, 3); f.ring(203, 211, metal_name, 7)
+    return f
+
+def p_crown(metal_name="crimson", glow_c='ff7050'):
+    """GILDED, crowned: a crimson ring with a gold sunburst of blades all round and a star on top."""
+    f = Frame(); f.shadow()
+    f.add(glow(band(200, 214), 8) * 0.6, glow_c)
+    blades(f, 24, 200, 238, 0.07, "gold", phase=-np.pi / 2)
+    blades(f, 24, 200, 222, 0.05, metal_name, phase=-np.pi / 2 + np.pi / 24)
+    f.ring(164, 204, metal_name, 4)
+    f.line(184, 2, 'ffd070', 0.9)
+    studs(f, 8, 184, 9, "gold", phase=np.pi / 8, shape="round")
+    star = np.zeros((S, S), np.float32)
+    pts = [(C + (30 if k % 2 == 0 else 12) * math.cos(math.radians(-90 + k * 36)), C - 184 + (30 if k % 2 == 0 else 12) * math.sin(math.radians(-90 + k * 36))) for k in range(10)]
+    cv2.fillPoly(star, [np.array(pts, np.int32)], 1.0, cv2.LINE_AA)
+    f.add(glow(star, 6) * 0.8, glow_c)
+    f.over(ramp(np.full((S, S), 0.5, np.float32), METAL["gold"]), star)
+    return f
+
+def p_gems(seed=631, metal_name="gold"):
+    """PRISMATIC, gem-set: a gold ring set with twelve holographic diamond gems."""
+    f = Frame(); f.shadow()
+    f.ring(164, 206, metal_name, 5)
+    f.line(185, 3, METAL[metal_name][0], 0.9)
+    m = np.zeros((S, S), np.float32)
+    for i in range(12):
+        a = -np.pi / 2 + 2 * np.pi * i / 12
+        x, y = C + 185 * math.cos(a), C + 185 * math.sin(a); sz = 22 if i % 3 == 0 else 15
+        pts = np.array([[x + sz * math.cos(a), y + sz * math.sin(a)], [x + sz * 0.62 * math.cos(a + 1.57), y + sz * 0.62 * math.sin(a + 1.57)],
+                        [x - sz * math.cos(a), y - sz * math.sin(a)], [x + sz * 0.62 * math.cos(a - 1.57), y + sz * 0.62 * math.sin(a - 1.57)]], np.int32)
+        cv2.fillConvexPoly(m, pts, 1.0, cv2.LINE_AA)
+    hue = ((xx * 0.6 + yy * 0.4) / 90 + fbm(seed, base=4) * 0.6) % 1.0
+    foil = cv2.cvtColor(np.dstack([hue * 360, np.full((S, S), 0.5, np.float32), np.ones((S, S), np.float32)]).astype(np.float32), cv2.COLOR_HSV2RGB)
+    f.add(glow(m, 5) * 0.6, 'ffffff')
+    edge = np.clip(glow(m, 1.5) - m * 0.6, 0, 1)
+    f.over(foil * (0.75 + 0.25 * np.cos(TH * 12))[..., None], m)
+    f.over(ramp(np.full((S, S), 0.55, np.float32), METAL[metal_name]), np.clip(m - cv2.erode(m, np.ones((5, 5))), 0, 1))
+    return f
+
 FRAMES = [
+    ("p_rift", p_rift), ("p_gilded", p_gilded), ("p_prism", p_prism),
+    # achievement prizes (never sold; Engine/Achievements.cs gives them)
+    ("ach_comeback", lambda: p_rift(601, seam_c='ff9a50', tilt=np.pi / 4)), ("ach_puzzle_master", p_puzzle),
+    ("ach_matches", p_gilded), ("ach_legend", p_crown),
+    ("ach_untouched", lambda: p_prism(621)), ("ach_decksmith", p_gems),
     ("classic", classic),
     ("bronze", lambda: tier("bronze", 1)), ("silver", lambda: tier("silver", 2)), ("gold", lambda: tier("gold", 3)),
     ("platinum", lambda: tier("platinum", 4)), ("diamond", lambda: tier("diamond", 5)), ("master", lambda: tier("gold", 6)),

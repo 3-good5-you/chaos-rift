@@ -21,8 +21,12 @@ public static class Shop
         new("radiant", "Radiant", 3000, Cosmetic.Mat), new("ruins", "Ruins", 2500, Cosmetic.Mat), new("pharaoh", "Pharaoh", 4000, Cosmetic.Mat), new("datastream", "Datastream", 2500, Cosmetic.Mat),
         new("cup_arena", "Cup Arena", 3500, Cosmetic.Mat), new("steel", "Steel", 2500, Cosmetic.Mat), new("twin_vortex", "Twin Vortex", 3500, Cosmetic.Mat), new("starlane", "Starlane", 3500, Cosmetic.Mat),
         new("art_dark_magician", "Dark Magician", 5000, Cosmetic.Mat), new("art_blue_eyes", "Blue-Eyes", 5000, Cosmetic.Mat), new("art_red_eyes", "Red-Eyes", 5000, Cosmetic.Mat),
-        // Prize mats (price -1, never sold): a tournament win gives the next one you don't have (PrizeMat).
+        // Tournament mats (price -1, never sold): achievements for 3 / 5 / 10 / 20 tournament wins (2026-11-17).
         new("obsidian", "Obsidian", -1, Cosmetic.Mat), new("ivory", "Ivory", -1, Cosmetic.Mat), new("eclipse", "Eclipse", -1, Cosmetic.Mat), new("crimson", "Crimson", -1, Cosmetic.Mat),
+        // Achievement prizes (2026-11-17, never sold): Rift / Gilded / Prismatic families (tools/matforge.py ach_*)
+        new("ach_all_comers", "Rift of Rivals", -1, Cosmetic.Mat), new("ach_triple_white", "White Rift", -1, Cosmetic.Mat),
+        new("ach_veteran", "Veteran's Laurel", -1, Cosmetic.Mat), new("ach_champion", "Champion's Laurel", -1, Cosmetic.Mat),
+        new("ach_half_way", "Collector's Prism", -1, Cosmetic.Mat),
     };
 
     public static readonly Item[] Backs =
@@ -39,6 +43,10 @@ public static class Shop
         new("23_pharaoh_relic", "Pharaoh's Relic", 3500, Cosmetic.Back), new("24_slifer_scroll", "Slifer Scroll", 3500, Cosmetic.Back), new("25_golden_pharaoh", "Golden Pharaoh", 3500, Cosmetic.Back),
         new("26_yellow_puzzle", "Yellow Puzzle", 3500, Cosmetic.Back), new("27_spirit_duel", "Spirit Duel", 3500, Cosmetic.Back), new("28_neon_dragons", "Neon Dragons", 3500, Cosmetic.Back),
         new("29_gods_tapestry", "Legends", 3500, Cosmetic.Back), new("30_chaos_vortex", "Chaos Vortex", 3500, Cosmetic.Back),
+        // Achievement prizes (2026-11-17, never sold; tools/backforge.py ach_*)
+        new("ach_duelist", "Duelist's Rift", -1, Cosmetic.Back), new("ach_grudge", "Grudge Rift", -1, Cosmetic.Back), new("ach_chaos", "Rift of Chaos", -1, Cosmetic.Back),
+        new("ach_forbidden", "Forbidden Laurel", -1, Cosmetic.Back), new("ach_dragon_hoard", "Dragon's Laurel", -1, Cosmetic.Back),
+        new("ach_king", "King's Prism", -1, Cosmetic.Back), new("ach_gauntlet", "Gauntlet Prism", -1, Cosmetic.Back),
     };
 
     // ponytail: rank-style frames (bronze..master) are bought too; ranked play would award them instead.
@@ -51,6 +59,10 @@ public static class Shop
         new("water", "Water", 2500, Cosmetic.Frame), new("fire", "Fire", 2500, Cosmetic.Frame), new("wind", "Wind", 2500, Cosmetic.Frame),
         new("millennium", "Millennium", 3500, Cosmetic.Frame), new("fusion", "Fusion", 3500, Cosmetic.Frame), new("rune", "Rune Circle", 3500, Cosmetic.Frame),
         new("chain", "Chain", 3000, Cosmetic.Frame), new("circuit", "Circuit", 3000, Cosmetic.Frame),
+        // Achievement prizes (2026-11-17, never sold; tools/frameforge.py ach_*)
+        new("ach_comeback", "Comeback Rift", -1, Cosmetic.Frame), new("ach_puzzle_master", "Puzzle Rift", -1, Cosmetic.Frame),
+        new("ach_matches", "Match Laurel", -1, Cosmetic.Frame), new("ach_legend", "Legend Laurel", -1, Cosmetic.Frame),
+        new("ach_untouched", "Untouched Prism", -1, Cosmetic.Frame), new("ach_decksmith", "Decksmith Prism", -1, Cosmetic.Frame),
     };
 
     public static Item[] All(Cosmetic k) => k switch { Cosmetic.Mat => Mats, Cosmetic.Back => Backs, _ => Frames };
@@ -92,19 +104,18 @@ public static class Shop
         return true;
     }
 
-    /// A tournament win's playmat: the first prize mat you don't own yet (null once you have them all). Grants it.
-    public static Item? PrizeMat(Profile p)
-    {
-        var it = Mats.FirstOrDefault(m => m.Price < 0 && !p.Mats.Contains(m.Key));
-        if (it != null) p.Mats.Add(it.Key);
-        return it;
-    }
-
     public static bool Owns(Profile p, Item it) => it.Price == 0 || Bought(p, it.Kind).Contains(it.Key);
+
+    /// The achievement that gives this item, if any: such items are only ever earned, never sold (user 2026-11-17).
+    public static Achievements.Def? EarnedBy(Item it) => Achievements.All.FirstOrDefault(a => a.Key == it.Key && a.Kind switch
+        { Achievements.Prize.Back => it.Kind == Cosmetic.Back, Achievements.Prize.Mat => it.Kind == Cosmetic.Mat, Achievements.Prize.Frame => it.Kind == Cosmetic.Frame, _ => false });
+
+    /// For sale: priced, not a tournament prize (price -1), not an achievement prize.
+    public static bool Sold(Item it) => it.Price > 0 && EarnedBy(it) == null;
 
     public static bool Buy(Profile p, Item it)
     {
-        if (Owns(p, it) || it.Price < 0 || p.Dp < it.Price) return false;   // prize mats are won, not bought
+        if (Owns(p, it) || !Sold(it) || p.Dp < it.Price) return false;   // prizes are won, not bought
         p.Dp -= it.Price;
         Bought(p, it.Kind).Add(it.Key);
         return true;
@@ -121,6 +132,9 @@ public static class Shop
     /// After loading: keep only known bought items; anything equipped but not owned falls back to the default.
     public static void Tidy(Profile p)
     {
+        // an achievement claimed before its prize changed (2026-11-17: own designs) still gives the current prize
+        foreach (var a in Achievements.All.Where(a => a.Kind != Achievements.Prize.Dp && Achievements.Claimed(a, p)))
+            Bought(p, a.Kind switch { Achievements.Prize.Back => Cosmetic.Back, Achievements.Prize.Mat => Cosmetic.Mat, _ => Cosmetic.Frame }).Add(a.Key);
         foreach (var k in Enum.GetValues<Cosmetic>()) Bought(p, k).RemoveWhere(key => All(k).All(i => i.Key != key));
         bool Ok(Cosmetic k, string key) => All(k).FirstOrDefault(i => i.Key == key) is { } it && Owns(p, it);
         if (!Ok(Cosmetic.Mat, p.Mat)) p.Mat = DefaultMat;

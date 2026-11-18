@@ -169,6 +169,9 @@ public sealed class CardDb
         foreach (var (name, max) in ExpansionLimits)
             if (ByName.TryGetValue(name, out var cl))
                 foreach (var lim in Limits.Values) foreach (var c in cl.Where(c => c.Modern)) lim[c.KonamiId] = max;
+        // Nothing is forbidden (user 2026-11-17: rival decks hold the Gods and other once-banned cards): a forbidden card
+        // counts as limited, one copy.
+        foreach (var lim in Limits.Values) foreach (var k in lim.Keys.ToList()) if (lim[k] == 0) lim[k] = 1;
         foreach (var b in rt.GetProperty("joey").GetProperty("attribute_boosts").EnumerateArray())
             AttributeBoosts[b.GetProperty("id").GetInt32()] =
                 b.GetProperty("atk_by_attribute").EnumerateObject().ToDictionary(x => x.Name, x => x.Value.GetInt32());

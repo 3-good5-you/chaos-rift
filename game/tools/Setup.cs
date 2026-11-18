@@ -31,6 +31,9 @@ static class Setup
     [STAThread]
     static int Main(string[] args)
     {
+        // Started by the game's UPDATE we inherit its working directory, the install folder: Windows will not delete a
+        // folder that is a process's current directory ("used by another process"), so step out of it first.
+        try { Environment.CurrentDirectory = Path.GetTempPath(); } catch { }
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
         foreach (var a in args) if (a == "--uninstall") return Uninstall();
@@ -84,9 +87,15 @@ static class Setup
                 self.Read(stub, 0, stub.Length);
             }
             progress(50, "Installing...");
-            if (Directory.Exists(dest)) Directory.Delete(dest, true);
             using (var zip = ZipFile.OpenRead(tmp))
             {
+                // A small update (package.py --base): only the changed files, written over the installed game.
+                bool patch = zip.GetEntry("patch.json") != null;
+                if (patch && !File.Exists(Path.Combine(dest, Exe))) throw new IOException("this is an update: " + App + " is not installed in " + dest);
+                for (int t = 0; !patch && Directory.Exists(dest); t++)   // antivirus or a closing game can hold a file a few seconds
+                    try { Directory.Delete(dest, true); }
+                    catch (IOException) { if (t >= 20) throw; Thread.Sleep(500); }
+                    catch (UnauthorizedAccessException) { if (t >= 20) throw; Thread.Sleep(500); }
                 int n = zip.Entries.Count, i = 0;
                 foreach (var e in zip.Entries)
                 {

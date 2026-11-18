@@ -170,5 +170,5 @@ void fragment() {
 		if (!Shooting) GetTree().CreateTimer(delay + 2.2).Timeout += () => Transition.Go(this, "res://ui/field/DuelField.tscn");
 	}
 
-	protected override void OnBack() { if (!Lan.On) Transition.Go(this, "res://ui/DuelSetup.tscn"); }   // LAN: the duel is dealt, no way back
+	protected override void OnBack() { if (!Lan.On) Transition.Go(this, Session.Draft != null ? "res://ui/PackDraft.tscn" : "res://ui/DuelSetup.tscn"); }   // LAN: the duel is dealt, no way back
 }

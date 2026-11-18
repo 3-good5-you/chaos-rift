@@ -252,7 +252,7 @@ public static partial class Scripts
             var l = x.My.Hand.Concat(x.My.Deck).Where(c => c.Name is "Harpie Lady" or "Harpie Lady Sisters");
             var t = await x.Pick(l, "Special Summon which Harpie?");
             if (t != null) { bool fromDeck = t.Loc == Loc.Deck; await x.D.SpecialSummon(t, x.Me, await x.D.ChoosePosition(x.Me, t), by: x.Self); if (fromDeck) x.D.Shuffle(x.Me); }
-        }, x => x.D.FaceUpMonsters.Any(m => m.Name == "Harpie Lady") && x.D.FreeMonsterZones(x.Me) > 0);
+        }, x => x.D.FaceUpMonsters.Any(m => Scripts.NameOf(m) == "Harpie Lady") && x.D.FreeMonsterZones(x.Me) > 0);
 
         {
             var s = S("Castle of Dark Illusions");

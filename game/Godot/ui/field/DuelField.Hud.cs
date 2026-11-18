@@ -8,6 +8,7 @@ public partial class DuelField
 {
     Control hud = null!;
     TextureRect detailArt = null!;
+    CardData? detailFor;
     Label detailName = null!, detailType = null!, detailStars = null!, detailStats = null!, detailDesc = null!, detailHint = null!;
     RichTextLabel detailRich = null!;   // the text as shown, keywords marked; detailDesc stays (invisible) as the measure
     readonly Panel[] profile = new Panel[2];
@@ -17,8 +18,8 @@ public partial class DuelField
     ShaderMaterial vignette = null!;
     Panel detail = null!;
     ColorRect detailRule = null!;
-    Panel prompt = null!, toast = null!;
-    Label promptTitle = null!, toastText = null!, toastSub = null!;
+    Panel toast = null!;
+    Label toastText = null!, toastSub = null!;
     Control promptChips = null!;
     int promptToken, toastToken;
 
@@ -101,7 +102,8 @@ void fragment() { float r = length((UV - 0.5) * vec2(1.6, 1.0)); COLOR = vec4(co
         if (c == null) return;
         var d = c.Data;
         detailHint.Visible = false;
-        detailArt.Texture = CardArt.Large(d);
+        detailFor = d;   // a later hover wins over a picture still decoding
+        CardArt.LargeAsync(d, t => { if (detailFor == d && IsInstanceValid(detailArt)) detailArt.Texture = t; });
         detailName.Text = d.Name;
         if (d.IsMonster)
         {
@@ -234,47 +236,12 @@ void fragment() { vec3 c = mix(col.rgb * 0.7, col.rgb * 1.25, UV.x) + vec3(0.25)
 
     void BuildPrompt()
     {
-        prompt = Box(hud, new Rect2(W / 2 - 380, H * 0.4f, 760, 150), Glass(RivalPanels.Gold * new Color(1, 1, 1, 0.8f), 0.25f));
-        prompt.Modulate = new Color(1, 1, 1, 0);
-        promptTitle = Put(prompt, "", Cond, 30, Colors.White, new Vector2(0, 16), new Vector2(760, 40), HorizontalAlignment.Center);
-        promptChips = new Control { Position = new Vector2(30, 76), Size = new Vector2(700, 50), MouseFilter = MouseFilterEnum.Ignore };
-        prompt.AddChild(promptChips);
 
         toast = Box(hud, new Rect2(W / 2 - 330, 24, 660, 66), Glass(RivalPanels.Gold * new Color(1, 1, 1, 0.6f)));
         toast.Modulate = new Color(1, 1, 1, 0);
         toastText = Put(toast, "", Cond, 28, Colors.White, new Vector2(24, 14), new Vector2(480, 40));
         toastText.ClipText = true;
         toastSub = Put(toast, "", Impact, 28, RivalPanels.Gold, new Vector2(456, 12), new Vector2(180, 40), HorizontalAlignment.Right);
-    }
-
-    async Task AskYou(Prompt p, Command cmd)
-    {
-        promptToken++;
-        foreach (var c in promptChips.GetChildren()) c.QueueFree();
-        promptTitle.Text = p.Kind == Ask.Respond ? Lang.F("CHAIN TO {0}?", Lang.Tr(What(D.Window))) : Lang.Duel(p.Text).ToUpperInvariant();
-        FitText(promptTitle, 30);
-        var chips = new List<Panel>();
-        int n = Math.Min(p.Options.Count, 4);
-        float w = (700 - (n - 1) * 12) / n;
-        for (int i = 0; i < n; i++)
-        {
-            var o = p.Options[i];
-            var label = o.Act == Act.Pass ? "PASS" : o.Card?.Name ?? (o.Text != null ? Lang.Duel(o.Text) : o.ToString());
-            var chip = Chips.Make(label, new Vector2(i * (w + 12), 0), new Vector2(w, 46), () => { }, 20);
-            chip.MouseFilter = MouseFilterEnum.Ignore;
-            promptChips.AddChild(chip);
-            chips.Add(chip);
-        }
-        prompt.Scale = new Vector2(0.92f, 0.92f);
-        prompt.PivotOffset = prompt.Size / 2;
-        var tw = CreateTween().SetParallel();
-        tw.TweenProperty(prompt, "modulate:a", 1f, 0.18);
-        tw.TweenProperty(prompt, "scale", Vector2.One, 0.25).SetTrans(Tween.TransitionType.Back).SetEase(Tween.EaseType.Out);
-        await Wait(1.0);
-        foreach (var i in cmd.Picks) if (i < chips.Count) Chips.SetOn(chips[i], true);
-        await Wait(0.5);
-        CreateTween().TweenProperty(prompt, "modulate:a", 0f, 0.18);
-        await Wait(0.2);
     }
 
     static string What(Ev? e) => e?.Kind switch

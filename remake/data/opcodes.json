@@ -1,0 +1,284 @@
+{
+ "_derived_from": "Two complete recorded duels of yugi_pc.exe (data/duel_logs/, recorded with tools/poc_record.py) read against card ids and stats. Record = (op | player<<15, a, b, c). 'seen' = meaning confirmed by matching card names/numbers in the logs; 'inferred' = consistent with the logs but not proven. Card args: 'konami' = Konami id, 'idx' = card number in cards.json.",
+ "ops": {
+  "0x14": {
+   "meaning": "duel setup start",
+   "conf": "inferred"
+  },
+  "0x10": {
+   "meaning": "duel setup",
+   "conf": "inferred"
+  },
+  "0x12": {
+   "meaning": "response window / pass priority to the other player (appears after every activation, attack and battle result)",
+   "conf": "seen"
+  },
+  "0x61": {
+   "meaning": "draw cards",
+   "args": "b = count (5 = opening hand, 1 = normal draw)",
+   "conf": "seen"
+  },
+  "0x01": {
+   "meaning": "turn start",
+   "conf": "seen"
+  },
+  "0x50": {
+   "meaning": "Draw Phase",
+   "conf": "seen"
+  },
+  "0x51": {
+   "meaning": "Standby Phase",
+   "conf": "seen"
+  },
+  "0x52": {
+   "meaning": "Main Phase 1",
+   "conf": "seen"
+  },
+  "0x53": {
+   "meaning": "Battle Phase",
+   "conf": "seen"
+  },
+  "0x54": {
+   "meaning": "Main Phase 2",
+   "conf": "seen"
+  },
+  "0x55": {
+   "meaning": "End Phase",
+   "conf": "seen"
+  },
+  "0x47": {
+   "meaning": "End Phase housekeeping",
+   "conf": "inferred"
+  },
+  "0xa8": {
+   "meaning": "end-of-turn reset of a monster zone's per-turn flags",
+   "args": "a = zone 0..4",
+   "conf": "inferred"
+  },
+  "0x02": {
+   "meaning": "turn end (1)",
+   "conf": "seen"
+  },
+  "0x03": {
+   "meaning": "turn end (2)",
+   "conf": "seen"
+  },
+  "0x04": {
+   "meaning": "duel end",
+   "args": "a = winning player",
+   "conf": "seen"
+  },
+  "0xc4": {
+   "meaning": "Normal Summon / Set a monster from hand",
+   "args": "a = konami, b = position/zone code",
+   "conf": "seen"
+  },
+  "0xe6": {
+   "meaning": "summon declaration (precedes 0xc4/0x6f for face-up summons)",
+   "args": "a = konami",
+   "conf": "seen"
+  },
+  "0x6f": {
+   "meaning": "monster placed on field",
+   "args": "a = konami, b = zone",
+   "conf": "seen"
+  },
+  "0x92": {
+   "meaning": "summon complete, opens the response window for the opponent",
+   "args": "a = zone",
+   "conf": "seen"
+  },
+  "0x7f": {
+   "meaning": "monster released (tribute) from a zone",
+   "args": "a = zone",
+   "conf": "inferred"
+  },
+  "0x32": {
+   "meaning": "summon/declaration success step",
+   "conf": "inferred"
+  },
+  "0xc5": {
+   "meaning": "Set a Spell/Trap face-down",
+   "args": "a = konami, b = zone code",
+   "conf": "seen"
+  },
+  "0x91": {
+   "meaning": "flip a set Spell/Trap face-up to activate it",
+   "args": "a = S/T zone",
+   "conf": "seen"
+  },
+  "0x72": {
+   "meaning": "activate a Spell/Trap/effect (adds a chain link)",
+   "args": "a = konami, b = zone",
+   "conf": "seen"
+  },
+  "0x08": {
+   "meaning": "choose a target/cost for the activation",
+   "args": "a = player, b = zone bits",
+   "conf": "seen"
+  },
+  "0x0a": {
+   "meaning": "chain list entry before resolution",
+   "args": "a = zone, b = chain link number",
+   "conf": "seen"
+  },
+  "0x0b": {
+   "meaning": "resolve one chain link",
+   "args": "a = zone",
+   "conf": "seen"
+  },
+  "0x78": {
+   "meaning": "card leaves its zone after resolving/being destroyed",
+   "args": "a = zone",
+   "conf": "seen"
+  },
+  "0x79": {
+   "meaning": "destroy monster by effect",
+   "args": "a = zone",
+   "conf": "seen"
+  },
+  "0xb5": {
+   "meaning": "move card between areas",
+   "args": "a = src zone<<8 | player, b = 0x0e<<8 (graveyard) | player",
+   "conf": "inferred"
+  },
+  "0x7d": {
+   "meaning": "card arrives in graveyard",
+   "args": "a = konami | flags (0x8000 player, 0x1000 by battle?), b = 0x20 when destroyed by battle",
+   "conf": "seen"
+  },
+  "0x56": {
+   "meaning": "Battle Phase: set of monsters that may still attack",
+   "args": "a = bitmask of zones",
+   "conf": "seen"
+  },
+  "0x34": {
+   "meaning": "select attacker",
+   "args": "a = zone",
+   "conf": "seen"
+  },
+  "0x35": {
+   "meaning": "declare attack",
+   "args": "a = zone",
+   "conf": "seen"
+  },
+  "0x33": {
+   "meaning": "attack target prompt / opponent's monsters available",
+   "conf": "inferred"
+  },
+  "0x80": {
+   "meaning": "defender selection step",
+   "conf": "inferred"
+  },
+  "0x76": {
+   "meaning": "face-down defender flipped by the attack",
+   "args": "a = konami",
+   "conf": "seen"
+  },
+  "0x30": {
+   "meaning": "battle between two monsters",
+   "args": "a = player 0's monster (idx), b = player 1's monster (idx) or 0 for a direct attack; the record's player bit says who attacked",
+   "conf": "seen (both attack directions in the logs fit this; direct attacks only seen by player 0)"
+  },
+  "0x31": {
+   "meaning": "battle result",
+   "args": "b = damage, c flags: 0x400 direct hit, 0x300 face-down/defense defender destroyed with no damage, 0x600 attack-position defender destroyed + damage, 0x0003 seen once when a flipped Hane-Hane (flip effect) was the defender",
+   "conf": "seen (0x0003 unclear)"
+  },
+  "0x43": {
+   "meaning": "Life Points lost",
+   "args": "a = amount, issued by the damaged player",
+   "conf": "seen"
+  },
+  "0x42": {
+   "meaning": "Life Points change (other kind: cost or gain)",
+   "args": "a = amount",
+   "conf": "inferred"
+  },
+  "0x7a": {
+   "meaning": "battle destruction step",
+   "conf": "inferred"
+  },
+  "0x81": {
+   "meaning": "battle step (after a flip effect)",
+   "conf": "inferred"
+  },
+  "0xad": {
+   "meaning": "flip effect trigger",
+   "args": "a = konami",
+   "conf": "seen"
+  },
+  "0x11": {
+   "meaning": "Field Spell takes effect",
+   "args": "a = zone",
+   "conf": "inferred"
+  },
+  "0x75": {
+   "meaning": "Special Summon from graveyard (Monster Reborn)",
+   "args": "a = konami",
+   "conf": "seen"
+  },
+  "0xd3": {
+   "meaning": "card leaves graveyard",
+   "args": "a = konami | flags",
+   "conf": "inferred"
+  },
+  "0x71": {
+   "meaning": "equip / attach (a = equip/new card, b = target konami)",
+   "conf": "inferred"
+  },
+  "0x59": {
+   "meaning": "Fusion: pick material",
+   "args": "a = 0x0b, b = zone",
+   "conf": "seen"
+  },
+  "0x5a": {
+   "meaning": "Fusion: send material",
+   "args": "a = 0x0b, b = zone",
+   "conf": "seen"
+  },
+  "0xcc": {
+   "meaning": "monster zone emptied",
+   "args": "a = zone",
+   "conf": "inferred"
+  },
+  "0xca": {
+   "meaning": "Fusion summon start",
+   "conf": "inferred"
+  },
+  "0xdc": {
+   "meaning": "Fusion monster chosen",
+   "args": "a = konami",
+   "conf": "seen"
+  },
+  "0xe8": {
+   "meaning": "Fusion materials list",
+   "conf": "inferred"
+  },
+  "0xe9": {
+   "meaning": "Fusion monster summoned",
+   "args": "a = konami",
+   "conf": "seen"
+  },
+  "0x57": {
+   "meaning": "monster battle position change (per zone)",
+   "conf": "inferred"
+  },
+  "0x95": {
+   "meaning": "position change confirmed",
+   "conf": "inferred"
+  },
+  "0x72+0x0b on Kuriboh (0xc0, 0xea)": {
+   "meaning": "hand trap: discard during damage step (Kuriboh), then damage step re-evaluated",
+   "conf": "inferred"
+  },
+  "0x86": {
+   "meaning": "continuous effect applied (Spellbinding Circle on a monster)",
+   "conf": "inferred"
+  },
+  "0x60": {
+   "meaning": "shuffle with CRT rand() seed (from the exe, 0x530ed0)",
+   "conf": "seen in code"
+  }
+ }
+}

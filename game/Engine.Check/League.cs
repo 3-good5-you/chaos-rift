@@ -29,12 +29,13 @@ static class League
         var db = CardDb.Shared;
         Scripts.Get(db.Named("Pot of Greed"));   // build shared tables before going parallel
         new Ai(0, 0);
-        var decks = db.DeckNames().ToList();
+        // LEAGUE_DECKS=remastered: the decks you face (rival ladders, tournament duelists) instead of the original CPU decks.
+        var decks = (Environment.GetEnvironmentVariable("LEAGUE_DECKS") == "remastered" ? db.RemasteredDeckNames() : db.DeckNames()).ToList();
         int aWins = 0, bWins = 0, draws = 0, errors = 0;
         var thinks = new List<double>();
         var sw = Stopwatch.StartNew();
         int from = first ?? int.Parse(Environment.GetEnvironmentVariable("LEAGUE_FROM") ?? "0");
-        Parallel.For(from, from + pairs, i =>
+        Parallel.For(from, from + pairs, Cores, i =>
         {
             var rng = new Rng((ulong)(31000 + i));
             var setup = Chaos ? Bots.RandomSetup(rng, chaos: true) : new DuelSetup { Seed = rng.Next(), FirstPlayer = rng.Int(2) };
@@ -101,7 +102,7 @@ static class League
             : prefix.Contains(',') ? prefix.Split(',').ToList() : all.Where(k => k.StartsWith(prefix)).ToList();
         var cache = all.Union(keys).ToDictionary(k => k, k => db.Deck(k));
         var wins = new int[keys.Count]; var games = new int[keys.Count];
-        Parallel.For(0, keys.Count * perDeck, job =>
+        Parallel.For(0, keys.Count * perDeck, Cores, job =>
         {
             int k = job / perDeck, i = job % perDeck;
             var rng = new Rng((ulong)(job * 7919 + 11));
@@ -159,7 +160,7 @@ static class League
         var sided = all.Concat(db.RemasteredDeckNames()).Where(k => db.DeckSide(k).Count > 0).ToList();
         var cache = all.Union(sided).ToDictionary(k => k, k => (deck: db.Deck(k), side: db.DeckSide(k)));
         var later = new int[2]; var laterN = new int[2]; var won = new int[2]; int swaps = 0;
-        Parallel.For(0, matches, i =>
+        Parallel.For(0, matches, Cores, i =>
         {
             var rng = new Rng((ulong)(55000 + i));
             string cpuKey = sided[rng.Int(sided.Count)], youKey = all[rng.Int(all.Count)];
@@ -210,7 +211,7 @@ static class League
         var keys = db.DeckNames().Where(k => k.StartsWith("joey/cpu_")).ToList();
         var starters = DeckRules.Starters.Select(s => db.Deck(s.Key)).ToList();
         var wins = new int[keys.Count]; var games = new int[keys.Count];
-        Parallel.For(0, keys.Count * perDeck, job =>
+        Parallel.For(0, keys.Count * perDeck, Cores, job =>
         {
             int k = job / perDeck, i = job % perDeck;
             var rng = new Rng((ulong)(job * 104729 + 3));
@@ -247,7 +248,7 @@ static class League
         var use = Environment.GetEnvironmentVariable("RIVALS_USE") == "1" ? new Dictionary<string, int>() : null;   // what the rival's deck actually did
         var starters = DeckRules.Starters.Select(s => db.Deck(s.Key)).ToList();
         var wins = new int[keys.Count]; var games = new int[keys.Count];
-        Parallel.For(0, keys.Count * perDeck, job =>
+        Parallel.For(0, keys.Count * perDeck, Cores, job =>
         {
             int k = job / perDeck, i = job % perDeck;
             var rng = new Rng((ulong)(job * 104729 + 11));
@@ -262,11 +263,13 @@ static class League
                 if (use != null)
                     d.OnEvent += e =>
                     {
-                        string? key = e.Kind switch { EvKind.Summoned when e.Card!.Controller == 1 => $"summon {(SummonKind)e.Arg} {e.Card.Name}", EvKind.Activated when e.Link!.Player == 1 => "use " + e.Link.Card.Name, _ => null };
+                        string? key = e.Kind switch { EvKind.Summoned when e.Card!.Owner == 1 => $"summon {(SummonKind)e.Arg} {e.Card.Name}", EvKind.Activated when e.Link!.Player == 1 => "use " + e.Link.Card.Name, _ => null };
                         if (key != null) lock (use) use[key] = use.GetValueOrDefault(key) + 1;
                     };
-                var ais = new[] { Make(spec, 0, rng.Next()), Make(spec, 1, rng.Next()) };
-                for (int steps = 0; !d.Over && steps < 4000; steps++) d.Submit(ais[d.Pending!.Player].Decide(d));
+                var ais = new[] { Make(Environment.GetEnvironmentVariable("RIVALS_VS") ?? spec, 0, rng.Next()), Make(spec, 1, rng.Next()) };   // RIVALS_VS: who plays the starter decks
+                int steps = 0;
+                for (; !d.Over && steps < 4000; steps++) d.Submit(ais[d.Pending!.Player].Decide(d));
+                if (steps > 600) Console.WriteLine($"  long duel: {keys[k]} vs starter {i % starters.Count}, {steps} decisions, turn {d.Turn}, over={d.Over}");
                 if (use != null) lock (use) { use["turns"] = use.GetValueOrDefault("turns") + d.Turn; use[$"won{d.Winner}"] = use.GetValueOrDefault($"won{d.Winner}") + 1; }
                 if (d.Winner < 0) return;
                 Interlocked.Increment(ref games[k]);
@@ -278,12 +281,16 @@ static class League
         for (int l = 1; l <= 7; l++)
             Console.WriteLine($"  {l}  " + string.Join("", new[] { "yugi", "kaiba", "joey", "jaden" }.Select(r => { int k = keys.IndexOf($"{r}/x_lv{l}"); return k < 0 ? "    -  " : $"{100.0 * wins[k] / Math.Max(1, games[k]),6:0.0} "; })));
         if (use != null) foreach (var (k, v) in use.OrderByDescending(kv => kv.Value)) Console.WriteLine($"    {v,5} {k}");
+        foreach (var r in keys.Where(k => k.Contains("/x_lv")).Select(k => k.Split('/')[0]).Distinct().Except(new[] { "yugi", "kaiba", "joey", "jaden" }))
+            Console.WriteLine($"  {r,-8}" + string.Join("", Enumerable.Range(1, 7).Select(l => { int k = keys.IndexOf($"{r}/x_lv{l}"); return k < 0 ? "    -  " : $"{100.0 * wins[k] / Math.Max(1, games[k]),6:0.0} "; })));
         foreach (var k in keys.Where(k => !k.Contains("/x_lv"))) Console.WriteLine($"  {k}: {100.0 * wins[keys.IndexOf(k)] / Math.Max(1, games[keys.IndexOf(k)]):0.0}%");
     }
 
     /// Train the board value (Value.cs) on CPU-vs-CPU duels: half CPU decks, half whole-pool decks. 10% of duels are
     /// held out to report how often the model calls the eventual winner. Writes Engine/ai_value.json.
     /// Run: ... -- train 3000 [spec]   (spec as in `levels`: who plays the training duels)
+    static readonly ParallelOptions Cores = new() { MaxDegreeOfParallelism = Environment.ProcessorCount };   // more threads than cores starve on the CPU's shared locks
+
     public static Value Train(int duels, string spec = "Plus", bool write = true, int seedBase = 77000)
     {
         var db = CardDb.Shared;
@@ -297,7 +304,15 @@ static class League
         // Card payoffs carry over at half weight, so rare cards keep what earlier runs saw.
         var uses = new Value(new double[Value.Names.Length], Value.Trained.Uses.ToDictionary(kv => kv.Key, kv => new[] { kv.Value[0] / 2, kv.Value[1] / 2 }));
         Ai.Used = uses.Used;
-        Parallel.For(0, duels, i =>
+        var dealt = new System.Collections.Concurrent.ConcurrentDictionary<string, byte>();
+        var hits0 = new Dictionary<string, int>(Scripts.Hits);
+        var live = new System.Collections.Concurrent.ConcurrentDictionary<int, (Stopwatch t, Duel? d)>();
+        using var dog = new System.Threading.Timer(_ =>
+        {
+            foreach (var (n, (t, dd)) in live)
+                if (t.Elapsed.TotalSeconds > 600) Console.WriteLine($"  STUCK? duel {n} {t.Elapsed.TotalMinutes:0}min turn {dd?.Turn} pending {dd?.Pending?.Kind}");
+        }, null, 300_000, 300_000);
+        Parallel.For(0, duels, Cores, i =>
         {
             var rng = new Rng((ulong)(seedBase + i));
             var setup = i % 2 == 1 ? Bots.RandomSetup(rng, chaos: true) : new DuelSetup { Seed = rng.Next(), FirstPlayer = rng.Int(2) };
@@ -307,13 +322,21 @@ static class League
             fit[i] = new();
             try
             {
+                foreach (var x in setup.Main.Concat(setup.Extra).SelectMany(l => l)) dealt[db.ByIdx[x].Name] = 0;
+                if (Environment.GetEnvironmentVariable("DEAL_ONLY") != null) return;
                 var d = new Duel(setup);
                 var ais = new[] { Make(spec, 0, rng.Next()), Make(spec, 1, rng.Next()) };
-                for (int k = 0; k < 4000 && !d.Over; k++) d.Submit(ais[d.Pending!.Player].Decide(d));
+                var t0 = Stopwatch.StartNew(); int k = 0; live[i] = (t0, d);
+                for (; k < 4000 && !d.Over; k++) d.Submit(ais[d.Pending!.Player].Decide(d));
+                if (t0.Elapsed.TotalSeconds > 120) Console.WriteLine($"  slow duel {i}: {k} decisions, {t0.Elapsed.TotalSeconds:0}s, over={d.Over}");
                 fit[i] = Value.Positions(d);
             }
             catch (Exception) { }
+            finally { live.TryRemove(i, out _); }
         });
+        int ran; lock (Scripts.Hits) ran = Scripts.Hits.Count(kv => kv.Value > hits0.GetValueOrDefault(kv.Key));
+        var names = db.ByIdx.Values.Select(c => c.Name).Distinct().ToList();
+        Console.WriteLine($"Coverage: {names.Count} distinct cards in the db, {names.Count(n => Scripts.IsWired(db.Named(n)))} with effect code, {dealt.Count} dealt in these duels, {ran} had their effect code run");
         var train = fit.Where((_, i) => i % 10 != 0).SelectMany(x => x).ToList();
         var test = fit.Where((_, i) => i % 10 == 0).SelectMany(x => x).ToList();
         Ai.Used = null;
@@ -325,8 +348,9 @@ static class League
         foreach (var (k, u) in v.Uses.Where(kv => kv.Value[1] >= 5).OrderByDescending(kv => kv.Value[0] / kv.Value[1]).Take(12))
             Console.WriteLine($"  {k,-28} avg {u[0] / u[1],6:0}  ({u[1]} uses)");
         if (!write) return v;
-        File.WriteAllText(Path.Combine("Engine", "ai_value.json"), v.ToJson());
-        Console.WriteLine("wrote Engine/ai_value.json (rebuild to ship it)");
+        var outFile = Environment.GetEnvironmentVariable("TRAIN_OUT") ?? Path.Combine("Engine", "ai_value.json");
+        File.WriteAllText(outFile, v.ToJson());
+        Console.WriteLine($"wrote {outFile} (Engine/ai_value.json: rebuild to ship it)");
         return v;
     }
 
@@ -367,12 +391,22 @@ static class League
 
     static Ai Make(string spec, int seat, ulong seed)
     {
+        // "7L" = the CPU before 2026-11-15; "7R" = its rules only (new search), "7P" = its search only (no pruning)
+        bool noCombo = spec.EndsWith("N");   // "7N" = no combo look-ahead (Seer.Deep)
+        if (noCombo) spec = spec[..^1];
+        char tag = spec[^1];
+        bool legacy = tag is 'L' or 'R', noPrune = tag is 'L' or 'P';
+        if (legacy || noPrune) spec = spec[..^1];
+        bool twice = spec.EndsWith("+");    // "7+" = twice the worlds and the time (what more cores buy in the game)
+        if (twice) spec = spec[..^1];
         bool old = spec.EndsWith("o");
         var s = old ? spec[..^1] : spec;
         // "J2" = Classic+ with the judge on 2 worlds (cheap: training and deck tests); a number = Ai.ForLevel.
         var ai = s.StartsWith("J") ? new Ai(seat, seed, Brain.Plus) { JudgeWorlds = int.Parse(s[1..]) }
             : int.TryParse(s, out int lv) ? Ai.ForLevel(seat, seed, lv) : new Ai(seat, seed, Enum.Parse<Brain>(s));
         if (old) ai.Board = null;
+        ai.Legacy = legacy; ai.NoPrune = noPrune; ai.Combo = !noCombo && tag != 'L';
+        if (twice) { ai.Worlds *= 2; ai.JudgeWorlds *= 2; ai.TimeBudgetMs *= 2; ai.JudgeBudgetMs *= 2; }
         return ai;
     }
 
@@ -425,7 +459,7 @@ static class League
         bool trace = Environment.GetEnvironmentVariable("PASSIVE_TRACE") != null;
         var lines = new List<string>();
         if (trace) Ai.Overruled = l => lines.Add("      " + l);
-        Parallel.For(0, duels, new ParallelOptions { MaxDegreeOfParallelism = trace ? 1 : -1 }, g =>
+        Parallel.For(0, duels, new ParallelOptions { MaxDegreeOfParallelism = trace ? 1 : Environment.ProcessorCount }, g =>
         {
             var rng = new Rng((ulong)(4200 + g));
             var setup = new DuelSetup { Seed = rng.Next(), FirstPlayer = rng.Int(2) };
@@ -481,6 +515,100 @@ static class League
             $"free attacks on an empty field {open}, not taken {missed}; tribute Sets {tributeSets}");
         Console.WriteLine($"habits: CPU turns {myTurns}; walls flipped to Attack {wallFlips}; turns with a winning attack {beats}, none made {beatsMissed}; attackers hidden in Defense {hides}; " +
             $"turns ended with a monster to play {idleMon}, with a Trap to set {idleTrap}");
+    }
+
+    /// Which cards the rule brain (the look-ahead's rollout policy) sits on: at every turn it ends, each card it could
+    /// still have activated or set, by name; and every response window it passed with a card it could have chained.
+    /// Remastered decks (rivals, tournament duelists) both sides. Run: ... -- idle 400 [spec]
+    public static void Idle(int duels, string spec = "Plus")
+    {
+        var db = CardDb.Shared;
+        Scripts.Get(db.Named("Pot of Greed"));
+        new Ai(0, 0);
+        var decks = db.RemasteredDeckNames().ToList();
+        var ended = new Dictionary<string, int>(); var passed = new Dictionary<string, int>(); var used = new Dictionary<string, int>();
+        void Add(Dictionary<string, int> m, string k) { lock (m) m[k] = m.GetValueOrDefault(k) + 1; }
+        Parallel.For(0, duels, Cores, g =>
+        {
+            var rng = new Rng((ulong)(8800 + g));
+            var setup = new DuelSetup { Seed = rng.Next(), FirstPlayer = rng.Int(2) };
+            for (int p = 0; p < 2; p++) { var (m, x) = db.Deck(decks[rng.Int(decks.Count)]); setup.Main[p].AddRange(m); setup.Extra[p].AddRange(x); }
+            try
+            {
+                var d = new Duel(setup);
+                var ais = new[] { Make(spec, 0, rng.Next()), Make(spec, 1, rng.Next()) };
+                for (int k = 0; k < 4000 && !d.Over; k++)
+                {
+                    var pr = d.Pending!;
+                    var cmd = ais[pr.Player].Decide(d);
+                    var o = pr.Options[cmd.Picks[0]];
+                    if (pr.Kind == Ask.Main && o.Act == Act.EndTurn)
+                        foreach (var x in pr.Options.Where(x => x.Act is Act.Activate or Act.SetSpell && x.Card != null).DistinctBy(x => x.Card!.Uid))
+                            Add(ended, $"{x.Act} {x.Card!.Name}");
+                    if (pr.Kind == Ask.Respond)
+                    {
+                        if (o.Act == Act.Pass) foreach (var x in pr.Options.Where(x => x.Act == Act.Activate)) Add(passed, $"{x.Card!.Name} @{d.Window?.Kind}");
+                        else Add(used, $"{o.Card?.Name} @{d.Window?.Kind}");
+                    }
+                    d.Submit(cmd);
+                }
+            }
+            catch (Exception) { }
+        });
+        void Show(string t, Dictionary<string, int> m) { Console.WriteLine(t); foreach (var (k, v) in m.Where(kv => Environment.GetEnvironmentVariable("IDLE_GREP") is not { } g || kv.Key.Contains(g)).OrderByDescending(kv => kv.Value).Take(40)) Console.WriteLine($"  {v,6} {k}"); }
+        Show("Turn ended with this still playable:", ended);
+        Show("Response window passed with:", passed);
+        Show("Chained:", used);
+    }
+
+    /// Per-card audit (2026-11-16: ~500 scripted cards never fired in training): random whole-pool decks, and for
+    /// every card how often it was dealt, offered (an Activate option or a "use this effect?" question), taken, and
+    /// how often its script ran. Writes a TSV (CARDS_OUT, default cards_audit.tsv). Run: ... -- cards 3000 [spec]
+    public static void Cards(int duels, string spec = "Plus")
+    {
+        var db = CardDb.Shared;
+        Scripts.Get(db.Named("Pot of Greed"));
+        new Ai(0, 0);
+        var stat = new System.Collections.Concurrent.ConcurrentDictionary<string, int[]>();   // dealt, offered, taken
+        void Add(string n, int k) { var a = stat.GetOrAdd(n, _ => new int[3]); Interlocked.Increment(ref a[k]); }
+        var hits0 = new Dictionary<string, int>(Scripts.Hits);
+        Parallel.For(0, duels, Cores, g =>
+        {
+            var rng = new Rng((ulong)(4400 + g));
+            var setup = Bots.RandomSetup(rng, chaos: true);
+            foreach (var x in setup.Main.Concat(setup.Extra).SelectMany(l => l)) Add(db.ByIdx[x].Name, 0);
+            try
+            {
+                var d = new Duel(setup);
+                var ais = new[] { Make(spec, 0, rng.Next()), Make(spec, 1, rng.Next()) };
+                for (int k = 0; k < 4000 && !d.Over; k++)
+                {
+                    var pr = d.Pending!;
+                    var cmd = ais[pr.Player].Decide(d);
+                    if (pr.Kind is Ask.Main or Ask.Respond or Ask.Battle)
+                    {
+                        foreach (var n in pr.Options.Where(o => o.Act == Act.Activate && o.Card != null).Select(o => o.Card!.Name).Distinct()) Add(n, 1);
+                        if (pr.Options[cmd.Picks[0]] is { Act: Act.Activate, Card: { } c }) Add(c.Name, 2);
+                    }
+                    else if (pr.Kind == Ask.YesNo && pr.Source != null)
+                    {
+                        Add(pr.Source.Name, 1);
+                        if (pr.Options[cmd.Picks[0]].Text == "Yes") Add(pr.Source.Name, 2);
+                    }
+                    d.Submit(cmd);
+                }
+            }
+            catch (Exception) { }
+        });
+        var path = Environment.GetEnvironmentVariable("CARDS_OUT") ?? "cards_audit.tsv";
+        Dictionary<string, int> hits; lock (Scripts.Hits) hits = Scripts.Hits.ToDictionary(kv => kv.Key, kv => kv.Value - hits0.GetValueOrDefault(kv.Key));
+        var byName = db.ByIdx.Values.GroupBy(c => c.Name).ToDictionary(g => g.Key, g => g.First());   // tokens have no entry
+        var rows = stat.Where(kv => byName.TryGetValue(kv.Key, out var cd) && Scripts.IsWired(cd))
+            .Select(kv => (name: kv.Key, d: byName[kv.Key], a: kv.Value, ran: hits.GetValueOrDefault(kv.Key))).ToList();
+        File.WriteAllLines(path, new[] { "name	kind	dealt	offered	taken	ran" }
+            .Concat(rows.OrderBy(r => r.ran).ThenByDescending(r => r.a[0]).Select(r => $"{r.name}	{(r.d.IsMonster ? "Monster" : r.d.IsTrap ? "Trap" : "Spell")}	{r.a[0]}	{r.a[1]}	{r.a[2]}	{r.ran}")));
+        int never = rows.Count(r => r.ran == 0);
+        Console.WriteLine($"{rows.Count} scripted cards dealt; script never ran: {never} (offered but never taken: {rows.Count(r => r.ran == 0 && r.a[1] > 0 && r.a[2] == 0)}, never offered: {rows.Count(r => r.ran == 0 && r.a[1] == 0)}) -> {path}");
     }
 
     /// How long rebuilding a duel from its log takes (the cost of one look-ahead branch).

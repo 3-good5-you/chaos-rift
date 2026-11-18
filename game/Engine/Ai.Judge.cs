@@ -127,38 +127,43 @@ public sealed partial class Ai
         var bad = new bool[cands.Count];
         var clock = Stopwatch.StartNew();
         int worlds = 0;
-        for (int w = 0; w < JudgeWorlds; w++)
+        for (int w = 0; w < JudgeWorlds && clock.ElapsedMilliseconds <= JudgeBudgetMs; w++)
         {
             ulong seed = rng.Next();
             var s = new double[cands.Count];
-            for (int i = 0; i < cands.Count; i++)
+            bool cut = false;
+            Parallel.For(0, cands.Count, Par, i =>
             {
-                if (clock.ElapsedMilliseconds > JudgeBudgetMs) return Average();
                 try
                 {
                     var sim = d.Replay();
                     sim.Redeal(me, seed);
-                    if (cands[i] is { } c) { sim.Submit(new Command(me, c)); Settle(sim, seed); }
+                    if (cands[i] is { } c) { sim.Submit(new Command(me, c)); if (!Settle(sim, seed, clock)) { cut = true; return; } }
                     s[i] = Eval(sim);
                 }
                 catch (Exception e) { bad[i] = true; Overruled?.Invoke($"simulation failed: {e.InnerException?.Message ?? e.Message}"); }
-            }
+            });
+            if (cut) break;   // a world cut short by the budget is dropped whole
             worlds++;
             for (int i = 0; i < s.Length; i++) sum[i] += s[i];
         }
-        return Average();
-        double[]? Average() => worlds == 0 ? null : sum.Select((v, i) => bad[i] ? double.NaN : v / worlds).ToArray();
+        return worlds == 0 ? null : sum.Select((v, i) => bad[i] ? double.NaN : v / worlds).ToArray();
     }
 
     /// Play on (Classic+ both sides) until someone is back at an open Main/Battle prompt or the turn ends.
-    void Settle(Duel sim, ulong seed)
+    /// False = the budget ran out first.
+    bool Settle(Duel sim, ulong seed, Stopwatch clock)
     {
         var ais = new Ai[2];
         ais[me] = new Ai(me, seed ^ 0x51, Brain.Plus).CopyTurn(this);
-        ais[1 - me] = new Ai(1 - me, seed ^ 0xA7, Brain.Plus);
+        ais[1 - me] = new Ai(1 - me, seed ^ 0xA7, Brain.Plus) { Legacy = Legacy };
         int t = sim.Turn;
         for (int steps = 0; !sim.Over && sim.Turn == t && sim.Pending!.Kind is not (Ask.Main or Ask.Battle) && steps < 300; steps++)
+        {
+            if ((steps & 15) == 15 && clock.ElapsedMilliseconds > JudgeBudgetMs) return false;
             sim.Submit(ais[sim.Pending.Player].Decide(sim));
+        }
+        return true;
     }
 
     /// Options that can't differ in outcome (two copies of one card in hand) share a key.

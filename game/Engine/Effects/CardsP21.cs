@@ -191,31 +191,6 @@ public static partial class Scripts
             };
         }
         {
-            var s = S("Ritual Sanctuary");
-            s.AddFx(f =>
-            {
-                f.Label = "Discard a Spell: add a LIGHT Ritual card";
-                f.Can = x => x.Self.FaceUp && Hopt(x, "1") && x.My.Hand.Any(c => c.Data.IsSpell) && x.My.Deck.Any(c => (c.Data.IsRitual && c.Data.Attribute == "LIGHT") || (c.Data.IsSpell && c.Data.Is("Ritual")));
-                f.Cost = async x => { UseHopt(x, "1"); await x.D.Discard(x.Me, await x.PickN(x.My.Hand.Where(c => c.Data.IsSpell), 1, 1, "Discard 1 Spell"), x.Self); };
-                f.Run = async x => await x.Search(c => (c.Data.IsRitual && c.Data.Attribute == "LIGHT") || (c.Data.IsSpell && c.Data.Is("Ritual")), "Add which card?");
-            });
-            s.AddFx(f =>
-            {
-                f.Label = "Shuffle Spells: revive a LIGHT Fairy";
-                f.Can = x => x.Self.FaceUp && Hopt(x, "2") && x.D.FreeMonsterZones(x.Me) > 0 && x.My.Grave.Any(c => c.Data.IsMonster && c.Data.Attribute == "LIGHT" && c.Data.Race == "Fairy" && c.Data.Level >= 1 && c.Data.Level <= x.My.Grave.Count(g => g.Data.IsSpell));
-                f.Cost = async x =>
-                {
-                    UseHopt(x, "2");
-                    var t = await x.Pick(x.Targetable(x.My.Grave.Where(c => c.Data.IsMonster && c.Data.Attribute == "LIGHT" && c.Data.Race == "Fairy" && c.Data.Level <= x.My.Grave.Count(g => g.Data.IsSpell))), "Special Summon which LIGHT Fairy?");
-                    if (t == null) return;
-                    x.T.Add(t);
-                    foreach (var c in await x.PickN(x.My.Grave.Where(c => c.Data.IsSpell), t.Data.Level, t.Data.Level, $"Shuffle {t.Data.Level} Spells into the Deck")) await x.D.ToDeck(c);
-                    x.D.Shuffle(x.Me);
-                };
-                f.Run = async x => { if (x.T0 is { Loc: Loc.Grave } t) await x.D.SpecialSummon(t, x.Me, await x.D.ChoosePosition(x.Me, t), by: x.Self); };
-            });
-        }
-        {
             var s = Spell("Ritual Weapon", async x => { if (x.T0 is { } t && t.Valid() && t.FaceUp) await x.D.Equip(x.Self, t); },
                 x => x.Targetable(x.D.FaceUpMonsters.Where(m => m.Data.IsRitual && x.D.Level(m) <= 6)).Any(), async x => await x.Target(x.D.FaceUpMonsters.Where(m => m.Data.IsRitual && x.D.Level(m) <= 6), "Equip to which Ritual Monster?"));
             s.EquipOk = (x, m) => m.Data.IsRitual && x.D.Level(m) <= 6;

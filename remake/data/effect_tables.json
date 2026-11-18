@@ -1,0 +1,4732 @@
+{
+ "_note": "Record = 24 bytes: u32 Konami card id, then 5 u32 code pointers (0 = slot unused). Records are sorted by id. Slot meanings are not named in the exe; slot 1 is always set (main effect routine), the others are optional per card (activation condition / target choice / cost / continuous effect - inferred from which cards fill them). Found by scanning data sections for runs of such records.",
+ "yugi": {
+  "table_va": "005a1598",
+  "records": 181,
+  "cards": {
+   "688 Reverse Trap": [
+    "0054eac0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "689 Fake Trap": [
+    "0054eb00",
+    null,
+    "005491b0",
+    null,
+    null
+   ],
+   "691 Turtle Oath": [
+    "00561270",
+    null,
+    "00560c10",
+    null,
+    null
+   ],
+   "693 Resurrection of Chakra": [
+    "00561270",
+    null,
+    "00560c10",
+    null,
+    null
+   ],
+   "695 Javelin Beetle Pact": [
+    "00561270",
+    null,
+    "00560c10",
+    null,
+    null
+   ],
+   "696 Garma Sword Oath": [
+    "00561270",
+    null,
+    "00560c10",
+    null,
+    null
+   ],
+   "698 Revival of Dokurorider": [
+    "00561270",
+    null,
+    "00560c10",
+    null,
+    null
+   ],
+   "699 Fortress Whale's Oath": [
+    "00561270",
+    null,
+    "00560c10",
+    null,
+    null
+   ],
+   "720 Dark Magic Ritual": [
+    "00561270",
+    null,
+    "00560c10",
+    null,
+    null
+   ],
+   "729 Dark-Eyes Illusionist": [
+    "0054efc0",
+    "005467b0",
+    null,
+    null,
+    "0055b5a0"
+   ],
+   "730 Relinquished": [
+    "0054f030",
+    "005467b0",
+    "00549360",
+    null,
+    "0055b5a0"
+   ],
+   "731 Jigen Bakudan": [
+    "0054f1d0",
+    null,
+    "005493d0",
+    "00547fa0",
+    null
+   ],
+   "742 Barrel Dragon": [
+    "00555b00",
+    "005467b0",
+    "00548fb0",
+    null,
+    "0055b5a0"
+   ],
+   "751 Jinzo": [
+    "0054f2a0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "762 Parasite Paracide": [
+    "0054f540",
+    null,
+    null,
+    null,
+    null
+   ],
+   "845 Valkyrion the Magna Warrior": [
+    "0054f5b0",
+    null,
+    "00549460",
+    "00547f70",
+    null
+   ],
+   "939 Ring of Destruction": [
+    "0054f700",
+    "00547450",
+    null,
+    null,
+    "0055c9e0"
+   ],
+   "945 Magical Hats": [
+    "0054f7f0",
+    null,
+    "0054a330",
+    null,
+    "0055cb20"
+   ],
+   "950 Time Machine": [
+    "0054fbe0",
+    null,
+    "00549510",
+    null,
+    null
+   ],
+   "954 Toon World": [
+    "005641c0",
+    null,
+    "00549540",
+    "005480c0",
+    null
+   ],
+   "958 Black Illusion Ritual": [
+    "00561270",
+    null,
+    "00560c10",
+    null,
+    null
+   ],
+   "960 Negate Attack": [
+    "0054fde0",
+    null,
+    "0054a330",
+    null,
+    null
+   ],
+   "962 7 Completed": [
+    "0054c880",
+    "00546810",
+    null,
+    null,
+    "0055cbe0"
+   ],
+   "964 Lightforce Sword": [
+    "0054fe10",
+    null,
+    "0054a220",
+    null,
+    null
+   ],
+   "966 The Flute of Summoning Dragon": [
+    "0054fe60",
+    null,
+    "00549560",
+    null,
+    null
+   ],
+   "967 Shield & Sword": [
+    "00550170",
+    null,
+    null,
+    null,
+    null
+   ],
+   "968 Graceful Charity": [
+    "005501b0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "969 Chain Destruction": [
+    "00550210",
+    null,
+    "00549670",
+    null,
+    null
+   ],
+   "970 Mesmeric Control": [
+    "00550380",
+    null,
+    null,
+    null,
+    null
+   ],
+   "990 Magic-Arm Shield": [
+    "005503c0",
+    "00547540",
+    "0054a330",
+    null,
+    "0055cd10"
+   ],
+   "1001 Fissure": [
+    "00550490",
+    "005475c0",
+    null,
+    null,
+    null
+   ],
+   "1002 Trap Hole": [
+    "005505c0",
+    null,
+    "005496e0",
+    null,
+    null
+   ],
+   "1003 Polymerization": [
+    "0055a5a0",
+    null,
+    "005497b0",
+    null,
+    null
+   ],
+   "1004 Remove Trap": [
+    "005506c0",
+    "00547610",
+    null,
+    null,
+    "0055ce10"
+   ],
+   "1005 Two-Pronged Attack": [
+    "00550740",
+    null,
+    "00549860",
+    null,
+    "0055cea0"
+   ],
+   "1006 Blue Medicine": [
+    "0054d1f0",
+    null,
+    null,
+    null,
+    "0055b9e0"
+   ],
+   "1007 Raimei": [
+    "0054d330",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1008 Monster Reborn": [
+    "005507e0",
+    null,
+    "005498b0",
+    null,
+    "0055b230"
+   ],
+   "1009 De-Spell": [
+    "0054db00",
+    "00547080",
+    null,
+    null,
+    "0055bc60"
+   ],
+   "1010 Pot of Greed": [
+    "005508e0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1011 Gravedigger Ghoul": [
+    "00550940",
+    null,
+    "00549940",
+    null,
+    null
+   ],
+   "1012 Burning Spear": [
+    "0054c880",
+    "00546810",
+    null,
+    null,
+    "0055b700"
+   ],
+   "1013 Gust Fan": [
+    "0054c880",
+    "00546810",
+    null,
+    null,
+    "0055b700"
+   ],
+   "1014 The Inexperienced Spy": [
+    "00550ae0",
+    null,
+    "0054a220",
+    null,
+    null
+   ],
+   "1015 Reinforcements": [
+    "00550ba0",
+    "00547450",
+    null,
+    null,
+    "0055d200"
+   ],
+   "1016 Castle Walls": [
+    "00550ba0",
+    "00547450",
+    null,
+    null,
+    "0055d200"
+   ],
+   "1017 Ultimate Offering": [
+    "00550c10",
+    null,
+    "005499a0",
+    "00547e20",
+    null
+   ],
+   "1018 Ancient Telescope": [
+    "005510f0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1019 White Hole": [
+    "00551150",
+    null,
+    "00549aa0",
+    null,
+    null
+   ],
+   "1021 Call of the Grave": [
+    "00551150",
+    null,
+    "00549aa0",
+    null,
+    null
+   ],
+   "1022 Anti Raigeki": [
+    "00551150",
+    null,
+    "00549aa0",
+    null,
+    null
+   ],
+   "1023 Tribute to The Doomed": [
+    "0054de00",
+    "00547160",
+    "00549eb0",
+    "005480f0",
+    "0055bf50"
+   ],
+   "1024 Soul Release": [
+    "00550940",
+    null,
+    "00549f10",
+    null,
+    null
+   ],
+   "1025 The Cheerful Coffin": [
+    "005518a0",
+    null,
+    "00549f60",
+    null,
+    null
+   ],
+   "1026 Call of the Dark": [
+    "00551a20",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1027 Change of Heart": [
+    "00551ab0",
+    "005467b0",
+    "00549ff0",
+    null,
+    "0055c650"
+   ],
+   "1028 Solemn Judgment": [
+    "00551bf0",
+    null,
+    "0054a030",
+    "00547e20",
+    null
+   ],
+   "1029 Magic Jammer": [
+    "00551150",
+    null,
+    "0054a0d0",
+    "005480f0",
+    null
+   ],
+   "1030 Seven Tools of the Bandit": [
+    "00551150",
+    null,
+    "0054a140",
+    "00547e20",
+    null
+   ],
+   "1031 Horn of Heaven": [
+    "00551cb0",
+    null,
+    "0054a190",
+    "005481a0",
+    null
+   ],
+   "1032 Just Desserts": [
+    "00551d10",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1033 Royal Decree": [
+    "0054f2a0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1034 Polymerization": [
+    "0055a5a0",
+    null,
+    "005497b0",
+    null,
+    null
+   ],
+   "1036 Last Day of Witch": [
+    "0054e5f0",
+    "00547210",
+    null,
+    null,
+    null
+   ],
+   "1037 Exile of the Wicked": [
+    "0054e5f0",
+    "00547210",
+    null,
+    null,
+    null
+   ],
+   "1038 Magic Thorn": [
+    "005641c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1039 Restructer Revolution": [
+    "0054d330",
+    null,
+    "0054a220",
+    null,
+    null
+   ],
+   "1040 Fusion Sage": [
+    "00551d60",
+    null,
+    "0054a250",
+    null,
+    null
+   ],
+   "1042 Sword of Deep-Seated": [
+    "0054c880",
+    "00546810",
+    null,
+    null,
+    "0055b700"
+   ],
+   "1043 Block Attack": [
+    "00551de0",
+    "00547670",
+    null,
+    null,
+    "0055d380"
+   ],
+   "1044 The Unhappy Maiden": [
+    "0054fde0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1045 Robbin' Goblin": [
+    "005641c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1046 Germ Infection": [
+    "0054c880",
+    "00546810",
+    null,
+    null,
+    "0055b700"
+   ],
+   "1047 Paralyzing Potion": [
+    "0054c880",
+    "00546810",
+    null,
+    null,
+    "0055b700"
+   ],
+   "1048 The Stern Mystic": [
+    "00551e30",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1049 Wall of Illusion": [
+    "00551fd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1054 Last Will": [
+    "00551ff0",
+    null,
+    "0054a290",
+    null,
+    null
+   ],
+   "1055 Waboku": [
+    "005520f0",
+    null,
+    "0054a300",
+    null,
+    null
+   ],
+   "1056 Mirror Force": [
+    "00552130",
+    null,
+    "0054a330",
+    null,
+    null
+   ],
+   "1058 Ring of Magnetism": [
+    "0054c880",
+    "00546810",
+    null,
+    null,
+    "0055b700"
+   ],
+   "1059 Share the Pain": [
+    "005524c0",
+    null,
+    "0054a500",
+    "005481a0",
+    null
+   ],
+   "1060 Stim-Pack": [
+    "0054c880",
+    "00546810",
+    null,
+    null,
+    "0055b700"
+   ],
+   "1061 Heavy Storm": [
+    "00552520",
+    "005479b0",
+    null,
+    null,
+    null
+   ],
+   "1062 Gryphon Wing": [
+    "00551150",
+    null,
+    "00549aa0",
+    null,
+    null
+   ],
+   "1063 Gravekeeper's Servant": [
+    "005641c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1064 Curse of Fiend": [
+    "005525c0",
+    null,
+    "0054a540",
+    null,
+    null
+   ],
+   "1065 Upstart Goblin": [
+    "00552630",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1066 Toll": [
+    "005641c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1067 Final Destiny": [
+    "00552670",
+    null,
+    "0054a590",
+    "005480f0",
+    null
+   ],
+   "1068 Snatch Steal": [
+    "00552710",
+    "005476e0",
+    null,
+    null,
+    "0055c650"
+   ],
+   "1069 Chorus of Sanctuary": [
+    "0054d040",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1070 Confiscation": [
+    "00552860",
+    null,
+    "0054a220",
+    "00547e20",
+    null
+   ],
+   "1071 Delinquent Duo": [
+    "005528d0",
+    null,
+    "0054a220",
+    "00547e20",
+    null
+   ],
+   "1072 Darkness Approaches": [
+    "00552940",
+    "005474b0",
+    "0054a600",
+    "005480f0",
+    "0055d430"
+   ],
+   "1073 Fairy's Hand Mirror": [
+    "00552990",
+    null,
+    "0054a630",
+    null,
+    "0055d510"
+   ],
+   "1074 Tailor of the Fickle": [
+    "00552a60",
+    "00547770",
+    null,
+    null,
+    "0055d6b0"
+   ],
+   "1075 Rush Recklessly": [
+    "00550ba0",
+    "00547450",
+    null,
+    null,
+    "0055d200"
+   ],
+   "1076 The Reliable Guardian": [
+    "00550ba0",
+    "00547450",
+    null,
+    null,
+    "0055d200"
+   ],
+   "1077 The Forceful Sentry": [
+    "00552ae0",
+    null,
+    "0054a220",
+    null,
+    null
+   ],
+   "1078 Chain Energy": [
+    "005641c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1079 Mystical Space Typhoon": [
+    "0054de00",
+    "005479b0",
+    null,
+    null,
+    "0055d8d0"
+   ],
+   "1080 Giant Trunade": [
+    "00552b70",
+    "005479b0",
+    null,
+    null,
+    null
+   ],
+   "1081 Painful Choice": [
+    "00552bf0",
+    null,
+    "0054a680",
+    null,
+    null
+   ],
+   "1082 Snake Fang": [
+    "00550ba0",
+    "00547450",
+    null,
+    null,
+    "0055d200"
+   ],
+   "1090 Time Seal": [
+    "00552f00",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1091 Graverobber": [
+    "00552f40",
+    null,
+    "0054a6a0",
+    null,
+    "0055b230"
+   ],
+   "1092 Gift of The Mystical Elf": [
+    "00552fc0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1093 The Eye of Truth": [
+    "005641c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1094 Dust Tornado": [
+    "00553070",
+    "00547960",
+    null,
+    null,
+    "0055da20"
+   ],
+   "1095 Call Of The Haunted": [
+    "00553280",
+    null,
+    "0054a740",
+    null,
+    "0055b230"
+   ],
+   "1096 Solomon's Lawbook": [
+    "005534e0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1097 Earthshaker": [
+    "00553510",
+    null,
+    "0054a7a0",
+    null,
+    "0055dab0"
+   ],
+   "1098 Enchanted Javelin": [
+    "00552130",
+    null,
+    "0054a330",
+    null,
+    null
+   ],
+   "1099 Mirror Wall": [
+    "005641c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1106 Cyber Jar": [
+    "005535d0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1108 Giant Rat": [
+    "005538d0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1109 Senju of the Thousand Hands": [
+    "00553ab0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1110 UFO Turtle": [
+    "005538d0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1112 Karate Man": [
+    "00553bf0",
+    null,
+    "00548fb0",
+    null,
+    null
+   ],
+   "1114 Giant Germ": [
+    "00553c20",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1115 Nimble Momonga": [
+    "00553c20",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1116 Spear Cretin": [
+    "00553f20",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1117 Shining Angel": [
+    "005538d0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1119 Mother Grizzly": [
+    "005538d0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1120 Flying Kamakiri #1": [
+    "005538d0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1122 Sonic Bird": [
+    "00553ab0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1123 Mystic Tomato": [
+    "005538d0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1125 Gaia Power": [
+    "0054d040",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1126 Umiiruka": [
+    "0054d040",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1127 Molten Destruction": [
+    "0054d040",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1128 Rising Air Current": [
+    "0054d040",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1129 Luminous Spark": [
+    "0054d040",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1130 Mystic Plasma Zone": [
+    "0054d040",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1131 Messenger of Peace": [
+    "005641c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1134 Gust": [
+    "0054de00",
+    "005479b0",
+    "0054a7f0",
+    null,
+    "0055d8d0"
+   ],
+   "1135 Driving Snow": [
+    "0054de00",
+    "005479b0",
+    "0054a7f0",
+    null,
+    "0055d8d0"
+   ],
+   "1136 Armored Glass": [
+    "00554120",
+    null,
+    "0054a7f0",
+    null,
+    null
+   ],
+   "1137 World Suppression": [
+    "00554120",
+    null,
+    "0054a7f0",
+    null,
+    null
+   ],
+   "1138 Mystic Probe": [
+    "00554120",
+    null,
+    "0054a7f0",
+    null,
+    null
+   ],
+   "1139 Metal Detector": [
+    "00554120",
+    null,
+    "0054a7f0",
+    null,
+    null
+   ],
+   "1140 Numinous Healer": [
+    "00554210",
+    null,
+    "0054a7f0",
+    null,
+    null
+   ],
+   "1141 Appropriate": [
+    "005641c0",
+    null,
+    "0054a7f0",
+    null,
+    null
+   ],
+   "1142 Forced Requisition": [
+    "005641c0",
+    null,
+    "0054a7f0",
+    null,
+    null
+   ],
+   "1145 DNA Surgery": [
+    "005542c0",
+    null,
+    null,
+    null,
+    "0055db60"
+   ],
+   "1146 The Regulation of Tribe": [
+    "005542c0",
+    null,
+    null,
+    null,
+    "0055db60"
+   ],
+   "1147 Backup Soldier": [
+    "00554350",
+    null,
+    "0054ab50",
+    null,
+    null
+   ],
+   "1149 Major Riot": [
+    "005544c0",
+    null,
+    "0054a7f0",
+    null,
+    null
+   ],
+   "1150 Ceasefire": [
+    "005545f0",
+    null,
+    "0054abe0",
+    null,
+    null
+   ],
+   "1151 Light of Intervention": [
+    "005641c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1152 Respect Play": [
+    "005641c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1154 Imperial Order": [
+    "0054f2a0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1157 Nobleman of Crossout": [
+    "005546d0",
+    "005479f0",
+    null,
+    null,
+    "0055dbc0"
+   ],
+   "1158 Nobleman of Extermination": [
+    "005546d0",
+    "00547a30",
+    null,
+    null,
+    "0055dc50"
+   ],
+   "1159 The Shallow Grave": [
+    "00553f20",
+    null,
+    "0054ac40",
+    null,
+    null
+   ],
+   "1160 Premature Burial": [
+    "00553280",
+    null,
+    "0054acb0",
+    "00547e20",
+    "0055b230"
+   ],
+   "1161 Inspection": [
+    "005548e0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1162 Prohibition": [
+    "00554aa0",
+    null,
+    null,
+    null,
+    "0055dce0"
+   ],
+   "1163 Morphing Jar #2": [
+    "00554af0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1177 Windstorm of Etaqua": [
+    "00554e80",
+    "005475c0",
+    null,
+    null,
+    null
+   ],
+   "1178 Aqua Chorus": [
+    "005641c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1179 Sebek's Blessing": [
+    "00554f50",
+    null,
+    "0054ace0",
+    null,
+    null
+   ],
+   "1180 Anti-Spell Fragrance": [
+    "005641c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1181 Riryoku": [
+    "00554f80",
+    "00547450",
+    "0054ad10",
+    null,
+    "0055ddb0"
+   ],
+   "1182 Sword of Dragon's Soul": [
+    "0054c880",
+    "00546810",
+    null,
+    null,
+    "0055b700"
+   ],
+   "1183 Seal of the Ancients": [
+    "00555050",
+    null,
+    "0054ad40",
+    "00547e20",
+    null
+   ],
+   "1203 Graceful Dice": [
+    "00555180",
+    null,
+    "0054ada0",
+    null,
+    null
+   ],
+   "1204 Skull Dice": [
+    "00555180",
+    null,
+    "0054add0",
+    null,
+    null
+   ],
+   "1205 Exchange": [
+    "005552a0",
+    null,
+    "0054ae00",
+    null,
+    null
+   ],
+   "1211 Thousand Knives": [
+    "0054de00",
+    "00547160",
+    "0054ae50",
+    null,
+    "0055bf50"
+   ],
+   "1212 Dark Magic Curtain": [
+    "00555be0",
+    null,
+    "0054aed0",
+    "00548210",
+    null
+   ],
+   "1213 Mystic Box": [
+    "00555cc0",
+    "00547160",
+    "0054af50",
+    null,
+    "0055df00"
+   ],
+   "1214 Magic Cylinder": [
+    "00552130",
+    null,
+    "0054a330",
+    null,
+    null
+   ],
+   "1220 Soul Exchange": [
+    "00555da0",
+    "00547160",
+    "0054afa0",
+    "00548260",
+    "0055e020"
+   ],
+   "1221 Card Destruction": [
+    "005562d0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1230 Nightmare's Steelcage": [
+    "005641c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1232 Multiply": [
+    "00556440",
+    null,
+    "0054b160",
+    "00548290",
+    null
+   ],
+   "1240 Berfomet": [
+    "005564a0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1241 Chimera the Flying Mythical Beast": [
+    "005507e0",
+    null,
+    "005498b0",
+    null,
+    "0055b230"
+   ],
+   "1242 Beast of Gilfer": [
+    "00556590",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1243 Ancient Lamp": [
+    "005641c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1244 Shadow Spell": [
+    "0054d530",
+    "005475c0",
+    null,
+    null,
+    "0055c650"
+   ]
+  }
+ },
+ "kaiba": {
+  "table_va": "005ae5f8",
+  "records": 181,
+  "cards": {
+   "688 Reverse Trap": [
+    "0055abe0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "689 Fake Trap": [
+    "0055ac10",
+    null,
+    "00554eb0",
+    null,
+    null
+   ],
+   "691 Turtle Oath": [
+    "0056dd60",
+    null,
+    "0056dc00",
+    null,
+    null
+   ],
+   "693 Resurrection of Chakra": [
+    "0056dd60",
+    null,
+    "0056dc00",
+    null,
+    null
+   ],
+   "695 Javelin Beetle Pact": [
+    "0056dd60",
+    null,
+    "0056dc00",
+    null,
+    null
+   ],
+   "696 Garma Sword Oath": [
+    "0056dd60",
+    null,
+    "0056dc00",
+    null,
+    null
+   ],
+   "698 Revival of Dokurorider": [
+    "0056dd60",
+    null,
+    "0056dc00",
+    null,
+    null
+   ],
+   "699 Fortress Whale's Oath": [
+    "0056dd60",
+    null,
+    "0056dc00",
+    null,
+    null
+   ],
+   "720 Dark Magic Ritual": [
+    "0056dd60",
+    null,
+    "0056dc00",
+    null,
+    null
+   ],
+   "729 Dark-Eyes Illusionist": [
+    "0055aec0",
+    "00552310",
+    null,
+    null,
+    "00567ba0"
+   ],
+   "730 Relinquished": [
+    "0055af60",
+    "00552310",
+    "00555060",
+    null,
+    "00567ba0"
+   ],
+   "731 Jigen Bakudan": [
+    "0055b110",
+    null,
+    "005550d0",
+    "00553af0",
+    null
+   ],
+   "742 Barrel Dragon": [
+    "00561ac0",
+    "00552310",
+    "00555160",
+    null,
+    "00567ba0"
+   ],
+   "751 Jinzo": [
+    "0055b230",
+    null,
+    null,
+    null,
+    null
+   ],
+   "762 Parasite Paracide": [
+    "0055b4c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "845 Valkyrion the Magna Warrior": [
+    "0055b530",
+    null,
+    "005551a0",
+    "00553ac0",
+    null
+   ],
+   "939 Ring of Destruction": [
+    "0055b680",
+    "00552f70",
+    null,
+    null,
+    "00568f80"
+   ],
+   "945 Magical Hats": [
+    "0055b780",
+    null,
+    "00555e00",
+    null,
+    "00569070"
+   ],
+   "950 Time Machine": [
+    "0055bb60",
+    null,
+    "00555250",
+    null,
+    null
+   ],
+   "954 Toon World": [
+    "00570cd0",
+    null,
+    "00555280",
+    "00553a80",
+    null
+   ],
+   "958 Black Illusion Ritual": [
+    "0056dd60",
+    null,
+    "0056dc00",
+    null,
+    null
+   ],
+   "960 Negate Attack": [
+    "0055bd60",
+    null,
+    "00555e00",
+    null,
+    null
+   ],
+   "962 7 Completed": [
+    "005586b0",
+    "00552370",
+    null,
+    null,
+    "00569140"
+   ],
+   "964 Lightforce Sword": [
+    "0055bde0",
+    null,
+    "00555d20",
+    null,
+    null
+   ],
+   "966 The Flute of Summoning Dragon": [
+    "0055be30",
+    null,
+    "005552a0",
+    null,
+    null
+   ],
+   "967 Shield & Sword": [
+    "0055c110",
+    null,
+    null,
+    null,
+    null
+   ],
+   "968 Graceful Charity": [
+    "0055c150",
+    null,
+    null,
+    null,
+    null
+   ],
+   "969 Chain Destruction": [
+    "0055c1e0",
+    null,
+    "005553b0",
+    null,
+    null
+   ],
+   "970 Mesmeric Control": [
+    "0055c350",
+    null,
+    null,
+    null,
+    null
+   ],
+   "990 Magic-Arm Shield": [
+    "0055c390",
+    "00553060",
+    "00555e00",
+    null,
+    "00569250"
+   ],
+   "1001 Fissure": [
+    "0055c460",
+    "005530e0",
+    null,
+    null,
+    null
+   ],
+   "1002 Trap Hole": [
+    "0055c670",
+    null,
+    "00555420",
+    null,
+    null
+   ],
+   "1003 Polymerization": [
+    "005669c0",
+    null,
+    "005554f0",
+    null,
+    null
+   ],
+   "1004 Remove Trap": [
+    "0055c770",
+    "00553130",
+    null,
+    null,
+    "00569350"
+   ],
+   "1005 Two-Pronged Attack": [
+    "0055c7f0",
+    null,
+    "005555a0",
+    null,
+    "00569420"
+   ],
+   "1006 Blue Medicine": [
+    "00559100",
+    null,
+    null,
+    null,
+    "00568050"
+   ],
+   "1007 Raimei": [
+    "00559240",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1008 Monster Reborn": [
+    "0055c890",
+    null,
+    "005555f0",
+    null,
+    "00567810"
+   ],
+   "1009 De-Spell": [
+    "00559ac0",
+    "00552b80",
+    null,
+    null,
+    "00568210"
+   ],
+   "1010 Pot of Greed": [
+    "0055c9a0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1011 Gravedigger Ghoul": [
+    "0055ca10",
+    null,
+    "00555680",
+    null,
+    null
+   ],
+   "1012 Burning Spear": [
+    "005586b0",
+    "00552370",
+    null,
+    null,
+    "00567cf0"
+   ],
+   "1013 Gust Fan": [
+    "005586b0",
+    "00552370",
+    null,
+    null,
+    "00567cf0"
+   ],
+   "1014 The Inexperienced Spy": [
+    "0055cb90",
+    null,
+    "00555d20",
+    null,
+    null
+   ],
+   "1015 Reinforcements": [
+    "0055cc50",
+    "00552f70",
+    null,
+    null,
+    "00569660"
+   ],
+   "1016 Castle Walls": [
+    "0055cc50",
+    "00552f70",
+    null,
+    null,
+    "00569660"
+   ],
+   "1017 Ultimate Offering": [
+    "0055ccc0",
+    null,
+    "005556e0",
+    "00553a80",
+    null
+   ],
+   "1018 Ancient Telescope": [
+    "0055d190",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1019 White Hole": [
+    "0055d1f0",
+    null,
+    "005557e0",
+    null,
+    null
+   ],
+   "1021 Call of the Grave": [
+    "0055d1f0",
+    null,
+    "005557e0",
+    null,
+    null
+   ],
+   "1022 Anti Raigeki": [
+    "0055d1f0",
+    null,
+    "005557e0",
+    null,
+    null
+   ],
+   "1023 Tribute to The Doomed": [
+    "00559dd0",
+    "00552ca0",
+    "00555970",
+    "00553c90",
+    "00568560"
+   ],
+   "1024 Soul Release": [
+    "0055ca10",
+    null,
+    "005559a0",
+    null,
+    null
+   ],
+   "1025 The Cheerful Coffin": [
+    "0055d5a0",
+    null,
+    "005559f0",
+    null,
+    null
+   ],
+   "1026 Call of the Dark": [
+    "0055d710",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1027 Change of Heart": [
+    "0055d7a0",
+    "00552310",
+    "00555a80",
+    null,
+    "00568bb0"
+   ],
+   "1028 Solemn Judgment": [
+    "0055d8c0",
+    null,
+    "00555ac0",
+    "00553a80",
+    null
+   ],
+   "1029 Magic Jammer": [
+    "0055d1f0",
+    null,
+    "00555b80",
+    "00553c90",
+    null
+   ],
+   "1030 Seven Tools of the Bandit": [
+    "0055d1f0",
+    null,
+    "00555c10",
+    "00553a80",
+    null
+   ],
+   "1031 Horn of Heaven": [
+    "0055da00",
+    null,
+    "00555c90",
+    "00553d60",
+    null
+   ],
+   "1032 Just Desserts": [
+    "0055da90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1033 Royal Decree": [
+    "0055b230",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1034 Polymerization": [
+    "005669c0",
+    null,
+    "005554f0",
+    null,
+    null
+   ],
+   "1036 Last Day of Witch": [
+    "0055a6d0",
+    "00552d50",
+    null,
+    null,
+    null
+   ],
+   "1037 Exile of the Wicked": [
+    "0055a6d0",
+    "00552d50",
+    null,
+    null,
+    null
+   ],
+   "1038 Magic Thorn": [
+    "00570cd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1039 Restructer Revolution": [
+    "00559240",
+    null,
+    "00555d20",
+    null,
+    null
+   ],
+   "1040 Fusion Sage": [
+    "0055dae0",
+    null,
+    "00555d50",
+    null,
+    null
+   ],
+   "1042 Sword of Deep-Seated": [
+    "00558aa0",
+    "00552370",
+    null,
+    null,
+    "00567cf0"
+   ],
+   "1043 Block Attack": [
+    "0055db70",
+    "00553190",
+    null,
+    null,
+    "005697d0"
+   ],
+   "1044 The Unhappy Maiden": [
+    "0055bdb0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1045 Robbin' Goblin": [
+    "00570cd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1046 Germ Infection": [
+    "005586b0",
+    "00552370",
+    null,
+    null,
+    "00567cf0"
+   ],
+   "1047 Paralyzing Potion": [
+    "005586b0",
+    "00552370",
+    null,
+    null,
+    "00567cf0"
+   ],
+   "1048 The Stern Mystic": [
+    "0055dbc0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1049 Wall of Illusion": [
+    "0055dd60",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1054 Last Will": [
+    "0055dd80",
+    null,
+    "00555d90",
+    null,
+    null
+   ],
+   "1055 Waboku": [
+    "0055de80",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1056 Mirror Force": [
+    "0055deb0",
+    null,
+    "00555e00",
+    null,
+    null
+   ],
+   "1058 Ring of Magnetism": [
+    "005586b0",
+    "00552370",
+    null,
+    null,
+    "00567cf0"
+   ],
+   "1059 Share the Pain": [
+    "0055e230",
+    null,
+    "00555fd0",
+    "00553d60",
+    null
+   ],
+   "1060 Stim-Pack": [
+    "005586b0",
+    "00552370",
+    null,
+    null,
+    "00567cf0"
+   ],
+   "1061 Heavy Storm": [
+    "0055e280",
+    "00553370",
+    null,
+    null,
+    null
+   ],
+   "1062 Gryphon Wing": [
+    "0055d1f0",
+    null,
+    "005557e0",
+    null,
+    null
+   ],
+   "1063 Gravekeeper's Servant": [
+    "00570cd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1064 Curse of Fiend": [
+    "0055e360",
+    null,
+    "00556010",
+    null,
+    null
+   ],
+   "1065 Upstart Goblin": [
+    "0055e420",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1066 Toll": [
+    "00570cd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1067 Final Destiny": [
+    "0055e470",
+    null,
+    "00556060",
+    "00553c90",
+    null
+   ],
+   "1068 Snatch Steal": [
+    "0055e570",
+    "00552370",
+    "00555a80",
+    null,
+    "00568bb0"
+   ],
+   "1069 Chorus of Sanctuary": [
+    "00558f90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1070 Confiscation": [
+    "0055e670",
+    null,
+    "005560f0",
+    "00553a80",
+    null
+   ],
+   "1071 Delinquent Duo": [
+    "0055e6e0",
+    null,
+    "005560f0",
+    "00553a80",
+    null
+   ],
+   "1072 Darkness Approaches": [
+    "0055e750",
+    "00552fd0",
+    "005560c0",
+    "00553c90",
+    "00569980"
+   ],
+   "1073 Fairy's Hand Mirror": [
+    "0055e7a0",
+    null,
+    "00556150",
+    null,
+    "00569a50"
+   ],
+   "1074 Tailor of the Fickle": [
+    "0055e7f0",
+    "00553200",
+    null,
+    null,
+    "00569bc0"
+   ],
+   "1075 Rush Recklessly": [
+    "0055cc50",
+    "00552f70",
+    null,
+    null,
+    "00569660"
+   ],
+   "1076 The Reliable Guardian": [
+    "0055cc50",
+    "00552f70",
+    null,
+    null,
+    "00569660"
+   ],
+   "1077 The Forceful Sentry": [
+    "0055e8f0",
+    null,
+    "00555d20",
+    null,
+    null
+   ],
+   "1078 Chain Energy": [
+    "00570cd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1079 Mystical Space Typhoon": [
+    "00559dd0",
+    "00553370",
+    null,
+    null,
+    "00569e90"
+   ],
+   "1080 Giant Trunade": [
+    "0055e990",
+    "00553370",
+    null,
+    null,
+    null
+   ],
+   "1081 Painful Choice": [
+    "0055ea10",
+    null,
+    "005561b0",
+    null,
+    null
+   ],
+   "1082 Snake Fang": [
+    "0055cc50",
+    "00552f70",
+    null,
+    null,
+    "00569660"
+   ],
+   "1090 Time Seal": [
+    "0055ec10",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1091 Graverobber": [
+    "0055ec50",
+    null,
+    "005561d0",
+    null,
+    "00567810"
+   ],
+   "1092 Gift of The Mystical Elf": [
+    "0055ecd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1093 The Eye of Truth": [
+    "00570cd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1094 Dust Tornado": [
+    "0055ed80",
+    "00553320",
+    null,
+    null,
+    "0056a020"
+   ],
+   "1095 Call Of The Haunted": [
+    "0055ef70",
+    null,
+    "00556270",
+    null,
+    "00567810"
+   ],
+   "1096 Solomon's Lawbook": [
+    "0055f1f0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1097 Earthshaker": [
+    "0055f220",
+    null,
+    "005562d0",
+    null,
+    "0056a0b0"
+   ],
+   "1098 Enchanted Javelin": [
+    "0055deb0",
+    null,
+    "00555e00",
+    null,
+    null
+   ],
+   "1099 Mirror Wall": [
+    "00570cd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1106 Cyber Jar": [
+    "0055f2e0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1108 Giant Rat": [
+    "0055f750",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1109 Senju of the Thousand Hands": [
+    "0055f920",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1110 UFO Turtle": [
+    "0055f750",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1112 Karate Man": [
+    "0055fb20",
+    null,
+    "00555160",
+    null,
+    null
+   ],
+   "1114 Giant Germ": [
+    "0055fb50",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1115 Nimble Momonga": [
+    "0055fb50",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1116 Spear Cretin": [
+    "0055ff10",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1117 Shining Angel": [
+    "0055f750",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1119 Mother Grizzly": [
+    "0055f750",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1120 Flying Kamakiri #1": [
+    "0055f750",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1122 Sonic Bird": [
+    "0055f920",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1123 Mystic Tomato": [
+    "0055f750",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1125 Gaia Power": [
+    "00558f90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1126 Umiiruka": [
+    "00558f90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1127 Molten Destruction": [
+    "00558f90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1128 Rising Air Current": [
+    "00558f90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1129 Luminous Spark": [
+    "00558f90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1130 Mystic Plasma Zone": [
+    "00558f90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1131 Messenger of Peace": [
+    "00570cd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1134 Gust": [
+    "00559dd0",
+    "00553370",
+    "00556320",
+    null,
+    "00569e90"
+   ],
+   "1135 Driving Snow": [
+    "00559dd0",
+    "00553370",
+    "00556320",
+    null,
+    "00569e90"
+   ],
+   "1136 Armored Glass": [
+    "00560160",
+    null,
+    "00556320",
+    null,
+    null
+   ],
+   "1137 World Suppression": [
+    "00560160",
+    null,
+    "00556320",
+    null,
+    null
+   ],
+   "1138 Mystic Probe": [
+    "00560160",
+    null,
+    "00556320",
+    null,
+    null
+   ],
+   "1139 Metal Detector": [
+    "00560160",
+    null,
+    "00556320",
+    null,
+    null
+   ],
+   "1140 Numinous Healer": [
+    "00560250",
+    null,
+    "00556320",
+    null,
+    null
+   ],
+   "1141 Appropriate": [
+    "00570cd0",
+    null,
+    "00556320",
+    null,
+    null
+   ],
+   "1142 Forced Requisition": [
+    "00570cd0",
+    null,
+    "00556320",
+    null,
+    null
+   ],
+   "1145 DNA Surgery": [
+    "00560300",
+    null,
+    null,
+    null,
+    "0056a160"
+   ],
+   "1146 The Regulation of Tribe": [
+    "00560300",
+    null,
+    null,
+    null,
+    "0056a160"
+   ],
+   "1147 Backup Soldier": [
+    "00560390",
+    null,
+    "00556670",
+    null,
+    null
+   ],
+   "1149 Major Riot": [
+    "005604f0",
+    null,
+    "00556320",
+    null,
+    null
+   ],
+   "1150 Ceasefire": [
+    "00560620",
+    null,
+    "00556700",
+    null,
+    null
+   ],
+   "1151 Light of Intervention": [
+    "00570cd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1152 Respect Play": [
+    "00570cd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1154 Imperial Order": [
+    "0055b230",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1157 Nobleman of Crossout": [
+    "00560700",
+    "005533d0",
+    null,
+    null,
+    "0056a1c0"
+   ],
+   "1158 Nobleman of Extermination": [
+    "00560700",
+    "00553410",
+    null,
+    null,
+    "0056a2a0"
+   ],
+   "1159 The Shallow Grave": [
+    "0055ff10",
+    null,
+    "00556760",
+    null,
+    null
+   ],
+   "1160 Premature Burial": [
+    "0055ef70",
+    null,
+    "005567c0",
+    "00553a80",
+    "00567810"
+   ],
+   "1161 Inspection": [
+    "00560960",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1162 Prohibition": [
+    "00560ae0",
+    null,
+    null,
+    null,
+    "0056a3b0"
+   ],
+   "1163 Morphing Jar #2": [
+    "00560b20",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1177 Windstorm of Etaqua": [
+    "00560eb0",
+    "005530e0",
+    null,
+    null,
+    null
+   ],
+   "1178 Aqua Chorus": [
+    "00570cd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1179 Sebek's Blessing": [
+    "00560f80",
+    null,
+    "005567f0",
+    null,
+    null
+   ],
+   "1180 Anti-Spell Fragrance": [
+    "00570cd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1181 Riryoku": [
+    "00560fb0",
+    "00552f70",
+    "00556820",
+    null,
+    "0056a450"
+   ],
+   "1182 Sword of Dragon's Soul": [
+    "005586b0",
+    "00552370",
+    null,
+    null,
+    "00567cf0"
+   ],
+   "1183 Seal of the Ancients": [
+    "00561080",
+    null,
+    "00556850",
+    "00553a80",
+    null
+   ],
+   "1203 Graceful Dice": [
+    "005611b0",
+    null,
+    "005568f0",
+    null,
+    null
+   ],
+   "1204 Skull Dice": [
+    "005611b0",
+    null,
+    "00556920",
+    null,
+    null
+   ],
+   "1205 Exchange": [
+    "005612b0",
+    null,
+    "00556950",
+    null,
+    null
+   ],
+   "1211 Thousand Knives": [
+    "00559dd0",
+    "00553480",
+    "005569a0",
+    null,
+    "00568560"
+   ],
+   "1212 Dark Magic Curtain": [
+    "00561bb0",
+    null,
+    "00556a20",
+    "00553a80",
+    null
+   ],
+   "1213 Mystic Box": [
+    "00561c90",
+    "00552ca0",
+    "00556aa0",
+    null,
+    "0056a590"
+   ],
+   "1214 Magic Cylinder": [
+    "0055deb0",
+    null,
+    "00555e00",
+    null,
+    null
+   ],
+   "1220 Soul Exchange": [
+    "00561d70",
+    "00552310",
+    "00556af0",
+    "00583040",
+    "0056a6a0"
+   ],
+   "1221 Card Destruction": [
+    "00562630",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1230 Nightmare's Steelcage": [
+    "00570cd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1232 Multiply": [
+    "00562770",
+    null,
+    "00556ce0",
+    "00553e30",
+    null
+   ],
+   "1240 Berfomet": [
+    "005627d0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1241 Chimera the Flying Mythical Beast": [
+    "0055c890",
+    null,
+    "005555f0",
+    null,
+    "00567810"
+   ],
+   "1242 Beast of Gilfer": [
+    "005628c0",
+    "00552370",
+    null,
+    null,
+    null
+   ],
+   "1243 Ancient Lamp": [
+    "00570cd0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1244 Shadow Spell": [
+    "00559440",
+    "005530e0",
+    null,
+    null,
+    "00568bb0"
+   ]
+  }
+ },
+ "joey": {
+  "table_va": "005ed150",
+  "records": 311,
+  "cards": {
+   "71 Cocoon of Evolution": [
+    "00584500",
+    "0057a470",
+    "0057f2f0",
+    null,
+    "00593a20"
+   ],
+   "81 Red-Eyes B. Dragon": [
+    "00583f40",
+    null,
+    "0057f360",
+    "0057cb50",
+    null
+   ],
+   "82 Castle of Dark Illusions": [
+    "00584040",
+    null,
+    null,
+    null,
+    null
+   ],
+   "83 Reaper of the Cards": [
+    "00584160",
+    "00579bc0",
+    null,
+    null,
+    "00597570"
+   ],
+   "88 Catapult Turtle": [
+    "00584e60",
+    null,
+    "0057f490",
+    null,
+    "005938d0"
+   ],
+   "94 Crass Clown": [
+    "00585d50",
+    "00579c40",
+    null,
+    null,
+    "00593970"
+   ],
+   "101 Mask of Darkness": [
+    "00584270",
+    null,
+    "00582860",
+    null,
+    "00593530"
+   ],
+   "113 White Magical Hat": [
+    "005842e0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "119 Dream Clown": [
+    "00585c80",
+    "00579c40",
+    "0057f5c0",
+    null,
+    "00593970"
+   ],
+   "161 Tainted Wisdom": [
+    "00584360",
+    null,
+    "0057f5c0",
+    null,
+    null
+   ],
+   "170 Big Eye": [
+    "00584390",
+    null,
+    "0057f610",
+    null,
+    null
+   ],
+   "198 Penguin Knight": [
+    "00584440",
+    null,
+    null,
+    null,
+    null
+   ],
+   "219 Masked Sorcerer": [
+    "005844a0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "223 Trap Master": [
+    "00584160",
+    "00579bc0",
+    null,
+    null,
+    "00597570"
+   ],
+   "255 Dimensional Warrior": [
+    "0058cc00",
+    null,
+    null,
+    null,
+    null
+   ],
+   "261 The Little Swordsman of Aile": [
+    "005844c0",
+    null,
+    "0057f4c0",
+    "0057c6a0",
+    null
+   ],
+   "265 Princess of Tsurugi": [
+    "00584e60",
+    null,
+    null,
+    null,
+    null
+   ],
+   "300 Legendary Sword": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "301 Sword of Dark Destruction": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "302 Dark Energy": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "303 Axe of Despair": [
+    "00584610",
+    "0057a470",
+    "0057f510",
+    "0057c6e0",
+    "00593a20"
+   ],
+   "304 Laser Cannon Armor": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "305 Insect Armor with Laser Cannon": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "306 Elf's Light": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "307 Beast Fangs": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "308 Steel Shell": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "309 Vile Germs": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "310 Black Pendant": [
+    "00584660",
+    "0057a470",
+    "0057f550",
+    null,
+    "00593a20"
+   ],
+   "311 Silver Bow and Arrow": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "312 Horn of Light": [
+    "00584610",
+    "0057a470",
+    "0057f570",
+    "0057c910",
+    "00593a20"
+   ],
+   "313 Horn of the Unicorn": [
+    "00584610",
+    "0057a470",
+    "0057f550",
+    null,
+    "00593a20"
+   ],
+   "314 Dragon Treasure": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "315 Electro-Whip": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "316 Cyber Shield": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "317 Elegant Egotist": [
+    "005846b0",
+    null,
+    "0057f640",
+    null,
+    null
+   ],
+   "318 Mystical Moon": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "319 Stop Defense": [
+    "00584930",
+    "0057a570",
+    null,
+    null,
+    "00593ba0"
+   ],
+   "320 Malevolent Nuzzler": [
+    "00584610",
+    "0057a470",
+    "0057f570",
+    "0057c910",
+    "00593a20"
+   ],
+   "321 Violet Crystal": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "322 Book of Secret Arts": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "323 Invigoration": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "324 Machine Conversion Factory": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "325 Raise Body Heat": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "326 Follow Wind": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "327 Power of Kaishin": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "328 Dragon Capture Jar": [
+    "005849d0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "329 Forest": [
+    "00584a90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "330 Wasteland": [
+    "00584a90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "331 Mountain": [
+    "00584a90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "332 Sogen": [
+    "00584a90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "333 Umi": [
+    "00584a90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "334 Yami": [
+    "00584a90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "335 Dark Hole": [
+    "00584c80",
+    "0057a820",
+    null,
+    null,
+    null
+   ],
+   "336 Raigeki": [
+    "00584cb0",
+    "0057a8a0",
+    null,
+    null,
+    null
+   ],
+   "337 Mooyan Curry": [
+    "00584d00",
+    null,
+    null,
+    null,
+    "00593bf0"
+   ],
+   "338 Red Medicine": [
+    "00584d00",
+    null,
+    null,
+    null,
+    "00593ca0"
+   ],
+   "339 Goblin's Secret Remedy": [
+    "00584d00",
+    null,
+    null,
+    null,
+    "00593ca0"
+   ],
+   "340 Soul of the Pure": [
+    "00584d00",
+    null,
+    null,
+    null,
+    "00593ca0"
+   ],
+   "341 Dian Keto the Cure Master": [
+    "00584d00",
+    null,
+    null,
+    null,
+    "00593ca0"
+   ],
+   "342 Sparks": [
+    "00584e60",
+    null,
+    null,
+    null,
+    "00593cc0"
+   ],
+   "343 Hinotama": [
+    "00584e60",
+    null,
+    null,
+    null,
+    "00593cc0"
+   ],
+   "344 Final Flame": [
+    "00584e60",
+    null,
+    null,
+    null,
+    "00593cc0"
+   ],
+   "345 Ookazi": [
+    "00584e60",
+    null,
+    null,
+    null,
+    "00593cc0"
+   ],
+   "346 Tremendous Fire": [
+    "00585130",
+    null,
+    null,
+    null,
+    null
+   ],
+   "347 Swords of Revealing Light": [
+    "00585170",
+    null,
+    null,
+    null,
+    null
+   ],
+   "348 Spellbinding Circle": [
+    "00585200",
+    "00579c40",
+    null,
+    null,
+    "00593970"
+   ],
+   "349 Dark-Piercing Light": [
+    "005852a0",
+    null,
+    "0057f6a0",
+    null,
+    null
+   ],
+   "370 Sanga of the Thunder": [
+    "00585310",
+    null,
+    "0057f6f0",
+    null,
+    null
+   ],
+   "371 Kazejin": [
+    "00585310",
+    null,
+    "0057f6f0",
+    null,
+    null
+   ],
+   "372 Suijin": [
+    "00585310",
+    null,
+    "0057f6f0",
+    null,
+    null
+   ],
+   "390 Zoa": [
+    "00583f40",
+    null,
+    "0057f360",
+    "0057cb50",
+    null
+   ],
+   "401 Monster Eye": [
+    "00585350",
+    null,
+    "0057f7b0",
+    "0057c5c0",
+    null
+   ],
+   "416 Blast Juggler": [
+    "005853b0",
+    "0057a630",
+    "0057f810",
+    "0057cb50",
+    "00593cf0"
+   ],
+   "419 Cyber-Stein": [
+    "00585420",
+    null,
+    "0057f8d0",
+    "0057c5c0",
+    null
+   ],
+   "424 Thunder Dragon": [
+    "00585730",
+    null,
+    "0057f930",
+    null,
+    null
+   ],
+   "427 Magician of Faith": [
+    "00584270",
+    null,
+    "00582860",
+    null,
+    "00593530"
+   ],
+   "428 Goddess of Whim": [
+    "00585540",
+    null,
+    "00580050",
+    null,
+    null
+   ],
+   "461 The Immortal of Thunder": [
+    "00585970",
+    null,
+    "00581040",
+    "0057c5f0",
+    null
+   ],
+   "462 Electric Snake": [
+    "005859c0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "468 Armed Ninja": [
+    "005859e0",
+    "0057a6e0",
+    null,
+    null,
+    "00597570"
+   ],
+   "478 Cockroach Knight": [
+    "00585ae0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "489 Needle Ball": [
+    "00584e60",
+    null,
+    "0057f940",
+    "0057d420",
+    null
+   ],
+   "496 Yado Karu": [
+    "00585b10",
+    null,
+    "0057f5c0",
+    null,
+    null
+   ],
+   "499 Dragon Seeker": [
+    "00585bf0",
+    "0057a790",
+    null,
+    null,
+    "005944d0"
+   ],
+   "500 Man-Eater Bug": [
+    "00585c80",
+    "0057a930",
+    null,
+    null,
+    "005944d0"
+   ],
+   "505 Gale Dogra": [
+    "00585640",
+    null,
+    "0057f970",
+    "0057c5c0",
+    null
+   ],
+   "511 Cannon Soldier": [
+    "00584e60",
+    null,
+    "0057f490",
+    "0057c660",
+    null
+   ],
+   "522 The Bistro Butcher": [
+    "00585d30",
+    null,
+    null,
+    null,
+    null
+   ],
+   "533 Minar": [
+    "00584e60",
+    null,
+    null,
+    null,
+    null
+   ],
+   "539 Skelengel": [
+    "005887c0",
+    null,
+    null,
+    null,
+    "00593ca0"
+   ],
+   "540 Hane-Hane": [
+    "00585d50",
+    "0057a930",
+    null,
+    null,
+    "005944d0"
+   ],
+   "552 Mushroom Man #2": [
+    "00585dc0",
+    null,
+    "0057f9b0",
+    "0057cb80",
+    null
+   ],
+   "561 Needle Worm": [
+    "00585e40",
+    null,
+    null,
+    null,
+    null
+   ],
+   "573 Witch of the Black Forest": [
+    "00583d20",
+    null,
+    null,
+    null,
+    null
+   ],
+   "579 Patrol Robo": [
+    "00585e70",
+    "0057aa30",
+    "0057f9f0",
+    null,
+    "00594b70"
+   ],
+   "582 Weather Report": [
+    "00585f50",
+    null,
+    "0057fa60",
+    null,
+    null
+   ],
+   "585 Greenkappa": [
+    "00586040",
+    "0057ac40",
+    "0057fa90",
+    null,
+    "00593f80"
+   ],
+   "590 Morphing Jar": [
+    "005860e0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "601 Penguin Soldier": [
+    "005861f0",
+    "0057a930",
+    null,
+    null,
+    "00594200"
+   ],
+   "610 Hiro's Shadow Scout": [
+    "00586260",
+    null,
+    null,
+    null,
+    null
+   ],
+   "615 Hourglass of Courage": [
+    "00586290",
+    null,
+    null,
+    null,
+    null
+   ],
+   "640 Invader of the Throne": [
+    "00586330",
+    "00579c40",
+    "0057fac0",
+    "0057d510",
+    "005944d0"
+   ],
+   "650 Kunai with Chain": [
+    "0058cca0",
+    "0057a470",
+    "0057fae0",
+    null,
+    "00594520"
+   ],
+   "651 Magical Labyrinth": [
+    "00586500",
+    "0057a470",
+    "0057fb70",
+    null,
+    "00594780"
+   ],
+   "652 Warrior Elimination": [
+    "00586540",
+    "0057aaa0",
+    null,
+    null,
+    null
+   ],
+   "653 Salamandra": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "655 Eternal Rest": [
+    "00586540",
+    "0057aaa0",
+    null,
+    null,
+    null
+   ],
+   "656 Megamorph": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "657 Metalmorph": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "659 Stain Storm": [
+    "00586540",
+    "0057aaa0",
+    null,
+    null,
+    null
+   ],
+   "660 Crush Card": [
+    "005865c0",
+    "0057aca0",
+    null,
+    "0057d560",
+    null
+   ],
+   "661 Eradicating Aerosol": [
+    "00586540",
+    "0057aaa0",
+    null,
+    null,
+    null
+   ],
+   "662 Breath of Light": [
+    "00586540",
+    "0057aaa0",
+    null,
+    null,
+    null
+   ],
+   "663 Eternal Draught": [
+    "00586540",
+    "0057aaa0",
+    null,
+    null,
+    null
+   ],
+   "667 Bright Castle": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "669 Black Luster Ritual": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "670 Zera Ritual": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "671 Harpie's Feather Duster": [
+    "00586850",
+    null,
+    "0057fc40",
+    null,
+    null
+   ],
+   "672 War-Lion Ritual": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "673 Beastly Mirror Ritual": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "675 Commencement Dance": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "676 Hamburger Recipe": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "678 Novox's Prayer": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "680 House of Adhesive Tape": [
+    "0058d380",
+    null,
+    "005804f0",
+    null,
+    null
+   ],
+   "681 Eatgaboon": [
+    "0058d380",
+    null,
+    "005804f0",
+    null,
+    null
+   ],
+   "684 Acid Trap Hole": [
+    "005868a0",
+    "0057ad50",
+    null,
+    null,
+    "005944d0"
+   ],
+   "685 Widespread Ruin": [
+    "005883c0",
+    "0057ada0",
+    "00581210",
+    null,
+    null
+   ],
+   "686 Goblin Fan": [
+    "00583f30",
+    null,
+    null,
+    null,
+    null
+   ],
+   "688 Reverse Trap": [
+    "00586b10",
+    null,
+    null,
+    null,
+    null
+   ],
+   "689 Fake Trap": [
+    "00586b30",
+    null,
+    "0057fc70",
+    null,
+    null
+   ],
+   "691 Turtle Oath": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "693 Resurrection of Chakra": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "695 Javelin Beetle Pact": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "696 Garma Sword Oath": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "698 Revival of Dokurorider": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "699 Fortress Whale's Oath": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "720 Dark Magic Ritual": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "729 Dark-Eyes Illusionist": [
+    "00586ef0",
+    "00579c40",
+    null,
+    null,
+    "00593970"
+   ],
+   "730 Relinquished": [
+    "00586fb0",
+    "00579c40",
+    "0057ff50",
+    null,
+    "00593970"
+   ],
+   "731 Jigen Bakudan": [
+    "005870c0",
+    null,
+    "0057ffd0",
+    "0057cc80",
+    null
+   ],
+   "735 Blast Sphere": [
+    "0058cdf0",
+    null,
+    "00582140",
+    null,
+    null
+   ],
+   "742 Barrel Dragon": [
+    "005871a0",
+    "00579c40",
+    "00580050",
+    null,
+    "00593970"
+   ],
+   "751 Jinzo": [
+    "005872b0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "762 Parasite Paracide": [
+    "005875a0",
+    null,
+    "005800a0",
+    "0057ccc0",
+    null
+   ],
+   "845 Valkyrion the Magna Warrior": [
+    "005877e0",
+    null,
+    "00580100",
+    "0057cb50",
+    null
+   ],
+   "939 Ring of Destruction": [
+    "00587950",
+    "0057ae20",
+    null,
+    null,
+    "00594810"
+   ],
+   "945 Magical Hats": [
+    "00587a90",
+    "0057bbf0",
+    "00581130",
+    null,
+    null
+   ],
+   "950 Time Machine": [
+    "0058ceb0",
+    null,
+    "005801c0",
+    null,
+    null
+   ],
+   "954 Toon World": [
+    "00583f30",
+    null,
+    "00580330",
+    "0057c5c0",
+    null
+   ],
+   "958 Black Illusion Ritual": [
+    "005999d0",
+    null,
+    "00599850",
+    null,
+    null
+   ],
+   "960 Negate Attack": [
+    "0058cf50",
+    null,
+    "005811b0",
+    null,
+    null
+   ],
+   "962 7 Completed": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "005948b0"
+   ],
+   "964 Lightforce Sword": [
+    "00587e80",
+    null,
+    "00581000",
+    null,
+    null
+   ],
+   "966 The Flute of Summoning Dragon": [
+    "00587f90",
+    null,
+    "00580360",
+    null,
+    null
+   ],
+   "967 Shield & Sword": [
+    "005881d0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "968 Graceful Charity": [
+    "00588260",
+    null,
+    "00580780",
+    null,
+    "00593ca0"
+   ],
+   "969 Chain Destruction": [
+    "0058cfd0",
+    "0057b010",
+    "00580450",
+    null,
+    "00594a10"
+   ],
+   "970 Mesmeric Control": [
+    "00588380",
+    null,
+    null,
+    null,
+    "00593cc0"
+   ],
+   "990 Magic-Arm Shield": [
+    "0058d220",
+    "0057b0e0",
+    "00581210",
+    null,
+    "00594b70"
+   ],
+   "1001 Fissure": [
+    "005883c0",
+    "0057b180",
+    null,
+    null,
+    null
+   ],
+   "1002 Trap Hole": [
+    "0058d380",
+    null,
+    "005804f0",
+    null,
+    null
+   ],
+   "1003 Polymerization": [
+    "005921c0",
+    null,
+    "00580600",
+    null,
+    null
+   ],
+   "1004 Remove Trap": [
+    "005885a0",
+    "0057b270",
+    null,
+    null,
+    "00594bb0"
+   ],
+   "1005 Two-Pronged Attack": [
+    "00588640",
+    "0057a930",
+    "005806c0",
+    null,
+    "00594c00"
+   ],
+   "1006 Blue Medicine": [
+    "00584d00",
+    null,
+    null,
+    null,
+    "00593ca0"
+   ],
+   "1007 Raimei": [
+    "00584e60",
+    null,
+    null,
+    null,
+    "00593cc0"
+   ],
+   "1008 Monster Reborn": [
+    "005886c0",
+    null,
+    "00580710",
+    null,
+    "00593530"
+   ],
+   "1009 De-Spell": [
+    "005859e0",
+    "0057a6e0",
+    null,
+    null,
+    "00597570"
+   ],
+   "1010 Pot of Greed": [
+    "005887c0",
+    null,
+    "00580780",
+    null,
+    "00593ca0"
+   ],
+   "1011 Gravedigger Ghoul": [
+    "00588830",
+    null,
+    "005807f0",
+    null,
+    "00594f00"
+   ],
+   "1012 Burning Spear": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "1013 Gust Fan": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "1014 The Inexperienced Spy": [
+    "005889a0",
+    null,
+    "00581000",
+    null,
+    "00593cc0"
+   ],
+   "1015 Reinforcements": [
+    "00588ae0",
+    "0057ae20",
+    null,
+    null,
+    "005952c0"
+   ],
+   "1016 Castle Walls": [
+    "00588ae0",
+    "0057ae20",
+    null,
+    null,
+    "005952c0"
+   ],
+   "1017 Ultimate Offering": [
+    "00588b70",
+    null,
+    "00580870",
+    "0057d6a0",
+    null
+   ],
+   "1018 Ancient Telescope": [
+    "00588d30",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1019 White Hole": [
+    "00588d90",
+    null,
+    "00580960",
+    null,
+    null
+   ],
+   "1021 Call of the Grave": [
+    "00588d90",
+    null,
+    "00580960",
+    null,
+    null
+   ],
+   "1022 Anti Raigeki": [
+    "00588d90",
+    null,
+    "00580960",
+    null,
+    null
+   ],
+   "1023 Tribute to The Doomed": [
+    "00585c80",
+    "0057a9a0",
+    "00580d20",
+    "0057d7c0",
+    "005944d0"
+   ],
+   "1024 Soul Release": [
+    "00588830",
+    null,
+    "00580d60",
+    null,
+    "00594f00"
+   ],
+   "1025 The Cheerful Coffin": [
+    "00589030",
+    null,
+    "00580de0",
+    null,
+    "00593ca0"
+   ],
+   "1026 Call of the Dark": [
+    "00589160",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1027 Change of Heart": [
+    "00589200",
+    "00579c40",
+    "00580e80",
+    null,
+    "005944d0"
+   ],
+   "1028 Solemn Judgment": [
+    "0058d480",
+    null,
+    "00580ec0",
+    "0057c5c0",
+    null
+   ],
+   "1029 Magic Jammer": [
+    "00588d90",
+    null,
+    "00580960",
+    "0057d7c0",
+    null
+   ],
+   "1030 Seven Tools of the Bandit": [
+    "00588d90",
+    null,
+    "00580960",
+    "0057c5c0",
+    null
+   ],
+   "1031 Horn of Heaven": [
+    "0058d590",
+    null,
+    "00580f70",
+    "0057d870",
+    null
+   ],
+   "1032 Just Desserts": [
+    "00584e60",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1033 Royal Decree": [
+    "005872b0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1034 Polymerization": [
+    "005921c0",
+    null,
+    "00580600",
+    null,
+    null
+   ],
+   "1036 Last Day of Witch": [
+    "00586540",
+    "0057aaa0",
+    null,
+    null,
+    null
+   ],
+   "1037 Exile of the Wicked": [
+    "00586540",
+    "0057aaa0",
+    null,
+    null,
+    null
+   ],
+   "1038 Magic Thorn": [
+    "00583f30",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1039 Restructer Revolution": [
+    "00584e60",
+    null,
+    "00581000",
+    null,
+    "00593cc0"
+   ],
+   "1040 Fusion Sage": [
+    "005892d0",
+    null,
+    "00581040",
+    null,
+    null
+   ],
+   "1042 Sword of Deep-Seated": [
+    "00584610",
+    "0057a470",
+    "0057f550",
+    null,
+    "00593a20"
+   ],
+   "1043 Block Attack": [
+    "00589400",
+    "0057b2e0",
+    null,
+    null,
+    "00595310"
+   ],
+   "1044 The Unhappy Maiden": [
+    "0058cfa0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1045 Robbin' Goblin": [
+    "005842e0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1046 Germ Infection": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "1047 Paralyzing Potion": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "1048 The Stern Mystic": [
+    "00589480",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1049 Wall of Illusion": [
+    "0058d5e0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1054 Last Will": [
+    "00589610",
+    null,
+    "00581050",
+    null,
+    null
+   ],
+   "1055 Waboku": [
+    "005897b0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1056 Mirror Force": [
+    "0058d660",
+    null,
+    "00581210",
+    null,
+    null
+   ],
+   "1058 Ring of Magnetism": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "1059 Share the Pain": [
+    "005897e0",
+    null,
+    "00581330",
+    "0057c660",
+    null
+   ],
+   "1060 Stim-Pack": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "1061 Heavy Storm": [
+    "00589830",
+    "0057b530",
+    null,
+    null,
+    null
+   ],
+   "1062 Gryphon Wing": [
+    "00588d90",
+    null,
+    "00580960",
+    null,
+    null
+   ],
+   "1063 Gravekeeper's Servant": [
+    "00583f30",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1064 Curse of Fiend": [
+    "00589860",
+    null,
+    "00581370",
+    null,
+    null
+   ],
+   "1065 Upstart Goblin": [
+    "00589920",
+    null,
+    "00580780",
+    null,
+    null
+   ],
+   "1066 Toll": [
+    "00583f30",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1067 Final Destiny": [
+    "00589970",
+    null,
+    "005813d0",
+    "0057d7c0",
+    null
+   ],
+   "1068 Snatch Steal": [
+    "005899a0",
+    "0057a470",
+    "00580e80",
+    null,
+    "005944d0"
+   ],
+   "1069 Chorus of Sanctuary": [
+    "00584a90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1070 Confiscation": [
+    "00589a90",
+    null,
+    "005814d0",
+    "0057c5c0",
+    "00593cc0"
+   ],
+   "1071 Delinquent Duo": [
+    "00589b10",
+    null,
+    "005814d0",
+    "0057c5c0",
+    "00593cc0"
+   ],
+   "1072 Darkness Approaches": [
+    "00589b70",
+    "0057af30",
+    "00581480",
+    "0057d7c0",
+    "005974d0"
+   ],
+   "1073 Fairy's Hand Mirror": [
+    "00589c00",
+    null,
+    "00581540",
+    null,
+    "00595360"
+   ],
+   "1074 Tailor of the Fickle": [
+    "00589c70",
+    "0057b3b0",
+    null,
+    null,
+    "00595780"
+   ],
+   "1075 Rush Recklessly": [
+    "00588ae0",
+    "0057ae20",
+    null,
+    null,
+    "005952c0"
+   ],
+   "1076 The Reliable Guardian": [
+    "00588ae0",
+    "0057ae20",
+    null,
+    null,
+    "005952c0"
+   ],
+   "1077 The Forceful Sentry": [
+    "00589db0",
+    null,
+    "00581000",
+    null,
+    "00593cc0"
+   ],
+   "1078 Chain Energy": [
+    "00583f30",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1079 Mystical Space Typhoon": [
+    "00585c80",
+    "0057b530",
+    null,
+    null,
+    "00597570"
+   ],
+   "1080 Giant Trunade": [
+    "00589e60",
+    "0057b530",
+    null,
+    null,
+    null
+   ],
+   "1081 Painful Choice": [
+    "00589eb0",
+    null,
+    "00581600",
+    null,
+    null
+   ],
+   "1082 Snake Fang": [
+    "00588ae0",
+    "0057ae20",
+    null,
+    null,
+    "005952c0"
+   ],
+   "1090 Time Seal": [
+    "0058a140",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1091 Graverobber": [
+    "0058a170",
+    null,
+    "00581630",
+    null,
+    "00593530"
+   ],
+   "1092 Gift of The Mystical Elf": [
+    "0058a200",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1093 The Eye of Truth": [
+    "0058a250",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1094 Dust Tornado": [
+    "0058a2c0",
+    "0057b4d0",
+    null,
+    null,
+    "00597570"
+   ],
+   "1095 Call Of The Haunted": [
+    "0058a4a0",
+    null,
+    "005816e0",
+    null,
+    "00593530"
+   ],
+   "1096 Solomon's Lawbook": [
+    "0058a660",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1097 Earthshaker": [
+    "0058a690",
+    null,
+    "00581740",
+    null,
+    null
+   ],
+   "1098 Enchanted Javelin": [
+    "0058d660",
+    null,
+    "005811b0",
+    null,
+    null
+   ],
+   "1099 Mirror Wall": [
+    "0058d860",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1106 Cyber Jar": [
+    "0058a880",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1108 Giant Rat": [
+    "0058ac10",
+    null,
+    "00581770",
+    null,
+    null
+   ],
+   "1109 Senju of the Thousand Hands": [
+    "0058add0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1110 UFO Turtle": [
+    "0058ac10",
+    null,
+    "00581770",
+    null,
+    null
+   ],
+   "1112 Karate Man": [
+    "0058afe0",
+    null,
+    "00580050",
+    null,
+    null
+   ],
+   "1114 Giant Germ": [
+    "0058b040",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1115 Nimble Momonga": [
+    "0058b040",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1116 Spear Cretin": [
+    "0058b3d0",
+    null,
+    "00581040",
+    "0057c5f0",
+    "00595a90"
+   ],
+   "1117 Shining Angel": [
+    "0058ac10",
+    null,
+    "00581770",
+    null,
+    null
+   ],
+   "1119 Mother Grizzly": [
+    "0058ac10",
+    null,
+    "00581770",
+    null,
+    null
+   ],
+   "1120 Flying Kamakiri #1": [
+    "0058ac10",
+    null,
+    "00581770",
+    null,
+    null
+   ],
+   "1122 Sonic Bird": [
+    "0058add0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1123 Mystic Tomato": [
+    "0058ac10",
+    null,
+    "00581770",
+    null,
+    null
+   ],
+   "1125 Gaia Power": [
+    "00584a90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1126 Umiiruka": [
+    "00584a90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1127 Molten Destruction": [
+    "00584a90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1128 Rising Air Current": [
+    "00584a90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1129 Luminous Spark": [
+    "00584a90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1130 Mystic Plasma Zone": [
+    "00584a90",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1131 Messenger of Peace": [
+    "00583f30",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1134 Gust": [
+    "00585c80",
+    "0057b530",
+    "00581790",
+    null,
+    "00597570"
+   ],
+   "1135 Driving Snow": [
+    "00585c80",
+    "0057b530",
+    "00581790",
+    null,
+    "00597570"
+   ],
+   "1136 Armored Glass": [
+    "0058b5e0",
+    null,
+    "005818c0",
+    null,
+    null
+   ],
+   "1137 World Suppression": [
+    "0058b5e0",
+    null,
+    "005818c0",
+    null,
+    null
+   ],
+   "1138 Mystic Probe": [
+    "0058b5e0",
+    null,
+    "005818c0",
+    null,
+    null
+   ],
+   "1139 Metal Detector": [
+    "0058b5e0",
+    null,
+    "005818c0",
+    null,
+    null
+   ],
+   "1140 Numinous Healer": [
+    "0058b810",
+    null,
+    "005818c0",
+    null,
+    null
+   ],
+   "1141 Appropriate": [
+    "0058b930",
+    null,
+    "005818c0",
+    null,
+    null
+   ],
+   "1142 Forced Requisition": [
+    "0058b9a0",
+    null,
+    "005818c0",
+    null,
+    null
+   ],
+   "1145 DNA Surgery": [
+    "00583f30",
+    null,
+    null,
+    null,
+    "00595ce0"
+   ],
+   "1146 The Regulation of Tribe": [
+    "00583f30",
+    null,
+    null,
+    null,
+    "00595ce0"
+   ],
+   "1147 Backup Soldier": [
+    "0058ba80",
+    null,
+    "00581b30",
+    null,
+    "00595d60"
+   ],
+   "1149 Major Riot": [
+    "0058bb10",
+    null,
+    "00581790",
+    null,
+    null
+   ],
+   "1150 Ceasefire": [
+    "0058bf40",
+    null,
+    "00581b80",
+    null,
+    null
+   ],
+   "1151 Light of Intervention": [
+    "00583f30",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1152 Respect Play": [
+    "00583f30",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1154 Imperial Order": [
+    "005872b0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1157 Nobleman of Crossout": [
+    "0058c080",
+    "0057b5a0",
+    null,
+    null,
+    "00594b70"
+   ],
+   "1158 Nobleman of Extermination": [
+    "0058c080",
+    "0057b600",
+    null,
+    null,
+    "00594b70"
+   ],
+   "1159 The Shallow Grave": [
+    "0058b400",
+    null,
+    "00581c30",
+    null,
+    "00595ac0"
+   ],
+   "1160 Premature Burial": [
+    "0058a4a0",
+    null,
+    "00581c90",
+    "0057c5c0",
+    "00593530"
+   ],
+   "1161 Inspection": [
+    "0058c2e0",
+    null,
+    "00581cd0",
+    "0057d8b0",
+    null
+   ],
+   "1162 Prohibition": [
+    "0058c430",
+    null,
+    null,
+    null,
+    "00595f20"
+   ],
+   "1163 Morphing Jar #2": [
+    "0058c490",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1170 Kiseitai": [
+    "0058cdf0",
+    null,
+    "00582140",
+    null,
+    null
+   ],
+   "1177 Windstorm of Etaqua": [
+    "0058c890",
+    "0057b180",
+    null,
+    null,
+    null
+   ],
+   "1178 Aqua Chorus": [
+    "00583f30",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1179 Sebek's Blessing": [
+    "0058d930",
+    null,
+    "00581d60",
+    null,
+    null
+   ],
+   "1180 Anti-Spell Fragrance": [
+    "00583f30",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1181 Riryoku": [
+    "0058c950",
+    "0057aec0",
+    "00581de0",
+    null,
+    "005961c0"
+   ],
+   "1182 Sword of Dragon's Soul": [
+    "00584500",
+    "0057a470",
+    null,
+    null,
+    "00593a20"
+   ],
+   "1183 Seal of the Ancients": [
+    "00589480",
+    null,
+    "00581e10",
+    "0057c5c0",
+    null
+   ],
+   "1203 Graceful Dice": [
+    "0058ca70",
+    null,
+    "00581e80",
+    null,
+    null
+   ],
+   "1204 Skull Dice": [
+    "0058ca70",
+    null,
+    "00581eb0",
+    null,
+    null
+   ],
+   "1205 Exchange": [
+    "0058cb70",
+    null,
+    "00581ee0",
+    null,
+    null
+   ],
+   "1211 Thousand Knives": [
+    "00585c80",
+    "0057b680",
+    "00581f40",
+    null,
+    "005944d0"
+   ],
+   "1212 Dark Magic Curtain": [
+    "0058dec0",
+    null,
+    "00581fc0",
+    "0057c5c0",
+    null
+   ],
+   "1213 Mystic Box": [
+    "0058dfe0",
+    "0057a930",
+    "00582040",
+    null,
+    "005963e0"
+   ],
+   "1214 Magic Cylinder": [
+    "0058d660",
+    null,
+    "005811b0",
+    null,
+    null
+   ],
+   "1220 Soul Exchange": [
+    "0058e160",
+    "00579c40",
+    "00582080",
+    null,
+    "005944d0"
+   ],
+   "1221 Card Destruction": [
+    "0058e1f0",
+    null,
+    "005820a0",
+    null,
+    null
+   ],
+   "1230 Nightmare's Steelcage": [
+    "00583f30",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1232 Multiply": [
+    "0058e2f0",
+    "0057b730",
+    "00582680",
+    "0057d8f0",
+    null
+   ],
+   "1240 Berfomet": [
+    "0058e3a0",
+    null,
+    null,
+    null,
+    null
+   ],
+   "1241 Chimera the Flying Mythical Beast": [
+    "0058e4e0",
+    null,
+    "005820e0",
+    null,
+    "00593740"
+   ],
+   "1242 Beast of Gilfer": [
+    "0058e580",
+    "0057a470",
+    null,
+    null,
+    "005965e0"
+   ],
+   "1243 Ancient Lamp": [
+    "0058d970",
+    "0057b7d0",
+    "00582140",
+    null,
+    "00596910"
+   ],
+   "1244 Shadow Spell": [
+    "00585200",
+    "0057b1f0",
+    null,
+    null,
+    "005944d0"
+   ]
+  }
+ }
+}

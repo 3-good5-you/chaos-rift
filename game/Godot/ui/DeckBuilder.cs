@@ -16,7 +16,7 @@ public partial class DeckBuilder : RiftMenu
 
     /// A deck for one game mode only (Pack Duel, Limited Duel): built from `Pool` (a pretend collection with the
     /// mode's rule applied), never saved or exported; USE THIS DECK puts it in Session.ModeDeck and goes to `Next`.
-    public sealed record TempBuild(string Name, string Rule, Profile Pool, string Next, List<List<int>>? Packs = null);
+    public sealed record TempBuild(string Name, string Rule, Profile Pool, string Next);
     public static TempBuild? Temp;
     static new Profile P => Temp?.Pool ?? Session.Profile;
     Deck source = null!, deck = null!;
@@ -51,26 +51,25 @@ public partial class DeckBuilder : RiftMenu
         if (Temp != null && Session.ModeDeck != null) { source = Session.ModeDeck; }   // rebuilding: start from the deck you made
         deck = source.Copy();
         Back(Temp != null ? "MODES" : "DECKS");
-        Put(this, "DECK BUILDER", Title, 40, Ink, new Vector2(60, 60));
-        Hair(this, new Vector2(62, 114), 160, GoldC);
 
         dx = W * 0.68f; dw = W - dx - 40;   // the deck: a narrow column on the right
         // anything dropped on the light side goes back to your cards
         var leftDrop = new Control { Size = new Vector2(dx - 30, H), MouseFilter = MouseFilterEnum.Pass };
         AddChild(leftDrop);
         Wire(leftDrop, 'c', null);
-        preview = new Control { Position = new Vector2(60, 140), Size = new Vector2(PreviewW, 10), MouseFilter = MouseFilterEnum.Ignore };
+        preview = new Control { Position = new Vector2(60, 84), Size = new Vector2(PreviewW, 10), MouseFilter = MouseFilterEnum.Ignore };
         AddChild(preview);
 
         var owned = Db.ByIdx.Values.Where(d => P.Count(d.Idx) > 0 && d.Name.Length > 0).ToList();
         // the preview has the whole left column; your cards take the middle, up to the rift
         float bx = 60 + PreviewW + 36;
-        browser = new CardBrowser(this, new Rect2(bx, 146, dx - 70 - bx, H - 176), 96, () => owned, new[] { "NAME", "ATK", "DEF", "LEVEL" })
+        browser = new CardBrowser(this, new Rect2(bx, 84, dx - 70 - bx, H - 104), 96, () => owned, new[] { "NAME", "ATK", "DEF", "LEVEL" })
         { Compact = true, GroupKinds = true, ReleaseClick = true };
         Wire(browser.Grid, 'c', null);
         browser.Decorate = (hit, d, size) =>
         {
             int n = deck.Copies(d.Idx);
+            if (P.Fresh.Contains(d.Idx)) NewMark.Tag(hit, size, seen: () => { if (P.Fresh.Remove(d.Idx)) Session.Save(); });
             for (int k = 0; k < n; k++) Pip(hit, new Vector2(size.X / 2 - (n - 1) * 8 + k * 16, size.Y + 10), 7);
             Wire(hit, 'c', d);
         };
@@ -80,13 +79,14 @@ public partial class DeckBuilder : RiftMenu
         browser.Hovered = ShowCard;
         browser.Refresh();
 
-        var coverHit = new Control { Position = new Vector2(dx, 128), Size = new Vector2(64, 64), TooltipText = "Choose the cover card" };
+        // Limited (Temp): no cover, no name (user 2026-11-17): only the rule on top, the deck right under it
+        var coverHit = new Control { Position = new Vector2(dx, 40), Size = new Vector2(64, 64), TooltipText = "Choose the cover card", Visible = Temp == null };
         AddChild(coverHit);
         cover = Pic(coverHit, null, Vector2.Zero, new Vector2(64, 64));
         cover.Material = Kit.RoundedMat(1, 0.14f);
         Click(coverHit, CoverPick, h => cover.SelfModulate = h ? new Color(1.15f, 1.15f, 1.15f) : Colors.White);
-        Put(this, "COVER", Thin, 12, Mist, new Vector2(dx, 196), new Vector2(64, 16), HorizontalAlignment.Center);
-        nameEdit = new LineEdit { Text = deck.Name, Position = new Vector2(dx + 80, 128), Size = new Vector2(dw - 80, 60), Flat = true, MaxLength = 24, SelectAllOnFocus = true, TooltipText = "Click to rename" };
+        Put(this, "COVER", Thin, 12, Mist, new Vector2(dx, 108), new Vector2(64, 16), HorizontalAlignment.Center).Visible = Temp == null;
+        nameEdit = new LineEdit { Text = deck.Name, Position = new Vector2(dx + 80, 40), Size = new Vector2(dw - 80, 60), Flat = true, MaxLength = 24, SelectAllOnFocus = true, TooltipText = "Click to rename" };
         nameEdit.AddThemeFontOverride("font", Title); nameEdit.AddThemeFontSizeOverride("font_size", 30);
         nameEdit.AddThemeColorOverride("font_color", Silver); nameEdit.AddThemeColorOverride("caret_color", Silver);
         nameEdit.TextChanged += t => { if (t.Trim().Length > 0) deck.Name = t.Trim(); };
@@ -94,26 +94,28 @@ public partial class DeckBuilder : RiftMenu
         AddChild(nameEdit);
         if (Temp == null)
         {
-            var ren = Put(this, "✎ RENAME", Title, 14, Mist, new Vector2(dx + 82, 184));
+            var ren = Put(this, "✎ RENAME", Title, 14, Mist, new Vector2(dx + 82, 96));
             Click(ren, () => nameEdit.GrabFocus(), h => ren.AddThemeColorOverride("font_color", h ? GoldLight : Mist));
         }
         else
         {
-            nameEdit.Editable = false;
-            Put(this, Temp.Rule, Title, 14, GoldLight, new Vector2(dx + 82, 208), new Vector2(dw - 82, 22));
-            Put(this, "FOR THIS DUEL ONLY  ·  NOT SAVED", Thin, 13, Mist, new Vector2(dx, 100));
+            nameEdit.Visible = false;
+            Put(this, Temp.Rule, Title, 16, GoldLight, new Vector2(dx, 44), new Vector2(dw, 26)).ClipText = true;
         }
-        legal = Put(this, "", Thin, 15, Mist, new Vector2(dx + 82, 208), new Vector2(dw - 82, 22));
+        legal = Put(this, "", Thin, 15, Mist, new Vector2(dx + 82, 120), new Vector2(dw - 82, 22));
         legal.Visible = Temp == null;
         legal.ClipText = true;
-        dirtyLabel = Put(this, "", Title, 14, GoldLight, new Vector2(dx, 100));
-        if (Temp != null) Button(this, "USE THIS DECK", new Vector2(W - 170, 76), UseTemp, 22);
+        dirtyLabel = Put(this, "", Title, 14, GoldLight, new Vector2(dx, H - 92));
+        if (Temp != null) { var use = Button(this, "START DUEL", new Vector2(W - 170, H - 50), UseTemp, 22); use.Position = new Vector2(W - 36 - use.Size.X, use.Position.Y); }   // actions bottom right (user 2026-11-17)
         else
         {
-            Button(this, "SAVE", new Vector2(W - 110, 76), () => Save(), 22);
-            Button(this, "REVERT", new Vector2(W - 200 - (Title.GetStringSize(Lang.Tr("SAVE"), HorizontalAlignment.Left, -1, Z(22)).X + Title.GetStringSize(Lang.Tr("REVERT"), HorizontalAlignment.Left, -1, Z(18)).X) / 2, 76), () => { deck = source.Copy(); nameEdit.Text = deck.Name; Changed(); }, 18);
+            // right edges by the buttons' real widths (GUARDAR ran off the screen)
+            var save = Button(this, "SAVE", new Vector2(W - 110, H - 50), () => Save(), 22);
+            save.Position = new Vector2(W - 36 - save.Size.X, save.Position.Y);
+            var revert = Button(this, "REVERT", new Vector2(W - 300, H - 50), () => { deck = source.Copy(); nameEdit.Text = deck.Name; Changed(); }, 18);
+            revert.Position = new Vector2(save.Position.X - 16 - revert.Size.X, revert.Position.Y);
         }
-        Hair(this, new Vector2(dx, 238), dw, Silver * new Color(1, 1, 1, 0.12f));
+        Hair(this, new Vector2(dx, Temp != null ? 82 : 150), dw, Silver * new Color(1, 1, 1, 0.12f));
         zones = new Control { Size = new Vector2(W, H), MouseFilter = MouseFilterEnum.Ignore };
         AddChild(zones);
         Changed();
@@ -145,7 +147,7 @@ public partial class DeckBuilder : RiftMenu
     string Why(CardData d, bool side)
     {
         if (deck.Copies(d.Idx) >= P.Count(d.Idx)) return Lang.F("You have {0} {1} and they're all in the deck.", P.Count(d.Idx), d.Name);
-        if (deck.CopiesNamed(d.Name) >= DeckRules.Limit(d)) return DeckRules.Limit(d) == 0 ? Lang.F("{0} is forbidden.", d.Name) : Lang.F("{0}: {1} copies at most.", d.Name, DeckRules.Limit(d));
+        if (deck.CopiesNamed(d.Name) >= DeckRules.Limit(d)) return Lang.F("{0}: {1} copies at most.", d.Name, DeckRules.Limit(d));
         return side ? Lang.F("The Side Deck holds {0} cards.", DeckRules.MaxSide) : Lang.F("The Main Deck holds {0} cards.", DeckRules.MaxMain);
     }
 
@@ -159,8 +161,16 @@ public partial class DeckBuilder : RiftMenu
         else Ask(Lang.F("{0} needs {1}. Not in your cards.", d.Name, names));
     }
 
+    /// Where MAIN DECK starts: higher in Limited, which has no cover or name.
+    static float ZoneTop => Temp != null ? 100 : 168;
+
+    /// The red of a Main Deck under 40 cards.
+    static readonly Color Short = new(1f, 0.45f, 0.4f);
+
     bool Save(bool force = false)
     {
+        // a deck under 40 cards can't be saved (user 2026-11-17)
+        if (deck.Main.Count < DeckRules.MinMain) { Ask(Lang.F("The Main Deck needs at least {0} cards.", DeckRules.MinMain)); return false; }
         var bare = DeckRules.FusionsMissingMaterials(deck);
         if (bare.Count > 0 && !force)
         {
@@ -237,9 +247,9 @@ public partial class DeckBuilder : RiftMenu
         foreach (var c in zones.GetChildren()) c.QueueFree();
         int cv = deck.CoverCard();
         cover.Texture = cv >= 0 ? CardArt.Picture(Db.Get(cv)) : null;
-        var probs = DeckRules.Formats.Select(f => (f.Name, Pr: DeckRules.Problem(deck, P, f.Key))).ToList();
-        legal.Text = string.Join("    ", probs.Select(p => $"{p.Name} {(p.Pr == null ? "✓" : "✕")}")) + (probs.FirstOrDefault(p => p.Pr != null).Pr is { } why ? $"    ·    {why}" : "");
-        legal.AddThemeColorOverride("font_color", probs.All(p => p.Pr == null) ? Mist : new Color(1f, 0.6f, 0.55f));
+        // no ban list choice any more (user 2026-11-17): only what keeps the deck from being played, in red
+        legal.Text = DeckRules.Problem(deck, P) is { } why ? Lang.Duel(why) : "";
+        legal.AddThemeColorOverride("font_color", new Color(1f, 0.6f, 0.55f));
 
         var main = Sorted(deck.Main); var side = Sorted(deck.Side); var ex = Sorted(deck.Extra);
         // tiles shrink a little for big decks so all three zones stay on screen
@@ -248,18 +258,17 @@ public partial class DeckBuilder : RiftMenu
         {
             mh = mw * 1.458f; cols = (int)((dw + mg) / (mw + mg));
             int rows = Math.Max(1, (Math.Max(main.Count, DeckRules.MinMain) + cols - 1) / cols) + (DeckRules.MaxSide + cols - 1) / cols + Math.Max(1, (ex.Count + cols - 1) / cols);
-            if (mw <= 30 || 256 + 3 * 46 + 24 + 2 * 18 + rows * (mh + mg) <= H - 16) break;
+            if (mw <= 30 || ZoneTop + 3 * 46 + 24 + 2 * 18 + rows * (mh + mg) <= H - 100) break;   // the bottom keeps room for REVERT / SAVE
         }
-        float y = 256;
-        void Zone(string name, string count, Color tint, string? kinds = null)
+        float y = ZoneTop;
+        // no Monster / Spell / Trap counts (user 2026-11-17: not needed)
+        void Zone(string name, string count, Color tint, bool short_ = false)
         {
-            // the Monster / Spell / Trap counts get their own line under the header (beside it they ran off the column)
-            if (kinds != null) Put(zones, kinds, Title, 14, Silver * new Color(1, 1, 1, 0.85f), new Vector2(dx + 22, y + 42));
             Pip(zones, new Vector2(dx + 6, y + 12), 9);
             Put(zones, name, Title, 20, tint, new Vector2(dx + 22, y));
-            Put(zones, count, Title, 16, Silver * new Color(1, 1, 1, 0.85f), new Vector2(dx + 22 + Title.GetStringSize(Lang.Tr(name), HorizontalAlignment.Left, -1, Z(20)).X + 24, y + 3));
+            Put(zones, count, Title, 16, short_ ? Short : Silver * new Color(1, 1, 1, 0.85f), new Vector2(dx + 22 + Title.GetStringSize(Lang.Tr(name), HorizontalAlignment.Left, -1, Z(20)).X + 24, y + 3));
             Hair(zones, new Vector2(dx, y + 34), dw, tint * new Color(1, 1, 1, 0.35f));
-            y += kinds != null ? 70 : 46;
+            y += 46;
         }
         void Tiles(List<CardData> cards, int slots, Color tint, char zone)
         {
@@ -290,7 +299,8 @@ public partial class DeckBuilder : RiftMenu
             }
             y += zh + 18;
         }
-        Zone("MAIN DECK", $"{main.Count} / {DeckRules.MinMain}–{DeckRules.MaxMain}", Silver, Lang.F("MONSTER {0}  SPELL {1}  TRAP {2}", main.Count(c => c.IsMonster), main.Count(c => c.IsSpell), main.Count(c => c.IsTrap)));
+        // just the count (user 2026-11-17: no "40–80"), red while under 40; adding past 80 is refused
+        Zone("MAIN DECK", $"{main.Count}", Silver, main.Count < DeckRules.MinMain);
         Tiles(main, DeckRules.MinMain, Silver, 'm');
         Zone("SIDE DECK", $"{side.Count} / {DeckRules.MaxSide}", Teal);
         Tiles(side, DeckRules.MaxSide, Teal, 's');
@@ -306,6 +316,7 @@ public partial class DeckBuilder : RiftMenu
         if (ids.Count == 0) return;
         CloseToast();
         toast = new Control { Size = new Vector2(W, H), ZIndex = 40 };
+        toast.SetMeta("dark", true);
         AddChild(toast);
         toast.AddChild(new ColorRect { Size = toast.Size, Color = new Color(0.02f, 0.02f, 0.03f, 0.95f), MouseFilter = MouseFilterEnum.Stop });
         Put(toast, "COVER CARD", Title, 38, Silver, new Vector2(0, 70), new Vector2(W, 50), HorizontalAlignment.Center);

@@ -35,22 +35,24 @@ public static class CardArt
     static readonly System.Collections.Concurrent.ConcurrentQueue<(string path, Image? img, Action<Texture2D> done)> decoded = new();
     static bool pumping;
 
-    public static void SmallAsync(CardData d, Action<Texture2D> done)
+    public static void SmallAsync(CardData d, Action<Texture2D> done) => Async(d, false, done);
+
+    /// The full scan off the main thread: decoding one 813x1185 JPG + mipmaps took ~20 ms, a hitch on every card shown.
+    public static void LargeAsync(CardData d, Action<Texture2D> done) => Async(d, true, done);
+
+    static void Async(CardData d, bool large, Action<Texture2D> done)
     {
         if (files == null) Index();   // built once, here on the main thread, before workers read it
-        var known = Exists(Hd(d)) ? SmallOf(d) : files!.GetValueOrDefault(d.Idx);
-        if (known != null && cache.TryGetValue(known, out var hit)) { done(hit ?? Back); return; }
+        var p = large && Exists(Hd(d)) ? Hd(d) : SmallPath(d);
+        if (p == null) { done(Back); return; }
+        if (cache.TryGetValue(p, out var hit)) { done(hit ?? Back); return; }
         if (!pumping) { pumping = true; ((SceneTree)Godot.Engine.GetMainLoop()).ProcessFrame += Pump; }
         Task.Run(() =>
         {
             Image? img = null;
-            try
-            {
-                var p = SmallPath(d);
-                if (p != null) { img = Image.LoadFromFile(p); img.GenerateMipmaps(); }
-                decoded.Enqueue((p ?? "", img, done));
-            }
-            catch (Exception) { decoded.Enqueue(("", null, done)); }
+            try { img = Image.LoadFromFile(p); img.GenerateMipmaps(); }
+            catch (Exception) { img = null; }
+            decoded.Enqueue((p, img, done));
         });
     }
 

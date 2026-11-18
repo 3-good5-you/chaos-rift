@@ -6,7 +6,7 @@ namespace PoC.Game.UI;
 /// Results after a duel (Chaos Rift, 2026-11-09, Victory Lab picks): you in the light (headline, numbers, the reward
 /// cards dealt and flipped; click one to see it), the rival in the dark (sad when you win, happy when you lose).
 /// Tournament champion = the podium, gauntlet cleared = the road through the rivals, a first challenge solve = the
-/// tiles; their cards behind SEE YOUR PRIZE. Records the duel (streak, Joey's ladder),
+/// tiles. The podium reveals every prize on it; the road's cards are behind SEE YOUR PRIZE. Records the duel (streak, Joey's ladder),
 /// keeps the match score and grants the rewards into Session.Profile.
 /// Screenshot args fake the incoming duel: `--case=win|loss|draw|match1|matchwin|matchloss --rival=N`.
 public partial class Results : RiftMenu
@@ -17,9 +17,12 @@ public partial class Results : RiftMenu
     int outcome, scoreYou, scoreThem, prize = 1;   // prize = cards a win gives at this difficulty (Rewards.For)
     bool match, matchOver;
     readonly List<Reward> cards = new();
+    readonly List<CardData> offer = new();   // Pack Duel: the cards to choose your prize from (empty once chosen)
     readonly List<Control> buttons = new();
     readonly List<string> targets = new();
     AudioStreamPlayer? sfx;
+    double done;   // when the podium's prizes are all open (its buttons, SAVE REPLAY and achievement pop-ups wait for it)
+    protected override double PopupAt => Math.Max(0.6, done);
     const float RevealStart = 1.6f, RevealStep = 0.75f;
 
     bool Won => outcome == 1;
@@ -43,7 +46,7 @@ public partial class Results : RiftMenu
             if (Session.Selected < 0) Session.Selected = 1;
             // the special screens: a tournament down to its final, a gauntlet at its last rival, an unsolved challenge
             if (c == "champion") { var t = Session.Tour = new Tournament(new Rng(7)); for (int r = 0; r < 2; r++) { t.PlayOthers(); t.Record(true); } }
-            if (c == "gauntlet") { Session.Mode = GameMode.Gauntlet; Session.Run = new Gauntlet(Session.Picks); Session.Run.Index = Session.Run.Order.Length - 1; Session.LastLp = 3450; }
+            if (c == "gauntlet") { Session.Mode = GameMode.Gauntlet; Session.Run = Gauntlet.Climb(Tournament.Roster, new Rng(3)); Session.Run.Index = Session.Run.Order.Length - 1; Session.LastLp = 3450; }
             if (c == "puzzle") { Session.Mode = GameMode.Challenges; Session.Puzzle = Puzzles.All[6]; Session.Profile.Solved.Remove(Session.Puzzle.Id); }
             Session.Match = c.StartsWith("match");
             (Session.MatchWins, Session.MatchLosses) = c switch { "matchwin" => (1, 1), "matchloss" => (0, 1), _ => (0, 0) };
@@ -83,7 +86,7 @@ public partial class Results : RiftMenu
                 if (n > 0) foreach (var (card, isNew) in Rewards.Roll(p, "tournament", Tournament.PrizePool(foe), n, false, Session.Rng, fresh)) cards.Add(new Reward(card, isNew));
                 if (place == 0)
                 {
-                    Session.LastMat = Shop.PrizeMat(p);   // the next prize playmat, revealed after this screen
+                    Achievements.Bump(p, "champion");
                     // the finalist's ace card
                     var ace = CardDb.Shared.Named(foe.Card);
                     bool isNew = p.Count(ace.Idx) == 0;
@@ -96,11 +99,13 @@ public partial class Results : RiftMenu
         else if (Session.Run is { } run)
         {
             run.Record(Won, Session.LastLp);
-            if (run.Cleared)
+            if (run.Cleared) Achievements.Bump(p, "gauntlet");
+            if (run.Over)
             {
-                var (dp, n, fresh) = Gauntlet.ClearPrize;
+                // the run pays once, when it ends: the prize of the highest floor beaten (Gauntlet.Floors)
+                var (dp, n) = run.Prize;
                 prize = n; p.Dp += dp; Session.LastDp += dp;
-                foreach (var (card, isNew) in Rewards.Roll(p, "tournament", Rewards.Pool("expansion"), n, false, Session.Rng, fresh)) cards.Add(new Reward(card, isNew));
+                foreach (var (card, isNew) in Rewards.Roll(p, "tournament", Rewards.Pool("expansion"), n, false, Session.Rng, (n + 1) / 2)) cards.Add(new Reward(card, isNew));
             }
         }
         else if (Session.Puzzle != null) { prize = 0; }   // DP only (Session.FinishDuel), first solve
@@ -115,19 +120,15 @@ public partial class Results : RiftMenu
         }
         else if (Session.Mode == GameMode.Pack && Session.ModeDeck is { } pd)
         {
-            // keep cards from your packs: 3 for a win, 1 for a loss
-            var pool = (DeckBuilder.Temp?.Packs?.SelectMany(x => x) ?? pd.Main).Distinct().ToList();
-            int keep = Won ? 3 : 1;
-            for (int k = 0; k < keep && pool.Count > 0; k++)
+            // PLAN_PACK_DUEL.md: a won duel shows 3 cards of your drafted deck, keep 1; a won best of 3 shows 6, keep 2.
+            // Cards you don't own come first.
+            prize = match ? 2 : 1;
+            if (Won && !MatchOn)
             {
-                var c = CardDb.Shared.Get(pool[Session.Rng.Int(pool.Count)]);
-                pool.Remove(c.Idx);
-                bool isNew = p.Count(c.Idx) == 0;
-                p.Owned[c.Idx] = Math.Min(255, p.Count(c.Idx) + 1);
-                if (isNew) p.Fresh.Add(c.Idx);
-                cards.Add(new Reward(c, isNew));
+                var pool = (Session.Draft?.Cards(0) ?? pd.Main.Concat(pd.Extra)).DistinctBy(i => CardDb.Shared.Get(i).Name).ToList();
+                Session.Rng.Shuffle(pool);
+                offer.AddRange(pool.OrderBy(i => p.Count(i) > 0).Take(match ? 6 : 3).Select(CardDb.Shared.Get));
             }
-            prize = keep;
         }
         else
         {
@@ -169,7 +170,7 @@ public partial class Results : RiftMenu
             try { r.Save(Session.ReplayDir); Session.LastReplay = null; b.Visible = false; T(host, "REPLAY SAVED", Thin, 16, at - new Vector2(80, 10), new Vector2(160, 24), HorizontalAlignment.Center, 0.8f); }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException) { GD.PrintErr($"replay: {e.Message}"); }
         }), 16);
-        Appear(b, 2.4);
+        Appear(b, Math.Max(2.4, done));
     }
 
     // ---------------------------------------------------------------- the split results (Victory Lab row 1/2: A)
@@ -193,22 +194,30 @@ public partial class Results : RiftMenu
         if (match) stats.Add(Lang.F("MATCH  {0} – {1}", scoreYou, scoreThem));
         if (Session.Run is { } run && !run.Over) stats.Add(Lang.F("{0} LP CARRIED", run.Lp));
         if (Session.LastStarter is { } st) stats.Add(Lang.F("{0} UNLOCKED", st.Name.ToUpperInvariant()));
-        if (Session.LastMat is { } lm) stats.Add(Lang.F("{0} PLAYMAT", Lang.Cosmetic(lm.Name).ToUpperInvariant()));
         for (int i = 0; i < stats.Count; i++) Appear(T(this, stats[i], Title, 30, new Vector2(98 + i * 330, 290), new Vector2(320, 40)), 0.6 + i * 0.12);
         // the cards (a match not yet over: dim backs for the cards still to win)
         int n = Math.Max(cards.Count, MatchOn ? prize : 0);
         // fit the row into the light side
         float gap = 34, ch = Math.Min(380, ((W * 0.56f + gap) / Math.Max(1, n) - gap) / 0.686f);
         if (n > 0) Deal(this, n, new Vector2(W * 0.31f, H * 0.6f), ch, gap, 0.8);
+        else if (offer.Count > 0)
+        {
+            Control b = null!;
+            b = Button(this, "CHOOSE YOUR PRIZE", new Vector2(W * 0.31f, H * 0.6f), () => ChooseOffer(b), 30);
+            Appear(b, 0.8);
+        }
         else Appear(T(this, MatchOn ? Lang.F("WIN THE MATCH TO EARN {0} CARDS", prize) : "NO CARDS THIS TIME", Thin, 28, new Vector2(98, H * 0.55f), new Vector2(1100, 36), HorizontalAlignment.Left, 0.7f), 0.8);
         // the rival on the dark side: sad when you win, happy when you lose
         string mood = outcome switch { 1 => "_sad", 0 => "_happy", _ => "" };
         Standing(rival, mood, H * 0.9f, new Vector2(W * 0.82f, H + 10), 0.2);
-        Buttons(new Vector2(W * 0.14f, H - 80), W * 0.26f);
+        Buttons(new Vector2(W * 0.14f, H - 80), Items.Length > 2 ? W * 0.2f : W * 0.26f);
     }
 
     // ---------------------------------------------------------------- tournament champion: the podium
 
+    /// Menu Lab pick B (2026-11-17): the podium rises, then steps back and the prizes take the stage: the finalist's ace
+    /// in the middle on a beam of light, the other cards either side, each turned over in turn (NewMark for new ones);
+    /// then the DP. The buttons and any achievement pop-ups wait until every card is open.
     void Podium(Tournament t)
     {
         Rift(0.5f, 0.5f);
@@ -218,8 +227,9 @@ public partial class Results : RiftMenu
         RivalPanels.Rival? third = qi >= 0 && t.Winners[0][qi ^ 1] is { } b ? RivalPanels.Of(Tournament.Get(b)) : null;
         var head = T(this, "CHAMPION", Title, 90, new Vector2(0, 40), new Vector2(W, 110), HorizontalAlignment.Center);
         head.Mat().P("lit", 1f);
+        head.PivotOffset = new Vector2(W / 2, 0);
         Appear(head, 1.6);
-        Appear(T(this, Lang.F("+{0:N0} DP  ·  {1} CARDS", Session.LastDp, cards.Count), Thin, 24, new Vector2(0, 150), new Vector2(W, 32), HorizontalAlignment.Center, 0.8f), 1.8);
+        var podium = new List<Control>();
         (RivalPanels.Rival? who, string place, float x, float h, double at)[] steps =
             { (second, "2", W * 0.27f, H * 0.2f, 0.3), (null, "1", W * 0.5f, H * 0.32f, 1.0), (third, "3", W * 0.73f, H * 0.13f, 0.6) };
         foreach (var (who, place, x, h, at) in steps)
@@ -235,12 +245,67 @@ public partial class Results : RiftMenu
             float d = place == "1" ? 240 : 170;
             var f = Face(who, d); f.Position = new Vector2(x - d / 2, top - d - 16); AddChild(f);
             var name = Put(this, who?.Name.ToUpperInvariant() ?? Settings.PlayerName.ToUpperInvariant(), Title, 24, place == "1" ? GoldLight : Mist, new Vector2(x - 200, top - d - 56), new Vector2(400, 32), HorizontalAlignment.Center);
-            foreach (var c in new Control[] { block, f, name }) Appear(c, at, new Vector2(0, 260));
+            foreach (var c in new Control[] { block, f, name }) { Appear(c, at, new Vector2(0, 260)); podium.Add(c); }
         }
         Burst(1.2);
         Confetti(1.3);
-        PrizeButton(new Vector2(W * 0.88f, H * 0.42f));
-        Buttons(new Vector2(W * 0.84f, H * 0.6f), 0, vertical: true);
+
+        // beat 2: the podium sinks away, the headline moves up
+        double t0 = 3.4;
+        var back = CreateTween().SetParallel();
+        foreach (var c in podium)
+        {
+            back.TweenProperty(c, "modulate:a", 0f, 0.6).SetDelay(t0);
+            back.TweenProperty(c, "position:y", c.Position.Y + 120, 0.6).SetDelay(t0).SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.InOut);
+        }
+        back.TweenProperty(head, "position:y", 10f, 0.5).SetDelay(t0);
+        back.TweenProperty(head, "scale", new Vector2(0.7f, 0.7f), 0.5).SetDelay(t0);
+        t0 += 0.6;
+
+        // the prizes: the ace (the last card) in the middle on a beam, the rest either side; turned over in turn, the ace last
+        double cue = t0 + 0.8;
+        float y = H * 0.42f, ch = 250, step = ch * 0.686f + 22;
+        var rest = cards.Take(Math.Max(0, cards.Count - 1)).ToList();
+        int left = (rest.Count + 1) / 2;
+        for (int i = 0; i < rest.Count; i++)
+        {
+            int side = i < left ? -1 : 1, k = i < left ? left - 1 - i : i - left;
+            cue = Reveal(this, rest[i], new Vector2(W / 2 + side * (200 + step / 2 + k * step), y + 20), ch, t0 + 0.3 + i * 0.12, cue);
+        }
+        if (cards.Count > 0)
+        {
+            Appear(Shadow(this, new Vector2(W / 2 - 130, -100), new Vector2(260, H * 0.8f), 0.5f, new Color(1, 0.85f, 0.5f)), t0);
+            cue = Reveal(this, cards[^1], new Vector2(W / 2, y), 400, t0, cue + 0.2);
+        }
+
+        // the DP under the cards; achievements this win finished slide in as the usual pop-up once it's all open (PopupAt)
+        double end = cue + 0.4;
+        var dp = T(this, Lang.F("+{0:N0} DP", 0), Title, 40, new Vector2(0, H * 0.7f), new Vector2(W, 50), HorizontalAlignment.Center);
+        dp.Mat().P("lit", 1f);
+        Appear(dp, end);
+        CreateTween().TweenMethod(Callable.From<int>(n => dp.Text = Lang.F("+{0:N0} DP", n)), 0, Session.LastDp, 1.0).SetDelay(end).SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.Out);
+        done = end + 1.2;
+        Buttons(new Vector2(W * 0.5f - 170, H - 50), 340, at2: done);
+    }
+
+    /// One prize card: rises face down at `rise`, turns over at `cue` (a new one with the NEW reveal, NewMark);
+    /// click it to see it large. Returns when the next card may turn.
+    double Reveal(Control host, Reward rw, Vector2 at, float h, double rise, double cue)
+    {
+        var card = Card(host, rw.Card, at + new Vector2(0, H), h, 0.3f, 0.9f);
+        var face = card.GetChildren().OfType<TextureRect>().Last();
+        face.Texture = Cosmetics.Back(P.Back, 512);
+        var tw = CreateTween().SetParallel();
+        tw.TweenProperty(card, "position:y", at.Y - h / 2, 0.55).SetDelay(rise).SetTrans(Tween.TransitionType.Expo).SetEase(Tween.EaseType.Out);
+        tw.TweenProperty(card, "rotation", 0f, 0.55).SetDelay(rise).SetTrans(Tween.TransitionType.Back).SetEase(Tween.EaseType.Out);
+        Click(card, () => Preview(rw.Card));
+        var flip = CreateTween();
+        flip.TweenInterval(cue);
+        if (rw.New) { flip.TweenCallback(Callable.From(() => NewMark.Reveal(card, face, CardArt.Large(rw.Card)))); return cue + 0.9; }
+        flip.TweenProperty(card, "scale:x", 0f, 0.1);
+        flip.TweenCallback(Callable.From(() => { face.Texture = CardArt.Large(rw.Card); Sfx("card_open"); }));
+        flip.TweenProperty(card, "scale:x", 1f, 0.12);
+        return cue + 0.3;
     }
 
     // ---------------------------------------------------------------- gauntlet cleared: the road
@@ -263,15 +328,15 @@ public partial class Results : RiftMenu
         int n = run.Order.Length;
         for (int i = 0; i < n; i++)
         {
-            var r = RivalPanels.All.FirstOrDefault(x => x.File == run.Order[i].Rival) ?? rival;
+            var r = RivalPanels.Of(Tournament.Get(run.Order[i].Rival));
             float x = Mathf.Lerp(x0, x1, (i + 1f) / n) - (i == n - 1 ? 40 : 0);
-            var f = Face(r, 170); f.Position = new Vector2(x - 85, y - 85); f.Modulate = new Color(0.45f, 0.45f, 0.5f); AddChild(f);
-            T(this, r.Name.ToUpperInvariant(), Title, 24, new Vector2(x - 150, y + 100), new Vector2(300, 32), HorizontalAlignment.Center);
+            var f = Face(r, 130); f.Position = new Vector2(x - 65, y - 65); f.Modulate = new Color(0.45f, 0.45f, 0.5f); AddChild(f);
+            T(this, r.Name.ToUpperInvariant(), Title, 16, new Vector2(x - 100, y + 80), new Vector2(200, 26), HorizontalAlignment.Center);
             int left = 8000 - (8000 - run.Lp) * (i + 1) / n;   // ponytail: only the final LP is kept; the steps between are drawn evenly
             GetTree().CreateTimer(0.85 + i * 0.55).Timeout += () =>
             {
                 CreateTween().TweenProperty(f, "modulate", Colors.White, 0.2);
-                var p = Pip(this, new Vector2(x, y - 110), 26);
+                var p = Pip(this, new Vector2(x, y - 90), 22);
                 p.Scale = new Vector2(2, 2);
                 CreateTween().TweenProperty(p, "scale", Vector2.One, 0.25).SetTrans(Tween.TransitionType.Back).SetEase(Tween.EaseType.Out);
                 lp.Text = left.ToString();
@@ -283,7 +348,7 @@ public partial class Results : RiftMenu
         head.Mat().P("lit", 1f);
         Appear(head, 0.5 + 0.55 * n);
         Burst(0.5 + 0.55 * n);
-        Appear(T(this, Lang.F("FOUR RIVALS, ONE DECK  ·  +{0:N0} DP  ·  {1} CARDS", Session.LastDp, cards.Count), Thin, 24, new Vector2(0, H * 0.1f + 100), new Vector2(W, 32), HorizontalAlignment.Center), 0.7 + 0.55 * n);
+        Appear(T(this, Lang.F("EIGHT RIVALS, ONE DECK  ·  +{0:N0} DP  ·  {1} CARDS", Session.LastDp, cards.Count), Thin, 24, new Vector2(0, H * 0.1f + 100), new Vector2(W, 32), HorizontalAlignment.Center), 0.7 + 0.55 * n);
         PrizeButton(new Vector2(W / 2, H - 160));
         Buttons(new Vector2(W / 2 - 230, H - 70), 460);
     }
@@ -338,12 +403,13 @@ public partial class Results : RiftMenu
         ? new[] { ("NEXT DUEL", "res://ui/field/DuelField.tscn") }
         : Session.Tour != null ? new[] { ("MAIN MENU", "res://ui/MainMenu.tscn"), ("BRACKET", "res://ui/Tournament.tscn") }
         : Session.Puzzle != null ? new[] { ("CHALLENGES", "res://ui/ChallengeSelect.tscn"), ("TRY AGAIN", "res://ui/field/DuelField.tscn") }
-        : Session.Run is { Over: false } ? new[] { ("MAIN MENU", "res://ui/MainMenu.tscn"), ("NEXT RIVAL", "res://ui/DuelSetup.tscn") }
+        : Session.Run is { Over: false } ? new[] { ("MAIN MENU", "res://ui/MainMenu.tscn"), ("NEXT FLOOR", "res://ui/Gauntlet.tscn") }
+        : Session.Draft != null ? new[] { ("MAIN MENU", "res://ui/MainMenu.tscn"), ("MODES", "res://ui/DuelModes.tscn"), ("REMATCH", "res://ui/PackDraft.tscn") }
         : Session.Mode != GameMode.Regular ? new[] { ("MAIN MENU", "res://ui/MainMenu.tscn"), ("MODES", "res://ui/DuelModes.tscn") }
         : new[] { ("MAIN MENU", "res://ui/MainMenu.tscn"), ("CONTINUE", "res://ui/RivalSelect.tscn") };
 
     /// The way on: diamond buttons, left to right (or top to bottom), the last one the main one.
-    void Buttons(Vector2 at, float step, bool vertical = false)
+    void Buttons(Vector2 at, float step, bool vertical = false, double? at2 = null)
     {
         var items = Items;
         for (int i = 0; i < items.Length; i++)
@@ -351,7 +417,7 @@ public partial class Results : RiftMenu
             int k = i;
             var pos = vertical ? at + new Vector2(0, i * 110) : at + new Vector2(i * step, 0);
             var b = Button(this, items[i].Label, pos, () => Choose(k), i == items.Length - 1 ? 30 : 24);
-            Appear(b, Math.Min(3.0, Math.Max(1.4, RevealEnd - 0.3)));
+            Appear(b, at2 ?? Math.Min(3.0, Math.Max(1.4, RevealEnd - 0.3)));
             buttons.Add(b);
             targets.Add(items[i].Target);
         }
@@ -363,10 +429,70 @@ public partial class Results : RiftMenu
         Appear(Button(this, "SEE YOUR PRIZE", at, ShowPrize, 26), 2.2);
     }
 
+    /// Pack Duel prize: pick `prize` of the offered cards from your drafted deck; KEEP adds them and deals them here.
+    void ChooseOffer(Control button)
+    {
+        var layer = new Control { Size = new Vector2(W, H), MouseFilter = MouseFilterEnum.Stop, ZIndex = 20 };
+        layer.SetMeta("dark", true);
+        AddChild(layer);
+        layer.AddChild(new ColorRect { Size = new Vector2(W, H), Color = new Color(0.02f, 0.02f, 0.03f, 0.9f), MouseFilter = MouseFilterEnum.Ignore });
+        Put(layer, "CHOOSE YOUR PRIZE", Title, 56, GoldLight, new Vector2(0, 90), new Vector2(W, 70), HorizontalAlignment.Center);
+        Put(layer, Lang.F("KEEP {0} OF {1}  ·  FROM YOUR DRAFTED DECK", prize, offer.Count), Thin, 22, Mist, new Vector2(0, 170), new Vector2(W, 30), HorizontalAlignment.Center);
+        var picked = new List<CardData>();
+        var row = new Control { MouseFilter = MouseFilterEnum.Ignore };
+        layer.AddChild(row);
+        void Draw()
+        {
+            foreach (var c in row.GetChildren()) c.QueueFree();
+            float h = offer.Count > 3 ? 300 : 380, w = h * 0.686f, gap = 30, x0 = W / 2 - (offer.Count * (w + gap) - gap) / 2;
+            foreach (var c in offer)
+            {
+                bool on = picked.Contains(c);
+                var at = new Vector2(x0 + w / 2, H * 0.52f - (on ? 22 : 0));
+                x0 += w + gap;
+                var card = Card(row, c, at, h, 0, on ? 1.3f : 0.7f);
+                if (!on && picked.Count == prize) card.Modulate = new Color(1, 1, 1, 0.45f);
+                if (on) Pip(row, at - new Vector2(0, h / 2 + 18), 10);
+                if (Session.Profile.Count(c.Idx) == 0) Put(row, "NOT OWNED", Title, 16, GoldLight, at + new Vector2(-w / 2, h / 2 + 10), new Vector2(w, 24), HorizontalAlignment.Center);
+                Click(card, () =>
+                {
+                    if (!picked.Remove(c)) { if (picked.Count >= prize) picked.RemoveAt(0); picked.Add(c); }
+                    UiSound(false);
+                    Draw();
+                });
+            }
+        }
+        Draw();
+        Button(layer, "KEEP", new Vector2(W / 2, H - 90), () =>
+        {
+            if (picked.Count != Math.Min(prize, offer.Count)) { Flash(Lang.F("Keep {0} cards", prize)); return; }
+            Grant(picked);
+            layer.QueueFree();
+            button.Visible = false;
+            float ch = Math.Min(380, ((W * 0.56f + 34) / cards.Count - 34) / 0.686f);
+            Deal(this, cards.Count, new Vector2(W * 0.31f, H * 0.6f), ch, 34, 0);
+        }, 28);
+    }
+
+    void Grant(IEnumerable<CardData> keep)
+    {
+        var p = Session.Profile;
+        foreach (var c in keep)
+        {
+            bool isNew = p.Count(c.Idx) == 0;
+            p.Owned[c.Idx] = Math.Min(255, p.Count(c.Idx) + 1);
+            if (isNew) p.Fresh.Add(c.Idx);
+            cards.Add(new Reward(c, isNew));
+        }
+        offer.Clear();
+        Session.Save();
+    }
+
     /// The reward cards dealt over the screen; click one to see it large.
     void ShowPrize()
     {
         var layer = new Control { Size = new Vector2(W, H), MouseFilter = MouseFilterEnum.Stop, ZIndex = 20 };
+        layer.SetMeta("dark", true);
         AddChild(layer);
         layer.AddChild(new ColorRect { Size = new Vector2(W, H), Color = new Color(0.02f, 0.02f, 0.03f, 0.9f), MouseFilter = MouseFilterEnum.Ignore });
         Put(layer, "YOUR PRIZE", Title, 56, GoldLight, new Vector2(0, 90), new Vector2(W, 70), HorizontalAlignment.Center);
@@ -376,34 +502,21 @@ public partial class Results : RiftMenu
     }
 
     /// `n` cards dealt face down along a row, then flipped one by one (cards beyond the rewards stay dim backs);
-    /// NEW in gold under the new ones; click a card to see it large.
+    /// the new ones get the NEW reveal (NewMark); click a card to see it large.
     void Deal(Control host, int n, Vector2 centre, float h, float gap, double start)
     {
         float w = h * 0.686f, row = n * (w + gap) - gap;
-        var back = Cosmetics.Back(P.Back, 512);
+        double cue = start + 0.8;
         for (int i = 0; i < n; i++)
         {
             var at = new Vector2(centre.X - row / 2 + i * (w + gap) + w / 2, centre.Y);
-            bool real = i < cards.Count;
-            var data = real ? cards[i].Card : CardDb.Shared.Get(0);
-            var card = Card(host, data, at + new Vector2(0, H), h, 0.3f, 0.9f);
-            var face = card.GetChildren().OfType<TextureRect>().Last();
-            var art = face.Texture; face.Texture = back;
+            if (i < cards.Count) { cue = Reveal(host, cards[i], at, h, start + i * 0.12, cue); continue; }
+            var card = Card(host, CardDb.Shared.Get(0), at + new Vector2(0, H), h, 0.3f, 0.9f);
+            card.GetChildren().OfType<TextureRect>().Last().Texture = Cosmetics.Back(P.Back, 512);
+            card.Modulate = new Color(0.35f, 0.35f, 0.4f);
             var tw = CreateTween().SetParallel();
             tw.TweenProperty(card, "position:y", at.Y - h / 2, 0.55).SetDelay(start + i * 0.12).SetTrans(Tween.TransitionType.Expo).SetEase(Tween.EaseType.Out);
             tw.TweenProperty(card, "rotation", 0f, 0.55).SetDelay(start + i * 0.12).SetTrans(Tween.TransitionType.Back).SetEase(Tween.EaseType.Out);
-            if (!real) { card.Modulate = new Color(0.35f, 0.35f, 0.4f); continue; }
-            var rw = cards[i];
-            Click(card, () => Preview(rw.Card));
-            var flip = CreateTween();
-            flip.TweenInterval(start + 0.8 + i * 0.3);
-            flip.TweenProperty(card, "scale:x", 0f, 0.1);
-            flip.TweenCallback(Callable.From(() => { face.Texture = CardArt.Large(rw.Card); Sfx(rw.New ? "reborn" : "card_open"); }));
-            flip.TweenProperty(card, "scale:x", 1f, 0.12);
-            if (!rw.New) continue;
-            var tag = T(host, "NEW", Title, 22, new Vector2(at.X - 60, at.Y + h / 2 + 12), new Vector2(120, 28), HorizontalAlignment.Center);
-            tag.Mat().P("lit", 1f);
-            Appear(tag, start + 1.0 + i * 0.3);
         }
     }
 
@@ -480,11 +593,11 @@ void fragment() { float m = 1.0 - smoothstep(0.49, 0.5, length(UV - 0.5)); vec4 
     protected override void OnChoose(int i)
     {
         if (i < 0 || i >= targets.Count) return;
+        if (offer.Count > 0) Grant(offer.Take(prize).ToList());   // left without choosing: the first ones (not owned first)
         if (MatchOn && outcome != 2) Session.YouFirst = outcome == 0; // the loser of a match duel goes first
         // A rival's deck was won: its reveal comes after the rewards, then on to where this button points.
         string to = targets[i];
-        if (Session.LastMat != null) { Session.AfterUnlock = to; to = "res://ui/MatUnlock.tscn"; }
-        else if (Session.LastStarter != null) { Session.AfterUnlock = to; to = "res://ui/DeckUnlock.tscn"; }
+        if (Session.LastStarter != null) { Session.AfterUnlock = to; to = "res://ui/DeckUnlock.tscn"; }
         GetTree().CreateTimer(0.2).Timeout += () => Transition.Go(this, to);
     }
 }

@@ -501,7 +501,7 @@ public static partial class Scripts
         };
         MetalForm("Wall Shadow", "Labyrinth Wall", "Magical Labyrinth");
         S("Magical Labyrinth").EquipOk = (x, m) => m.Name == "Labyrinth Wall";
-        SelfBoost("Harpie's Pet Dragon", x => 300 * x.D.FaceUpMonsters.Count(m => m.Name == "Harpie Lady"), x => 300 * x.D.FaceUpMonsters.Count(m => m.Name == "Harpie Lady"));
+        SelfBoost("Harpie's Pet Dragon", x => 300 * x.D.FaceUpMonsters.Count(m => Scripts.NameOf(m) == "Harpie Lady"), x => 300 * x.D.FaceUpMonsters.Count(m => Scripts.NameOf(m) == "Harpie Lady"));
         SelfBoost("Machine King", x => 100 * x.D.FaceUpMonsters.Count(m => x.IsRace(m, "Machine")));
         {
             var s = S("Cyber-Stein");

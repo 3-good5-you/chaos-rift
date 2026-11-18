@@ -44,6 +44,7 @@ public abstract partial class MenuBase : Control
             else if (a.StartsWith("--delay=")) shotDelay = double.Parse(a[8..], System.Globalization.CultureInfo.InvariantCulture);
         }
         Session.Load();
+        if (OS.GetCmdlineUserArgs().FirstOrDefault(a => a.StartsWith("--lang=")) is { } lg) Lang.Set(lg[7..]);   // dev: screenshots per language
         Kit.InkTheme = Inked;
         Settings.Apply(window: shotPath == null);
         if (shotPath == null)
@@ -55,6 +56,7 @@ public abstract partial class MenuBase : Control
             decideSnd = GD.Load<AudioStream>("res://assets/audio/md/se/SE_MENU_DECIDE.wav");
         }
         Build();
+        AfterBuild();
         Fonts.Lab(this);
     }
 
@@ -105,6 +107,9 @@ public abstract partial class MenuBase : Control
 
     /// Build the scene graph and start the intro animation.
     protected abstract void Build();
+
+    /// Runs once the screen is built (Rift menus: the achievement unlock pop-ups).
+    protected virtual void AfterBuild() { }
 
     /// Visual update when the focused item changes (old may be -1).
     protected abstract void OnFocus(int old, int now);
@@ -184,7 +189,9 @@ public abstract partial class MenuBase : Control
 
     // ---- small helpers
 
-    protected static Texture2D Tex(string path) => GD.Load<Texture2D>(path);
+    // Kept: Godot drops a texture once its last effect is freed, and the next effect read the file again (3-4 ms each).
+    static readonly Dictionary<string, Texture2D> texs = new();
+    protected static Texture2D Tex(string path) => texs.TryGetValue(path, out var t) ? t : texs[path] = GD.Load<Texture2D>(path);
 
     protected static Font Sys(string[] names, int weight = 400, bool italic = false, int stretch = 100) => Fonts.Get(names, weight, italic, stretch);
 
@@ -206,9 +213,37 @@ public abstract partial class MenuBase : Control
     protected static ShaderMaterial Mat(string code, params (string, Variant)[] uniforms)
     {
         // one Shader per source text: compiling it again for every material froze the duel's start (2 per card)
-        if (!shaders.TryGetValue(code, out var sh)) shaders[code] = sh = new Shader { Code = code };
+        if (!shaders.TryGetValue(code, out var sh)) { shaders[code] = sh = new Shader { Code = code }; Record(code); }
         var m = new ShaderMaterial { Shader = sh };
         foreach (var (k, v) in uniforms) m.SetShaderParameter(k, v);
         return m;
+    }
+
+    // Compiling a shader takes 10-40 ms on the main thread (more on Macs): the first Trap Hole, destroy or attack of a
+    // session hitched. Every shader the game has made is listed in WarmFile (added to whenever the game runs from the
+    // editor) and the loading screen compiles them all before the menu.
+    const string WarmFile = "res://assets/shader_warm.txt", WarmSep = "\n//----warm----\n";
+    static HashSet<string>? recorded;
+    static Queue<string>? warmQueue;
+
+    static void Record(string code)
+    {
+        if (!OS.HasFeature("editor")) return;
+        recorded ??= Godot.FileAccess.FileExists(WarmFile) ? Godot.FileAccess.GetFileAsString(WarmFile).Split(WarmSep, StringSplitOptions.RemoveEmptyEntries).ToHashSet() : new();
+        if (!recorded.Add(code)) return;
+        File.AppendAllText(ProjectSettings.GlobalizePath(WarmFile), code + WarmSep);
+    }
+
+    /// Compiles listed shaders for about `budgetMs` this frame; true once all are done.
+    public static bool WarmShaders(double budgetMs)
+    {
+        warmQueue ??= new(Godot.FileAccess.FileExists(WarmFile) ? Godot.FileAccess.GetFileAsString(WarmFile).Split(WarmSep, StringSplitOptions.RemoveEmptyEntries) : Array.Empty<string>());
+        ulong start = Time.GetTicksUsec();
+        while (warmQueue.Count > 0 && (Time.GetTicksUsec() - start) / 1000.0 < budgetMs)
+        {
+            var code = warmQueue.Dequeue();
+            if (!shaders.ContainsKey(code)) { var sh = shaders[code] = new Shader { Code = code }; new ShaderMaterial { Shader = sh }.SetShaderParameter("_warm", 0); }
+        }
+        return warmQueue.Count == 0;
     }
 }

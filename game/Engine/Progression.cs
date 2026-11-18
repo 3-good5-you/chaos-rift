@@ -21,6 +21,9 @@ public sealed class Profile
     public int Dp;                                         // Duelist Points (Shop.cs)
     public readonly HashSet<string> Starters = new();      // rivals whose starter deck you have (picked, or won by beating them)
     public readonly HashSet<string> Solved = new();        // Challenges solved (puzzle ids)
+    public readonly Dictionary<string, int> Stats = new(); // achievement counters ("wins", "beat:kaiba", ...): Achievements.cs
+    public readonly HashSet<string> Claimed = new();       // achievements paid out
+    public readonly HashSet<string> Told = new();          // achievements whose unlock pop-up was shown
     public readonly HashSet<int> Seen = new();            // cards a rival revealed against you: the shop sells these
     public readonly HashSet<string> Mats = new(), Backs = new(), Frames = new();   // bought cosmetics (free ones not listed)
     public string Mat = Shop.DefaultMat, Back = Shop.DefaultBack, Frame = Shop.DefaultFrame;  // equipped
@@ -55,21 +58,34 @@ public static class Progression
             "yugi" => Ratchet(Yugi(p, rng), p),
             "kaiba" => Ratchet(Kaiba(p, rng), p),
             "joey" => Joey(p, rng),
-            "jaden" => new OpponentPick("jaden", "", Math.Clamp(p.Of("jaden").Level, 1, 7)),   // remake rival: Joey's ladder rules
+            _ when HasLadder(rival) => new OpponentPick(rival, "", Math.Clamp(p.Of(rival).Level, 1, 7)),   // Jaden and the tournament duelists: Joey's ladder rules
             _ => throw new ArgumentException(rival),
         };
         // Yugi's Exodia decks (v1.0), a third of the time at EASY (their measured strength vs the starter decks, 7-20%):
         // level 1 the Exodia Necross deck, level 2 the instant-win one.
         if (rival == "yugi" && pick.Level is 1 or 2 && rng.Int(3) == 0) return pick with { DeckKey = pick.Level == 1 ? "yugi/x_exodia_gy" : "yugi/x_exodia_insta" };
         // Rare God decks (2026-11-10): at HARD and EXPERT, 1 duel in 20 the rival brings an Egyptian God deck instead.
-        if (pick.Level >= 5 && rng.Int(GodOdds) == 0) return pick with { DeckKey = GodDeck(rng) };
-        return pick with { DeckKey = $"{rival}/x_lv{pick.Level}" };
+        if (pick.Level >= 5 && rng.Int(GodOdds) == 0) return pick with { DeckKey = GodDeck(rng, rival) };
+        int deck = LadderLevel(rival, pick.Level);
+        return pick with { DeckKey = $"{rival}/x_lv{deck}", Level = deck };
     }
+
+    static HashSet<string>? decks;
+    static HashSet<string> Decks => decks ??= CardDb.Shared.RemasteredDeckNames().ToHashSet();
+    /// True when the rival has remake ladder decks (`rival/x_lvN`): the four rivals and the tournament duelists
+    /// (2026-11-16: 7 levels each, Mai / Alexis / Odion levels 2, 4, 6 and 7).
+    public static bool HasLadder(string rival) => Enumerable.Range(1, 7).Any(l => Decks.Contains($"{rival}/x_lv{l}"));
+    /// The level of the rival's deck closest to `level` (a tie goes to the harder one).
+    public static int LadderLevel(string rival, int level) =>
+        Enumerable.Range(1, 7).Where(l => Decks.Contains($"{rival}/x_lv{l}")).OrderBy(l => Math.Abs(l - level)).ThenByDescending(l => l).First();
 
     /// The rare Egyptian God decks (remastered_decks.json god/x_*): one per God, and one with all three.
     public static readonly string[] GodDecks = { "god/x_obelisk", "god/x_slifer", "god/x_ra", "god/x_pantheon" };
     public const int GodOdds = 20;
-    public static string GodDeck(Rng rng) => GodDecks[rng.Int(GodDecks.Length)];
+    /// The rare God deck a rival brings: their own when they have one (Marik's Ra, Bakura's Slifer: rival/x_god), else
+    /// one of the shared ones.
+    public static string GodDeck(Rng rng, string rival = "") => OwnGod(rival) ?? GodDecks[rng.Int(GodDecks.Length)];
+    public static string? OwnGod(string rival) => Decks.Contains($"{rival}/x_god") ? $"{rival}/x_god" : null;
 
     /// Remake rule (Yugi, Kaiba): the original re-rolls every duel, so beating a HARD deck often fell back to NORMAL
     /// and one loss at EXPERT could bring an EASY deck next. On a win streak the rival never drops below the level you
@@ -189,7 +205,7 @@ public static class Progression
         var r = p.Of(rival);
         if (r.LastWon == won && r.Streak > 0) r.Streak = Math.Min(255, r.Streak + 1); else r.Streak = 1;
         r.LastWon = won;
-        if (rival is not ("joey" or "jaden")) { if (level > 0) r.Level = level; return; }
+        if (rival is "yugi" or "kaiba" || !HasLadder(rival)) { if (level > 0) r.Level = level; return; }
         int co = p.CarriedOver && rival == "joey" ? 1 : 0;
         int u = Math.Max(1, r.Level + 2 * co);
         if (won && u < (co == 1 ? 9 : 7) && u < Up.Length && r.Streak >= Up[u]) { r.Level++; r.Streak = 0; }

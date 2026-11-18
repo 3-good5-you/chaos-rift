@@ -377,7 +377,136 @@ def artback(passcode, metal_name, accent, seed):
     img = emblem(img, W / 2, H - 170, 58, metal_name, accent, kanji_col=accent, width=470)
     return frame(img, metal_name, accent, 0.25)
 
+# ---------------------------------------------------------------- prize families (samples 2026-11-17): items only
+# achievements give. Three candidates, one picked family then dresses every achievement prize.
+
+def holo(seed, scale=420.0, shift=0.0):
+    """Holographic foil colour: a rainbow running diagonally, wobbled by noise."""
+    hue = ((xx * 0.7 + yy * 0.45) / scale + fbm(seed, base=3) * 0.8 + shift) % 1.0
+    hsv = np.dstack([hue * 360, np.full((H, W), 0.55, np.float32), np.ones((H, W), np.float32)])
+    return cv2.cvtColor(hsv.astype(np.float32), cv2.COLOR_HSV2RGB)
+
+def cover_art(passcode, top=3):
+    """Card art cropped to fill the back (sharpened a little), or None."""
+    p = os.path.join(ART, f"art-{passcode}.jpg")
+    if not os.path.exists(p): return None
+    art = cv2.imread(p)[:, :, ::-1].astype(np.float32) / 255
+    s = max(H / art.shape[0], W / art.shape[1])
+    big = cv2.resize(art, (int(art.shape[1] * s) + 1, int(art.shape[0] * s) + 1), interpolation=cv2.INTER_LANCZOS4)
+    x0, y0 = (big.shape[1] - W) // 2, (big.shape[0] - H) // top
+    img = big[y0:y0 + H, x0:x0 + W].copy()
+    return np.clip(img * 1.5 - cv2.GaussianBlur(img, (0, 0), 2) * 0.5, 0, 1)
+
+# Prize families (user 2026-11-17 liked all three: each achievement prize uses one). Samples: p_rift / p_gilded / p_prism.
+
+def p_rift(seed=301, art=None, seam=(1, 1, 1), metal_name="gold", accent=None, flip=False):
+    """RIFT: the game's own look. Light paper and the dark side (starfield, or card art), split by a glowing crack."""
+    t = yy[:, :1] / H
+    xs = W * ((0.36 + 0.28 * t) if flip else (0.64 - 0.28 * t)) + (fbm(seed + 1, base=10, octaves=4)[:, W // 2:W // 2 + 1] - 0.5) * 70
+    d = (xs - xx) if flip else (xx - xs)                       # >0: dark side
+    paper = ramp(fbm(seed + 2, base=4) * 0.5 + 0.5, [(0, hexc('d8d4cc')), (1, hexc('f4f1ea'))])
+    pic = cover_art(art) if art else None
+    night = ramp(fbm(seed + 3, base=3) * 0.6, [(0, hexc('050508')), (1, hexc('15141d'))]) if pic is None else pic * 0.82
+    side = np.clip(d / 2 + 0.5, 0, 1)[..., None]
+    img = paper * (1 - side) + night * side
+    if pic is None: img = stars(img, seed + 4, 160, col=(0.9, 0.92, 1)) * side + img * (1 - side)
+    s = np.exp(-(d ** 2) / 6)
+    img = add(img, s * 1.4 + glow(s, 6) * 1.0 + glow(s, 40) * 0.45, seam)
+    img = emblem(img, W / 2, H - 190, 150, "silver", hexc('ffffff'), kanji_col=hexc('2a2a30'), width=560)
+    return frame(img, metal_name, accent or hexc('fff2c8'), 0.25)
+
+def p_gilded(seed=311, art=None, metal_name="gold", glowc='ffb030', kanji='8a5a14'):
+    """GILDED: black lacquer, art-deco sunburst and a laurel wreath (round card art, or the logo, inside): a trophy."""
+    img = ramp(fbm(seed, base=3, aspect=(1, 2)) * 0.5, [(0, hexc('060505')), (1, hexc('1a1512'))])
+    cy0 = H * 0.46
+    r, th = polar(cy=cy0)
+    rays = ((0.5 + 0.5 * np.cos(th * 48)) ** 40) * np.clip((r - 240) / 80, 0, 1) * np.exp(-r / 900)
+    img = add(img, rays * 0.55, metal(metal_name, np.full((H, W), 0.4, np.float32)).mean(axis=(0, 1)))
+    pic = cover_art(art, top=4) if art else None
+    if pic is not None:                                        # the art in the wreath's circle
+        disc = np.clip((196 - r) / 2, 0, 1)[..., None]
+        img = img * (1 - disc) + pic * disc
+    arcs = sum(np.exp(-((r - k) ** 2) / 3) for k in (250, 268, 520)) + (np.exp(-((r - 198) ** 2) / 3) if pic is not None else 0)
+    img = metal_fill(img, np.clip(arcs, 0, 1) * 0.9, metal_name)
+    leaves = np.zeros((H, W), np.float32)
+    for side in (-1, 1):                     # two branches rising from the bottom, round both sides, open at the top
+        for i in range(9):
+            deg = 105 + i * 17 if side < 0 else 75 - i * 17          # y down: 90 = bottom, 180 = left, 0 = right
+            a = math.radians(deg)
+            for off in (-1, 1):
+                rr = 222 + off * 16
+                cx, cy = W / 2 + rr * math.cos(a), cy0 + rr * math.sin(a)
+                cv2.ellipse(leaves, (int(cx), int(cy)), (24, 9), deg + 90 + off * side * -35, 0, 360, 1.0, -1, cv2.LINE_AA)
+        cv2.ellipse(leaves, (int(W / 2), int(cy0)), (222, 222), 0, 105 if side < 0 else -61, 241 if side < 0 else 75, 1.0, 3, cv2.LINE_AA)
+    img = add(img, glow(leaves, 8) * 0.5, hexc(glowc))
+    img = metal_fill(img, leaves, metal_name)
+    star = np.zeros((H, W), np.float32)
+    pts = [(W / 2 + (34 if k % 2 == 0 else 14) * math.cos(math.radians(-90 + k * 36)), cy0 - 300 + (34 if k % 2 == 0 else 14) * math.sin(math.radians(-90 + k * 36))) for k in range(10)]
+    cv2.fillPoly(star, [np.array(pts, np.int32)], 1.0, cv2.LINE_AA)
+    img = metal_fill(add(img, glow(star, 10) * 0.8, hexc(glowc)), star, metal_name)
+    if pic is None: img = emblem(img, W / 2, cy0 + 20, 120, metal_name, hexc(glowc), kanji_col=hexc(kanji), width=380)
+    else: img = emblem(img, W / 2, H - 170, 130, metal_name, hexc(glowc), kanji_col=hexc(kanji), width=480)
+    return frame(img, metal_name, hexc(glowc), 0.4)
+
+def p_prism(seed=321, art=None, shift=0.0, metal_name="silver", kanji='9ab0ff'):
+    """PRISMATIC: holographic foil like a rare card (over card art, if any), a faceted star in the middle."""
+    pic = cover_art(art) if art else None
+    base = ramp(fbm(seed, base=2) * 0.5, [(0, hexc('08080e')), (1, hexc('181826'))]) if pic is None else pic * 0.7
+    foil = holo(seed + 1, shift=shift)
+    bands = 0.5 + 0.5 * np.sin((xx * 0.8 - yy * 0.6) / 38.0)
+    grid = (0.5 + 0.5 * np.sin(xx / 3.0)) * (0.5 + 0.5 * np.sin(yy / 3.0))
+    k = (0.1 + 0.28 * bands ** 4 + 0.06 * grid)[..., None]
+    img = base * (1 - k) + foil * k
+    if pic is None:
+        r, th = polar(cy=H * 0.44)
+        facet = (np.floor((th + math.pi) / (math.pi / 8)) % 2)[..., None]
+        star = np.clip(1 - r / (180 + 90 * (0.5 + 0.5 * np.cos(th * 8)) ** 4), 0, 1)
+        img = img * (1 - star[..., None]) + (foil * (0.55 + 0.45 * facet) + 0.25) * star[..., None]
+        img = add(img, glow((star > 0.02).astype(np.float32), 20) * 0.4, (1, 1, 1))
+    img = stars(img, seed + 2, 40, col=(1, 1, 1), size=(1.5, 4))
+    img = emblem(img, W / 2, H - 190, 150, metal_name, hexc('e8f0ff'), kanji_col=hexc(kanji), width=560)
+    return frame(img, metal_name, hexc('e8e8ff'), 0.3)
+
+def p_shatter(seed=421, core='f4e8ff', glowc='b070ff', metal_name="violet"):
+    """RIFT, shattered: violet-black night, light bursting out through cracks that radiate from one point."""
+    cx, cy = W * 0.5, H * 0.4
+    r, th = polar(cx, cy)
+    img = ramp(fbm(seed, base=3) * 0.7, [(0, hexc('040208')), (0.6, hexc('140a22')), (1, hexc('2a1240'))])
+    img = add(img, np.exp(-r / 260) * 0.9, hexc(glowc))
+    g = rng(seed + 1); m = np.zeros((H, W), np.float32)
+    for i in range(11):
+        a = 2 * math.pi * i / 11 + g.uniform(-0.2, 0.2); x, y = cx, cy; w = 7
+        while 0 < x < W and 0 < y < H:
+            a += g.normal(0, 0.18); step = g.uniform(30, 60)
+            nx, ny = x + step * math.cos(a), y + step * math.sin(a)
+            cv2.line(m, (int(x), int(y)), (int(nx), int(ny)), 1.0, max(1, int(w)), cv2.LINE_AA)
+            if g.random() < 0.12:                                   # side branch
+                b = a + g.choice([-1, 1]) * g.uniform(0.5, 1.0); bx, by = nx, ny
+                for _ in range(4):
+                    ex, ey = bx + 40 * math.cos(b), by + 40 * math.sin(b)
+                    cv2.line(m, (int(bx), int(by)), (int(ex), int(ey)), 1.0, 1, cv2.LINE_AA); bx, by = ex, ey; b += g.normal(0, 0.3)
+            x, y = nx, ny; w = max(1.0, w * 0.88)
+    img = add(img, m * 1.3 + glow(m, 4) * 1.0 + glow(m, 18) * 0.6, hexc(glowc))
+    img = add(img, m * 0.8, hexc(core))
+    img = add(img, np.exp(-(r / 70) ** 2) * 1.6 + np.exp(-r / 140) * 0.6, hexc(core))
+    img = stars(img, seed + 2, 90, col=(0.85, 0.8, 1))
+    img = emblem(img, W / 2, H - 190, 150, metal_name, hexc(glowc), kanji_col=hexc('2a0a46'), width=560)
+    return frame(img, metal_name, hexc(glowc), 0.3)
+
+# Achievement prizes: ach_<achievement id> (Engine/Achievements.cs gives them, Engine/Shop.cs lists them, never sold)
+PRIZES = [
+    ("ach_duelist", lambda: p_rift(401)),
+    ("ach_grudge", lambda: p_rift(411, art="89631139", seam=hexc('bfe6ff'), metal_name="silver", accent=hexc('8ad0ff'))),
+    ("ach_chaos", lambda: p_shatter(421)),
+    ("ach_forbidden", lambda: p_gilded(431, art="33396948", glowc='ff9a30')),
+    ("ach_dragon_hoard", lambda: p_gilded(441, art="74677422", metal_name="crimson", glowc='ff5a3a', kanji='6a0a08')),
+    ("ach_king", lambda: p_prism(451, art="38033121", shift=0.75, kanji='c08aff')),
+    ("ach_gauntlet", lambda: p_prism(461, shift=0.12, metal_name="gold", kanji='a0601a')),
+]
+
 STYLES = [
+    ("p_rift", p_rift), ("p_gilded", p_gilded), ("p_prism", p_prism),
+    *PRIZES,
     ("01_vortex", vortex),
     ("02_silver_grid", grid),
     ("03_light", lambda: burst("light", hexc('fff2a0'), hexc('e0a820'), hexc('5a3a06'), "gold", 81)),

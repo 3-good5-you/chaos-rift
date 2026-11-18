@@ -109,12 +109,6 @@ public static partial class Scripts
                 x.D.Shuffle(x.Me);
             };
         }
-        Spell("Ojamandala", async x =>
-        {
-            if (x.D.FreeMonsterZones(x.Me) < 3) return;
-            foreach (var n in OjamaTrio)
-                if (x.My.Grave.FirstOrDefault(c => c.Name == n && x.D.CanSpecialSummon(c, x.Me, by: x.Self)) is { } c) await x.D.SpecialSummon(c, x.Me, await x.D.ChoosePosition(x.Me, c), by: x.Self);
-        }, x => x.My.Lp > 1000 && x.D.FreeMonsterZones(x.Me) >= 3 && OjamaTrio.All(n => x.My.Grave.Any(c => c.Name == n)), async x => x.D.Pay(x.Me, 1000, x.Self));
         Spell("Ojamuscle", async x =>
         {
             if (x.T0 is not { Loc: Loc.Monster, FaceUp: true } k) return;
@@ -423,7 +417,7 @@ public static partial class Scripts
                 if (Up(x)) { SetBaseAtk(x, x.Self, 1500); x.Self.Vars["direct"] = x.D.Turn; }
             };
         }
-        Sure("Non-Fusion Area", "O - Oversoul", "Ojama Delta Hurricane!!", "Ojamandala", "Old Vindictive Magician", "Opti-Camouflage Armor", "Owner's Seal", "Perfect Machine King", "Phantasmal Martyrs",
+        Sure("Non-Fusion Area", "O - Oversoul", "Ojama Delta Hurricane!!", "Old Vindictive Magician", "Opti-Camouflage Armor", "Owner's Seal", "Perfect Machine King", "Phantasmal Martyrs",
             "Photon Generator Unit", "Pikeru's Circle of Enchantment", "Pinch Hopper", "Pitch-Black Warwolf", "Outstanding Dog Marron", "Oxygeddon", "Nubian Guard");
     }
 }

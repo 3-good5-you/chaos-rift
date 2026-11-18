@@ -53,7 +53,7 @@ public sealed class Tournament
         while (seats.Count < Size && pool.Count > 0) { int i = rng.Int(pool.Count); seats.Add(pool[i]); pool.RemoveAt(i); }
         Seats = seats.ToArray();
         // Rare God decks: a HARD-or-better duelist brings an Egyptian God deck 1 tournament in 20 (rolled once, here).
-        foreach (var k in Seats.Skip(1)) if (Get(k).Level >= 5 && rng.Int(Progression.GodOdds) == 0) gods[k] = Progression.GodDeck(rng);
+        foreach (var k in Seats.Skip(1)) if (Get(k).Level >= 5 && rng.Int(Progression.GodOdds) == 0) gods[k] = Progression.GodDeck(rng, k);
     }
 
     readonly Dictionary<string, string> gods = new();

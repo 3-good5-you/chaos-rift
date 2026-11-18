@@ -32,7 +32,8 @@ public partial class DuelField
     readonly List<System.Action> sheetCards = new();   // what each sheet card does
     readonly List<string> sheetLabels = new();
     Panel actionChip = null!;
-    Label actionText = null!, actionSub = null!;
+    Panel deckChip = null!;
+    Label actionText = null!, actionSub = null!, deckText = null!;
     Rng drive = new(99);
 
     static string ActName(Opt o) => o.Act switch
@@ -54,6 +55,9 @@ public partial class DuelField
         actionChip.Visible = false;
         actionText = Put(actionChip, "", Impact, 26, RivalPanels.Gold, new Vector2(0, 6), new Vector2(240, 32), HorizontalAlignment.Center, 4);
         actionSub = Put(actionChip, "", Cond, 15, new Color(1, 1, 1, 0.6f), new Vector2(0, 36), new Vector2(240, 20), HorizontalAlignment.Center);
+        deckChip = Box(hud, new Rect2(0, 0, 56, 36), Glass(RivalPanels.Gold * new Color(1, 1, 1, 0.9f), 0.3f));
+        deckChip.Visible = false;
+        deckText = Put(deckChip, "", Impact, 24, RivalPanels.Gold, new Vector2(0, 2), new Vector2(56, 32), HorizontalAlignment.Center, 3);
     }
 
     // ---------------------------------------------------------------- one prompt
@@ -219,6 +223,15 @@ public partial class DuelField
                 sub = (pl.Count > 1 ? Lang.F("{0} CARDS WITH ACTIONS", pl.Count) : Lang.Tr("1 CARD WITH ACTIONS"));
             }
             else show = false;
+        }
+        // Either deck, any time: a small badge with the cards left in it.
+        bool deck = !show && sheet == null && hovered >= 0 && views[hovered].S.Loc == Loc.Deck;
+        deckChip.Visible = deck;
+        if (deck)
+        {
+            deckText.Text = views[hovered].S.Count.ToString();
+            var d = cam.UnprojectPosition(views[hovered].Root.GlobalPosition);
+            deckChip.Position = new Vector2(Mathf.Clamp(d.X - 28, 10, W - 66), Mathf.Clamp(d.Y - 92, 10, H - 46));
         }
         actionChip.Visible = show;
         if (!show) return;

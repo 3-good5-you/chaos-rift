@@ -32,13 +32,6 @@ public static class Settings
 
     public static Texture2D? Avatar => PictureCard(Picture) is { } c ? CardArt.Picture(c) : null;
 
-    /// Ban list: index into DeckRules.Formats.
-    public static int Format
-    {
-        get => Array.FindIndex(DeckRules.Formats, f => f.Key == DeckRules.LimitGame);
-        set => DeckRules.LimitGame = DeckRules.Formats[value].Key;
-    }
-
     public static double Pace => Speeds[Speed].Pace;
 
     /// The options as the save file holds them.
@@ -53,7 +46,6 @@ public static class Settings
             Music = Math.Clamp(value.Music, 0, 1); Sound = Math.Clamp(value.Sound, 0, 1);
             Speed = Math.Clamp(value.Speed, 0, Speeds.Length - 1);
             Fullscreen = value.Fullscreen;
-            DeckRules.LimitGame = value.BanList;
             Lang.Set(value.Lang ?? "en");   // older saves: null → English
         }
     }

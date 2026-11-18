@@ -3,15 +3,15 @@ using PoC.Engine;
 
 namespace PoC.Game.UI;
 
-/// Tournament (Chaos Rift sample B, locked 2026-11-08): a mirrored 8-seat bracket, four seats in the light, four in
-/// the dark, every duelist a round picture; the current match large in the middle (you VS them) with DUEL; the prize
-/// ladder (by finishing place, Tournament.Ladder) along the bottom. `-- --demo --state=new|mid|won|out`.
+/// Tournament (Menu Lab pick 2026-11-16, replacing the mirrored bracket: players couldn't tell where they were): the
+/// bracket left to right in the light (round names over the columns, your plate gold with YOU, your rival's with
+/// NEXT, the cup at the end); the dark side holds only the next match and DUEL. `-- --demo --state=new|mid|won|out`.
 public partial class TournamentScreen : RiftMenu
 {
     Tournament tour = null!;
 
     protected override string? MusicPath => Md("solo_gate");
-    protected override void OnBack() => Transition.Go(this, "res://ui/MainMenu.tscn");
+    protected override void OnBack() => Transition.Go(this, "res://ui/DuelModes.tscn");
 
     protected override void Build()
     {
@@ -19,144 +19,143 @@ public partial class TournamentScreen : RiftMenu
         Stage();
         Session.Tour ??= new Tournament(new Rng((ulong)Session.Rng.Int(1 << 30)));
         tour = Session.Tour;
-        Rift(0.5f, 0.5f);
-        Back();
-        Put(this, "TOURNAMENT", Title, 40, Ink, new Vector2(80, 58));
-        Hair(this, new Vector2(82, 108), 160, GoldC);
-        string status = tour.Champion is { } c ? (c == Tournament.You ? "YOU ARE THE CHAMPION" : Lang.F("{0} WINS", Name(c)))
-            : tour.YouOut ? "KNOCKED OUT" : Tournament.RoundNames[tour.Round];
-        Put(this, status, Title, 22, GoldLight, new Vector2(W - 680, 66), new Vector2(600, 30), HorizontalAlignment.Right);
-        if (tour.Foe != null) Put(this, Lang.F("NEXT: VS {0}", tour.Foe.Name), Thin, 17, Mist, new Vector2(W - 680, 102), new Vector2(600, 24), HorizontalAlignment.Right);
-
-        const float d0 = 104;
-        var (cols, champ) = Mirror(60 + d0 / 2, 210, 170, H * 0.62f, H * 0.42f);
-        Lines(cols, champ, d0 / 2 + 8);
-        for (int i = 0; i < 8; i++) Seat(cols[0][i], tour.Seats[i], InCurrent(tour.Seats[i]) ? d0 * 1.08f : d0, true);
-        for (int r = 1; r < 3; r++)
-            for (int i = 0; i < cols[r].Count; i++)
-            {
-                var who = tour.Winners[r - 1][i];
-                if (who == null) Pip(this, cols[r][i], 8); else Seat(cols[r][i], who, 56, false);
-            }
-
-        // the current match, large, in the middle; or the champion
-        if (tour.Foe is { } foe)
-        {
-            var you = UI.Cosmetics.Framed(Avatar, P.Frame, 150);
-            you.Position = new Vector2(W / 2 - 260, champ.Y - 75); AddChild(you);
-            Round(new Vector2(W / 2 + 185, champ.Y), 150, foe.Key, true);
-            T(this, "VS", Title, 54, new Vector2(W / 2 - 100, champ.Y - 36), new Vector2(200, 70), HorizontalAlignment.Center);
-            Put(this, Settings.PlayerName.ToUpperInvariant(), Title, 18, Ink, new Vector2(W / 2 - 335, champ.Y + 84), new Vector2(300, 24), HorizontalAlignment.Center);
-            Put(this, foe.Name, Title, 18, Silver, new Vector2(W / 2 + 35, champ.Y + 84), new Vector2(300, 24), HorizontalAlignment.Center);
-            Button(this, "DUEL", new Vector2(W / 2, champ.Y + 160), () => Transition.Go(this, "res://ui/DuelSetup.tscn"), 28);
-        }
-        else
-        {
-            if (tour.Champion is { } ch)
-            {
-                if (ch == Tournament.You) { var y = UI.Cosmetics.Framed(Avatar, P.Frame, 170); y.Position = champ - new Vector2(85, 85); AddChild(y); }
-                else Round(champ, 170, ch, true);
-                T(this, Name(ch), Title, 26, new Vector2(W / 2 - 300, champ.Y + 96), new Vector2(600, 34), HorizontalAlignment.Center).Mat().P("lit", 1f);
-            }
-            Button(this, "NEW TOURNAMENT", new Vector2(W / 2, champ.Y + 180), () => { Session.Tour = new Tournament(new Rng((ulong)Session.Rng.Int(1 << 30))); Transition.Go(this, "res://ui/Tournament.tscn"); }, 24);
-        }
-        T(this, "CHAMPION", Title, 20, new Vector2(W / 2 - 200, 170), new Vector2(400, 28), HorizontalAlignment.Center).Mat().P("lit", 1f);
-        Pip(this, new Vector2(W / 2, 214), 20);
-        Prizes(new Vector2(W / 2, H - 130));
+        Rift(0.67f, 0.61f);
+        Back("MODES");
+        Put(this, "TOURNAMENT", Title, 38, Ink, new Vector2(80, 58));
+        Hair(this, new Vector2(82, 106), 140, GoldC);
+        Bracket(new Rect2(84, 150, CrackX(H) - 84 - 60, H - 150 - 70), false);
+        NextMatch(new Rect2(CrackX(H * 0.5f) + 40, 70, W - CrackX(H * 0.5f) - 100, H - 130));
     }
 
-    // ---------------------------------------------------------------- pieces
+    // ---------------------------------------------------------------- pieces (Menu Lab pick 2026-11-16: the user's
+    // reference bracket, left to right; the dark side shows only the next match, DUEL at the bottom)
 
-    string Name(string k) => k == Tournament.You ? Settings.PlayerName.ToUpperInvariant() : Tournament.Get(k).Name;
-    bool Lost(int r, int m, string who) => tour.Winners[r][m] is { } w && w != who;
-    bool Out(string k)
+    static string NameOf(string k) => k == Tournament.You ? Settings.PlayerName.ToUpperInvariant() : Tournament.Get(k).Name;
+    string Status => tour.Champion is { } c ? (c == Tournament.You ? "YOU ARE THE CHAMPION" : Lang.F("{0} WINS", NameOf(c))) : tour.YouOut ? "KNOCKED OUT" : Tournament.RoundNames[tour.Round];
+    bool Lost(string k)
     {
         for (int r = 0; r < 3; r++)
             for (int m = 0; m < tour.Winners[r].Length; m++)
             {
                 var (a, b) = tour.Pair(r, m);
-                if ((a == k || b == k) && Lost(r, m, k)) return true;
+                if ((a == k || b == k) && tour.Winners[r][m] is { } w && w != k) return true;
             }
         return false;
     }
-    bool InCurrent(string? k) => k != null && tour.Foe != null && (k == Tournament.You || k == tour.Foe.Key);
-
-    /// A round picture: gold ring for the current match, faded when out.
-    void Round(Vector2 at, float d, string key, bool big)
+    /// The furthest column a duelist reached (0 = first round).
+    int Depth(string k)
     {
-        var c = new Control { Position = at - new Vector2(d, d) / 2, Size = new Vector2(d, d), MouseFilter = MouseFilterEnum.Ignore };
-        AddChild(c);
-        if (key == Tournament.You) { c.AddChild(UI.Cosmetics.Framed(Avatar, P.Frame, d)); return; }
-        bool now = InCurrent(key);
-        c.AddChild(new ColorRect { Size = c.Size, Color = now || big ? GoldC : InkAt(at) * new Color(1, 1, 1, 0.25f), Material = Kit.RoundedMat(1, 0.5f), MouseFilter = MouseFilterEnum.Ignore });
-        var p = Pic(c, RivalPanels.FaceTex(RivalPanels.Of(Tournament.Get(key))), new Vector2(4, 4), c.Size - new Vector2(8, 8));
-        p.Material = Kit.RoundedMat(1, 0.5f);
-        if (!big && Out(key)) p.Modulate = new Color(0.5f, 0.5f, 0.55f, 0.4f);
+        int d = 0;
+        for (int r = 0; r < 3; r++) if (tour.Winners[r].Contains(k)) d = r + 1;
+        return d;
     }
 
-    void Seat(Vector2 at, string key, float d, bool named)
+    /// The bracket in `area`: round names on top, eight seats on the left, winners further right, the cup last.
+    /// `rings` = round pictures with the name beside them instead of name plates.
+    void Bracket(Rect2 area, bool rings)
     {
-        Round(at, d, key, false);
-        if (!named) return;
-        bool beaten = Out(key), you = key == Tournament.You, now = InCurrent(key);
-        var col = beaten ? InkAt(at) * new Color(1, 1, 1, 0.35f) : now || you ? GoldAt(at) : InkAt(at);
-        Put(this, Name(key), Title, 14, col, new Vector2(at.X - 90, at.Y + d / 2 + 6), new Vector2(180, 20), HorizontalAlignment.Center);
-    }
+        float top = area.Position.Y + 60, sp = (area.End.Y - top) / 8f, plateH = Math.Min(62, sp - 16);
+        float gap = 70, w0 = 230, w1 = 215, w2 = 200;
+        float[] colX = { area.Position.X, area.Position.X + w0 + gap, area.Position.X + w0 + w1 + 2 * gap };
+        float[] colW = { w0, w1, w2 };
+        float cupX = colX[2] + w2 + gap + 60;
+        var ys = new List<float[]> { Enumerable.Range(0, 8).Select(i => top + (i + 0.5f) * sp).ToArray() };
+        for (int r = 1; r < 4; r++) ys.Add(Enumerable.Range(0, 8 >> r).Select(m => (ys[r - 1][2 * m] + ys[r - 1][2 * m + 1]) / 2).ToArray());
 
-    (List<List<Vector2>> Cols, Vector2 Champ) Mirror(float outerX, float stepX, float top, float area, float champY)
-    {
-        var cols = new List<List<Vector2>>();
-        for (int r = 0; r < 3; r++)
+        // round names over their columns: done ones ticked, the current one gold with a diamond under it
+        int now = tour.Champion != null ? 3 : tour.Round;
+        string[] heads = { "QUARTERFINAL", "SEMIFINAL", "FINAL", "CHAMPION" };
+        for (int r = 0; r < 4; r++)
         {
-            int n = 8 >> r, half = n / 2;
-            var col = new List<Vector2>();
-            for (int i = 0; i < n; i++)
-            {
-                bool right = i >= half; int j = right ? i - half : i;
-                col.Add(new Vector2(right ? W - outerX - r * stepX : outerX + r * stepX, top + (j + 0.5f) * area / half));
-            }
-            cols.Add(col);
+            float cx = r == 3 ? cupX : colX[r] + colW[r] / 2;
+            var col = r == now ? GoldDeep : r < now ? Graphite : Graphite * new Color(1, 1, 1, 0.45f);
+            Mid(this, (r < now ? "✓  " : "") + heads[r], Title, r == now ? 16 : 14, col, new Rect2(cx - 120, area.Position.Y, 240, 26));
+            if (r == now) Pip(this, new Vector2(cx, area.Position.Y + 36), 8);
         }
-        return (cols, new Vector2(W / 2, champY));
-    }
 
-    void Lines(List<List<Vector2>> cols, Vector2 champ, float inset)
-    {
+        // lines under the plates; your road gold, the live match pulsing
         for (int r = 0; r < 3; r++)
-            for (int m = 0; m < cols[r].Count / 2; m++)
+            for (int m = 0; m < (8 >> (r + 1)); m++)
             {
                 var (pa, pb) = tour.Pair(r, m);
                 var win = tour.Winners[r][m];
-                bool current = r == tour.Round && (InCurrent(pa) || InCurrent(pb));
-                Vector2 to = r == 2 ? champ : cols[r + 1][m];
-                foreach (var (k, who) in new[] { (2 * m, pa), (2 * m + 1, pb) })
+                bool live = r == tour.Round && tour.Champion == null && !tour.YouOut && (pa == Tournament.You || pb == Tournament.You);
+                for (int k = 0; k < 2; k++)
                 {
-                    var from = cols[r][k];
-                    float dir = from.X < W / 2 ? 1 : -1;
-                    var a = from + new Vector2(dir * inset, 0);
-                    float mx = r == 2 ? to.X - dir * 30 : (a.X + to.X - dir * inset) / 2;
+                    var who = k == 0 ? pa : pb;
+                    var a = new Vector2(colX[r] + colW[r], ys[r][2 * m + k]);
+                    var b = new Vector2(r == 2 ? cupX - 58 : colX[r + 1], ys[r + 1][m]);
+                    float mx = a.X + gap / 2;
+                    bool mine = who == Tournament.You && (win == Tournament.You || live);
                     bool lit = win != null && win == who;
-                    var col = lit ? GoldC : current ? GoldC * new Color(1, 1, 1, 0.55f) : InkAt(a) * new Color(1, 1, 1, 0.25f);
-                    var pts = r == 2 ? new[] { a, new Vector2(mx, a.Y), new Vector2(mx, to.Y) } : new[] { a, new Vector2(mx, a.Y), new Vector2(mx, to.Y), to - new Vector2(dir * inset, 0) };
-                    AddChild(new Line2D { Points = pts, Width = lit ? 3.5f : current ? 2.5f : 1.5f, DefaultColor = col, JointMode = Line2D.LineJointMode.Round });
+                    var col = mine ? GoldC : lit ? Ink * new Color(1, 1, 1, 0.6f) : Ink * new Color(1, 1, 1, 0.16f);
+                    var line = new Line2D { Points = new[] { a, new Vector2(mx, a.Y), new Vector2(mx, b.Y), b }, Width = mine ? 3.5f : lit ? 2 : 1.5f, DefaultColor = col, JointMode = Line2D.LineJointMode.Round };
+                    AddChild(line);
+                    if (live && who == Tournament.You) { var tw = line.CreateTween().SetLoops(); tw.TweenProperty(line, "modulate:a", 0.35f, 0.7); tw.TweenProperty(line, "modulate:a", 1f, 0.7); }
                 }
             }
+
+        void Seat(int r, int i, string? key)
+        {
+            float w = colW[r], h = r == 0 ? plateH : plateH * 0.9f, y = ys[r][i];
+            var rect = new Rect2(colX[r], y - h / 2, w, h);
+            if (key == null)
+            {
+                Plate(this, rect, Box(new Color(1, 1, 1, 0.3f), Ink * new Color(1, 1, 1, 0.14f), 1.5f, 99));
+                Mid(this, "TO BE DECIDED", Thin, 11, Graphite * new Color(1, 1, 1, 0.45f), rect);
+                return;
+            }
+            bool you = key == Tournament.You, beaten = Lost(key) && r == Depth(key), next = tour.Foe?.Key == key && r == tour.Round;
+            if (!rings)
+            {
+                var s = you ? Box(new Color(1f, 0.96f, 0.86f), GoldC, 2.5f, 99, 14, GoldC with { A = 0.3f }, new Vector2(0, 3))
+                    : next ? Box(Colors.White, Ink * new Color(1, 1, 1, 0.8f), 2, 99, 10, new Color(0, 0, 0, 0.15f), new Vector2(0, 3))
+                    : Box(new Color(1, 1, 1, beaten ? 0.35f : 0.9f), new Color(0, 0, 0, 0.08f), 1, 99, beaten ? 0 : 6, new Color(0, 0, 0, 0.1f), new Vector2(0, 2));
+                Plate(this, rect, s);
+            }
+            float d = rings ? h + 6 : h - 8;
+            Face(this, new Vector2(rect.Position.X + h / 2, y), d, key, you || next, beaten ? 0.45f : 1);
+            float tagW = 0;
+            var nameBox = new Rect2(rect.Position.X + h + 6, y - 13, w - h - 14 - tagW, 26);
+            var name = Put(this, NameOf(key), Title, r == 0 ? 15 : 14, you ? GoldDeep : Ink * new Color(1, 1, 1, beaten ? 0.4f : 1), nameBox.Position + new Vector2(0, 2), nameBox.Size);
+            name.VerticalAlignment = VerticalAlignment.Center; name.ClipText = true;
+            if (beaten) Hair(this, new Vector2(nameBox.Position.X, y + 1), Math.Min(nameBox.Size.X, Title.GetStringSize(NameOf(key), HorizontalAlignment.Left, -1, Z(r == 0 ? 15 : 14)).X), Ink * new Color(1, 1, 1, 0.4f), 1.5f);
+            // small tags hanging on the plate's top edge, clear of the name
+            if (you && r == Depth(key) && !tour.YouOut && tour.Champion == null) Tag(this, "YOU", new Vector2(rect.End.X - 34, rect.Position.Y - 1), GoldC, Ink, 10);
+            if (next) Tag(this, "NEXT", new Vector2(rect.End.X - 38, rect.Position.Y - 1), Ink, GoldLight, 10);
+        }
+        for (int i = 0; i < 8; i++) Seat(0, i, tour.Seats[i]);
+        for (int r = 1; r < 3; r++) for (int m = 0; m < (8 >> r); m++) Seat(r, m, tour.Winners[r - 1][m]);
+
+        // the cup, with the champion's face on it once decided
+        var cc = new Vector2(cupX, ys[3][0]);
+        if (tour.Champion is { } ch) { Face(this, cc, 110, ch, true); Mid(this, NameOf(ch), Title, 15, GoldDeep, new Rect2(cc + new Vector2(-110, 62), new Vector2(220, 24))); }
+        else Cup(this, cc, 118);
+        Mid(this, Lang.F("{0:N0} DP", Tournament.Ladder[0].Dp), Title, 15, GoldDeep, new Rect2(cc + new Vector2(-110, 90), new Vector2(220, 24)));
     }
 
-    /// Four prize columns: place and DP. Champion in gold; your finishing place marked.
-    void Prizes(Vector2 centre)
+
+    /// The next match on the dark side on the dark side: you VS them, their difficulty, DUEL, and one line on what winning is worth.
+    void NextMatch(Rect2 r)
     {
-        int place = tour.Place ?? -1;
-        float colW = 230, x0 = centre.X - 2 * colW;
-        for (int i = 0; i < 4; i++)
+        float cx = r.GetCenter().X, y = r.Position.Y + 60;
+        Mid(this, tour.Foe != null ? "NEXT MATCH" : "RESULT", Thin, 15, Mist, new Rect2(r.Position.X, y, r.Size.X, 22));
+        Mid(this, Status, Title, 32, GoldLight, new Rect2(r.Position.X, y + 28, r.Size.X, 44));
+        y += 130;
+        if (tour.Foe is { } foe)
         {
-            float cx = x0 + (i + 0.5f) * colW;
-            bool lit = i == 0 || i == place;
-            T(this, Tournament.PlaceNames[i], Title, 15, new Vector2(cx - 115, centre.Y - 32), new Vector2(230, 22), HorizontalAlignment.Center, 0.9f).Mat().P("lit", lit ? 1f : 0f);
-            var dp = T(this, Lang.F("{0:N0} DP", Tournament.Ladder[i].Dp), Title, i == 0 ? 34 : 26, new Vector2(cx - 115, centre.Y - 6), new Vector2(230, 44), HorizontalAlignment.Center);
-            if (lit) dp.Mat().P("lit", 1f);
-            if (i == place) Pip(this, new Vector2(cx, centre.Y + 50), 9);
+            var yb = UI.Cosmetics.Framed(Avatar, P.Frame, 140); yb.Position = new Vector2(cx - 200, y); AddChild(yb);
+            Face(this, new Vector2(cx + 130, y + 70), 140, foe.Key, true);
+            Mid(this, "VS", Title, 32, Silver, new Rect2(cx - 60, y + 40, 120, 60));
+            Fit(this, Settings.PlayerName.ToUpperInvariant(), Title, 16, 11, Silver, new Rect2(cx - 230, y + 150, 200, 24));
+            Fit(this, foe.Name, Title, 16, 11, Silver, new Rect2(cx + 30, y + 150, 200, 24));
+            Mid(this, new OpponentPick(foe.Key, foe.Deck, foe.Level).Tier, Title, 13, Session.TierColor(foe.Level), new Rect2(cx + 30, y + 178, 200, 20));
+            Button(this, "DUEL", new Vector2(cx, r.End.Y - 20), () => Transition.Go(this, "res://ui/DuelSetup.tscn"), 30);
+            int next = Math.Min(2, tour.Round + 1);
+            string win = tour.Round == 2 ? Lang.F("Win: champion  ·  {0:N0} DP", Tournament.Ladder[0].Dp) : Lang.F("Win: on to the {0}  ·  {1:N0} DP sure", Tournament.RoundNames[next], Tournament.Ladder[2 - tour.Round].Dp);
+            Mid(this, win, Body, 18, Mist, new Rect2(r.Position.X, y + 230, r.Size.X, 26));
         }
+        else Button(this, "NEW TOURNAMENT", new Vector2(cx, r.End.Y - 20), () => { Session.Tour = new Tournament(new Rng((ulong)Session.Rng.Int(1 << 30))); Transition.Go(this, "res://ui/Tournament.tscn"); }, 28);
     }
 
     /// Screenshots: `--demo --state=new|mid|won|out`.

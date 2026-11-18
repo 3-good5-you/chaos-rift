@@ -56,6 +56,24 @@ public static class RivalPanels
         ["zane"] = new(0.21f, 0f, 0.38f),
     };
 
+    static readonly Dictionary<string, Texture2D> busts = new();
+    /// Head and shoulders cut from the portrait around the face box (a real texture, so rounded corners work): the
+    /// rival select cards (Menu Lab pick 2026-11-16). Width : height = 1 : 1.35.
+    public static Texture2D Bust(Rival r)
+    {
+        if (busts.TryGetValue(r.File, out var done)) return done;
+        if (!HasPortrait(r)) return busts[r.File] = Art(r);
+        var img = Portrait(r).GetImage();
+        if (img.IsCompressed()) img.Decompress();
+        float iw = img.GetWidth(), ih = img.GetHeight();
+        var f = Face(r);
+        float s = f.Z * iw, cx = f.X * iw + s / 2;
+        float bw = Math.Min(iw, s * 2.1f), bh = Math.Min(ih, bw * 1.35f);
+        bw = bh / 1.35f;
+        float x = Math.Clamp(cx - bw / 2, 0, Math.Max(0, iw - bw)), y = Math.Clamp(f.Y * ih - s * 0.25f, 0, Math.Max(0, ih - bh));
+        return busts[r.File] = ImageTexture.CreateFromImage(img.GetRegion(new Rect2I((int)x, (int)y, (int)bw, (int)bh)));
+    }
+
     static readonly Dictionary<string, Texture2D> faceTex = new();
     /// A square picture for round icons: the face cut from the portrait, or the signature card art without one.
     public static Texture2D FaceTex(Rival r)

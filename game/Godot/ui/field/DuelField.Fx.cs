@@ -147,7 +147,7 @@ public partial class DuelField
     /// A triggered effect that asks for a choice (search, target...) shows its source like an activation.
     async Task EffectFlash(Card c, int player)
     {
-        if (c.Uid == lastRays && Time.GetTicksMsec() - lastRaysAt < 4000) return;
+        if (GlowedNow(c)) { Focus(c); return; }
         if (views.TryGetValue(c.Uid, out var v)) GoldRays(v);
         Focus(c);
         await Wait(1.0);

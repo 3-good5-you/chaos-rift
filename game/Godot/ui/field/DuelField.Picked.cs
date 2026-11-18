@@ -601,11 +601,15 @@ void fragment() {
     /// The card lifts a little, a gold MD frame glows round it, soft gold rays turn behind it, a four-point glint
     /// pops and the light sweep runs down the art.
     int lastRays = -1;
-    ulong lastRaysAt;
+    int lastRaysCmd, cmds;   // cmds: commands answered so far
+
+    /// The card already glowed for this effect: its trigger, the prompt it opens and its activation are one glow, not two or
+    /// three (playtest 2026-11-17; it was a 4 s timer, so a slow pick or a long animation glowed it again).
+    bool GlowedNow(Card c) => c.Uid == lastRays && cmds - lastRaysCmd <= 1;
 
     void GoldRays(View v, Color? tint = null)
     {
-        lastRays = v.Card.Uid; lastRaysAt = Time.GetTicksMsec();
+        lastRays = v.Card.Uid; lastRaysCmd = cmds;
         var c = tint ?? FxGold;   // a Spell or Trap could use its own colour
         Cue(c == FxGreen ? "rays_spell" : c == FxPink ? "rays_trap" : "rays");
         // Rays and a star flash over the card, its frame glows and its face shines; no lift (user 2026-10-29).

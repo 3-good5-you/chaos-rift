@@ -10,6 +10,7 @@ public partial class Loading : Control
 
     public override void _Ready()
     {
+        Updater.LoadPatch();   // a small update's resources, before the menu loads anything
         SetAnchorsPreset(LayoutPreset.FullRect);
         AddChild(new ColorRect { AnchorRight = 1, AnchorBottom = 1, Color = new Color(0.008f, 0.008f, 0.012f) });
         ResourceLoader.LoadThreadedRequest(Menu);
@@ -17,7 +18,8 @@ public partial class Loading : Control
 
     public override void _Process(double delta)
     {
-        if (ResourceLoader.LoadThreadedGetStatus(Menu) != ResourceLoader.ThreadLoadStatus.Loaded) return;
+        bool warm = MenuBase.WarmShaders(40);   // the duel's shaders, compiled now instead of mid-duel
+        if (!warm || ResourceLoader.LoadThreadedGetStatus(Menu) != ResourceLoader.ThreadLoadStatus.Loaded) return;
         SetProcess(false);
         GetTree().ChangeSceneToPacked((PackedScene)ResourceLoader.LoadThreadedGet(Menu));
     }

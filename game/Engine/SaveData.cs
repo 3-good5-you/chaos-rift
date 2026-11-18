@@ -55,6 +55,8 @@ public static class SaveData
         public string? Brain;
         public List<string>? Starters;   // added later: null = older file (Session works it out from the deck names)
         public List<string>? Solved;     // Challenges (added 2026-11-08)
+        public Dictionary<string, int>? Stats;          // achievements (added 2026-11-16): null = older file
+        public List<string>? Claimed, Told;
         public string BrainFrom = "";
     }
     sealed class DeckDto
@@ -79,6 +81,7 @@ public static class SaveData
                 DryRuns = p.DryRuns,
                 Dp = p.Dp, Seen = p.Seen.Order().ToList(), Mats = p.Mats.Order().ToList(), Backs = p.Backs.Order().ToList(), Frames = p.Frames.Order().ToList(), Mat = p.Mat, Back = p.Back, Frame = p.Frame,
                 Brain = p.Brain.ToJson(), BrainFrom = p.BrainFrom, Starters = p.Starters.Order().ToList(), Solved = p.Solved.Order().ToList(),
+                Stats = new(p.Stats), Claimed = p.Claimed.Order().ToList(), Told = p.Told.Order().ToList(),
             },
             Decks = s.Decks.Select(d => new DeckDto { Name = d.Name, Cover = d.Cover, Main = d.Main.ToList(), Fusion = d.Extra.ToList(), Side = d.Side.ToList() }).ToList(),
             Playing = s.Playing,
@@ -86,6 +89,9 @@ public static class SaveData
         };
         return JsonSerializer.Serialize(f, Json);
     }
+
+    /// Lightning Crash, Ojamandala, Ritual Sanctuary, Wicked Canon, Hope for the Future (removed 2026-11-16).
+    static readonly HashSet<int> Removed = new() { 2876, 2924, 2960, 3053, 3158 };
 
     /// Throws on anything it can't trust: bad JSON, another version, unknown cards, a bad ban list.
     public static State FromJson(string json)
@@ -95,9 +101,16 @@ public static class SaveData
         var db = CardDb.Shared;
         void Known(IEnumerable<int> idx) { foreach (var i in idx) if (!db.ByIdx.ContainsKey(i)) throw new InvalidDataException($"unknown card {i}"); }
         var dp = f.Profile ?? throw new InvalidDataException("no profile");
+        // Cards taken out of the game (no English HD scan): copies a save still holds are dropped, not rejected.
+        foreach (var r in Removed) dp.Owned.Remove(r);
+        dp.Fresh.RemoveAll(Removed.Contains); dp.Seen?.RemoveAll(Removed.Contains);
+        foreach (var d in f.Decks ?? new())
+        {
+            d.Main.RemoveAll(Removed.Contains); d.Fusion.RemoveAll(Removed.Contains); d.Side.RemoveAll(Removed.Contains);
+            if (Removed.Contains(d.Cover)) d.Cover = -1;
+        }
         Known(dp.Owned.Keys); Known(dp.Fresh); Known(dp.Seen ?? new());
         var s = new State { Options = f.Options ?? throw new InvalidDataException("no options") };
-        if (!DeckRules.Formats.Any(x => x.Key == s.Options.BanList)) throw new InvalidDataException($"ban list {s.Options.BanList}");
         var p = s.Profile;
         // Older saves may hold another game's printing of a card (Canon): its copies merge into the collection's one.
         foreach (var (k, v) in dp.Owned) p.Owned[db.Canon(k)] = Math.Clamp(p.Count(db.Canon(k)) + v, 0, 255);
@@ -125,6 +138,10 @@ public static class SaveData
             s.Decks.Add(deck);
         }
         s.Playing = f.Playing >= 0 && f.Playing < s.Decks.Count ? f.Playing : -1;
+        if (dp.Stats != null) foreach (var (k, v) in dp.Stats) p.Stats[k] = v;
+        p.Claimed.UnionWith(dp.Claimed ?? new());
+        if (dp.Told != null) p.Told.UnionWith(dp.Told);
+        else Achievements.Quiet(p, s.Decks.Count);   // a save from before achievements: no pop-up storm on first launch
         return s;
     }
 

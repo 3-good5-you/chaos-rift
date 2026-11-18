@@ -33,7 +33,7 @@ public partial class LanLobby : RiftMenu
     {
         Demo.Ensure();
         Rift(0.6f, 0.54f);
-        back = T(this, "‹  MENU", Title, 18, new Vector2(62, 30), default, HorizontalAlignment.Left, 0.7f);
+        back = T(this, "‹  " + Lang.Tr("MODES"), Title, 18, new Vector2(62, 30), default, HorizontalAlignment.Left, 0.7f);
         Click(back, OnBack, h => back.Mat().P("lit", h ? 1f : 0f));
         Heading("LAN DUEL", new Vector2(80, 60), 46);
 
@@ -229,8 +229,7 @@ public partial class LanLobby : RiftMenu
         var them = Cosmetics.Framed(Lan.TheirAvatar, Lan.TheirFrame, size);
         them.Position = new Vector2(Rx - size / 2, 230);
         right.AddChild(them);
-        var list = DeckRules.Formats.FirstOrDefault(f => f.Key == Lan.List).Name ?? "?";
-        Dark($"{Lan.Link!.Peer}   ·   {Lang.Tr("BAN LIST")} {list}{(Lan.Link.IsHost ? "" : Lang.Tr(" (HOST'S)"))}", Thin, 15, Mist, 230 + size + 40);
+        Dark(Lan.Link!.Peer, Thin, 15, Mist, 230 + size + 40);
         float vy = H * 0.42f;
         T(right, "VS", Title, 64, new Vector2(CrackX(vy) - 100, vy - 44), new Vector2(200, 88), HorizontalAlignment.Center);
         TheirStatus();
@@ -238,14 +237,13 @@ public partial class LanLobby : RiftMenu
 
     void TheirStatus() { if (status != null && Lan.Them != null) { status.Text = theyReady ? "READY" : "PICKING A DECK…"; status.AddThemeColorOverride("font_color", theyReady ? GoldLight : Mist); } }
 
-    /// Decks legal under the host's ban list; false (with a note) when there are none.
+    /// Decks you can play; false (with a note) when there are none.
     bool Decks()
     {
-        var list = Lan.On ? Lan.List : DeckRules.LimitGame;
-        playable = Session.Decks.Where(d => DeckRules.IsLegal(d, Session.Profile, list)).ToList();
+        playable = Session.Decks.Where(d => DeckRules.IsLegal(d, Session.Profile)).ToList();
         if (Session.Playing == null || !playable.Contains(Session.Playing)) Session.Playing = playable.FirstOrDefault();
         ShowDeck();
-        if (playable.Count == 0) Note("No deck is legal under this ban list. Build one in the Deck Builder.");
+        if (playable.Count == 0) Note("No deck is ready to play. Build one in the Deck Builder.");
         return playable.Count > 0;
     }
 
@@ -346,7 +344,7 @@ public partial class LanLobby : RiftMenu
     /// The one main button under your decks (HOST DUEL / CANCEL / READY / NOT READY) and the back link's word.
     void SetGo(string text)
     {
-        back.Text = mode == Mode.Vs ? "‹  LEAVE" : "‹  MENU";
+        back.Text = "‹  " + Lang.Tr(mode == Mode.Vs ? "LEAVE" : "MODES");
         go?.QueueFree();
         go = Button(this, text, new Vector2(W * 0.3f, H - 100), Go, 32);
     }
@@ -356,7 +354,7 @@ public partial class LanLobby : RiftMenu
         if (mode == Mode.Vs) { Drop(""); return; }
         if (mode is Mode.Hosting or Mode.Joining) { Cancel(); return; }
         cts?.Cancel();
-        Transition.Go(this, "res://ui/MainMenu.tscn");
+        Transition.Go(this, "res://ui/DuelModes.tscn");
     }
 
     public override void _Process(double delta)

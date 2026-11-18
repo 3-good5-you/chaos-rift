@@ -72,6 +72,50 @@ static class Scenarios
             catch (Exception e) { check(false, $"scenario '{name}': {e.InnerException?.Message ?? e.Message}"); }
         }
 
+        T("Shadow Spell: -700 on their attacker, and the CPU fires it when that wins the fight (2026-11-16)", () =>
+        {
+            var s = new Sc(new[] { "Celtic Guardian", "Shadow Spell" }, new[] { "Neo the Magic Swordsman" });
+            s.Do(Act.Summon, "Celtic Guardian").AttackPos().PassAll().Do(Act.SetSpell, "Shadow Spell").EndTurn();
+            s.Do(Act.Summon, "Neo the Magic Swordsman").AttackPos().PassAll().Do(Act.ToBattle).PassAll().Do(Act.Attack, "Neo the Magic Swordsman", "Celtic Guardian");
+            var p = s.D.Pending!;
+            check(p.Kind == Ask.Respond && p.Options.Any(o => o.Card?.Name == "Shadow Spell"), $"Shadow Spell offered on the attack ({p})");
+            var pick = new Ai(0, 1, Brain.Plus).Decide(s.D).Picks[0];
+            check(p.Options[pick].Card?.Name == "Shadow Spell", $"the CPU fires it ({p.Options[pick]})");
+            s.Respond("Shadow Spell");
+            if (s.D.Pending is { Kind: Ask.Pick }) s.Pick("Neo the Magic Swordsman");
+            s.PassAll();
+            var neo = s.D.P(1).MonstersOnField.Concat(s.D.P(1).Grave).First(c => c.Name == "Neo the Magic Swordsman");
+            check(neo.Loc == Loc.Grave || s.D.Atk(neo) == 1000, $"Neo at 1000 ATK loses to Celtic Guardian ({neo.Loc}, {s.D.Atk(neo)})");
+        });
+
+        T("Relinquished absorbs their monster: its ATK/DEF, and the CPU uses it (2026-11-16)", () =>
+        {
+            var s = new Sc(new[] { "Relinquished" }, new[] { "Neo the Magic Swordsman" });
+            var rel = Put(s, 0, "Relinquished"); var neo = Put(s, 1, "Neo the Magic Swordsman");
+            s.EndTurn().EndTurn();   // options are built at the start of a Main Phase
+            var p = s.D.Pending!;
+            int act = p.Options.FindIndex(o => o.Act == Act.Activate && o.Card == rel);
+            check(act >= 0, $"Relinquished's effect offered ({p})");
+            // The CPU plays its turn (a summon first, then the absorb).
+            var cpu = new Ai(0, 1, Brain.Plus);
+            for (int k = 0; k < 30 && neo.Loc == Loc.Monster && s.D.Pending is { Player: 0 } q && !(q.Kind == Ask.Main && q.Options.All(o => o.Act != Act.Activate)) && s.D.Phase == Phase.Main1; k++)
+                s.D.Submit(cpu.Decide(s.D));
+            check(neo.Loc == Loc.Spell, $"the CPU absorbs ({neo.Loc})");
+            check(neo.Loc == Loc.Spell && neo.EquippedTo == rel && neo.Controller == 0, $"Neo is its Equip Card ({neo.Loc}, {neo.Controller})");
+            check(s.D.Atk(rel) == 1700 && s.D.Def(rel) == 1000, $"Relinquished takes Neo's 1700/1000 ({s.D.Atk(rel)}/{s.D.Def(rel)})");
+        });
+
+        T("Thousand-Eyes Restrict: other monsters cannot attack; Cyber Harpie is a Harpie Lady (2026-11-16)", () =>
+        {
+            var s = new Sc(new[] { "Thousand-Eyes Restrict", "Cyber Harpie" }, new[] { "Neo the Magic Swordsman" }, extra0: new[] { "Thousand-Eyes Restrict" });
+            var ter = s.D.P(0).Extra.First(); s.D.Place(ter, 0, Loc.Monster); ter.FaceUp = true;
+            var harpie = Put(s, 0, "Cyber Harpie");
+            check(Scripts.NameOf(harpie) == "Harpie Lady", $"Cyber Harpie's name ({Scripts.NameOf(harpie)})");
+            var neo = Put(s, 1, "Neo the Magic Swordsman");
+            s.EndTurn();
+            check(!s.D.CanAttack(neo) && !s.D.Pending!.Options.Any(o => o.Act == Act.Attack && o.Card == neo), $"Neo cannot attack ({s.D.Pending})");
+        });
+
         T("chain resolves last-in first-out (double Trap Hole)", () =>
         {
             var s = new Sc(new[] { "Trap Hole", "Trap Hole" }, new[] { "Neo the Magic Swordsman" });
@@ -604,6 +648,55 @@ static class Scenarios
             for (int k = 0; k < 30 && s.D.Phase is Phase.Main1 && s.D.Pending!.Player == 0; k++) s.D.Submit(ai.Decide(s.D));
             check(s.Mon(0, "Obelisk the Tormentor") != null, "Obelisk summoned");
             check(!s.D.P(1).MonstersOnField.Any(), $"Obelisk's effect used ({s.D.P(1).MonstersOnField.Count()} opponent monsters left)");
+        });
+
+        // 2026-11-15: expansion spells have no effect summary; the rules read their text (they used to sit in hand).
+        T("CPU: Double Summon brings out a second monster", () =>
+        {
+            var s = new Sc(new[] { "Double Summon", "Gemini Elf", "Vorse Raider" }, new string[0]);
+            var ai = new Ai(0, 3, Brain.Plus);
+            for (int k = 0; k < 30 && s.D.Phase is Phase.Main1 && s.D.Pending!.Player == 0; k++) s.D.Submit(ai.Decide(s.D));
+            check(s.D.P(0).MonstersOnField.Count() == 2, $"{s.D.P(0).MonstersOnField.Count()} monsters summoned");
+        });
+
+        // User 2026-11-16: Waboku went off at the start of the player's turn, before any attack.
+        T("CPU (game brain): Waboku waits for an attack", () =>
+        {
+            var s = new Sc(new[] { "Battle Ox", Filler }, new[] { "Waboku", Filler });
+            s.Do(Act.Summon, "Battle Ox").AttackPos().PassAll().EndTurn();
+            s.Do(Act.SetSpell, "Waboku").EndTurn();
+            var ai = Ai.ForLevel(1, 5, 7);
+            CpuAnswers(s, ai);
+            s.Do(Act.ToBattle); CpuAnswers(s, ai);
+            check(s.D.P(1).Spells.Any(c => c?.Name == "Waboku"), "Waboku used before any attack");
+            s.Do(Act.ToMain2); CpuAnswers(s, ai);
+            check(s.D.P(1).Spells.Any(c => c?.Name == "Waboku"), "Waboku used in a turn with no attack");
+        });
+
+        // User 2026-11-16: Mirror Force, then Negate Attack chained on the same attack (the second does nothing).
+        T("CPU (game brain): one answer per attack", () =>
+        {
+            var s = new Sc(new[] { "Battle Ox", "La Jinn the Mystical Genie of the Lamp", Filler }, new[] { "Mirror Force", "Negate Attack", Filler });
+            s.Do(Act.Summon, "Battle Ox").AttackPos().PassAll().EndTurn();
+            s.Do(Act.SetSpell, "Mirror Force").Do(Act.SetSpell, "Negate Attack").EndTurn();
+            var ai = Ai.ForLevel(1, 5, 7);
+            CpuAnswers(s, ai);
+            s.Do(Act.Summon, "La Jinn the Mystical Genie of the Lamp").AttackPos(); CpuAnswers(s, ai);
+            s.Do(Act.ToBattle); CpuAnswers(s, ai);
+            s.Do(Act.Attack, "Battle Ox", "direct"); CpuAnswers(s, ai);
+            int left = s.D.P(1).Spells.Count(c => c?.Name is "Mirror Force" or "Negate Attack");
+            check(left == 1, $"{2 - left} of Mirror Force / Negate Attack used on one attack");
+        });
+
+        // User 2026-11-16: a wall that beats everything the player has is summoned to attack, not in Defense.
+        T("CPU: a wall that outclasses the field attacks", () =>
+        {
+            var s = new Sc(new[] { "Kuriboh", Filler }, new[] { "Giant Soldier of Stone", Filler });
+            s.Do(Act.Summon, "Kuriboh").AttackPos().PassAll().EndTurn();
+            var ai = new Ai(1, 3, Brain.Plus);
+            for (int k = 0; k < 10 && s.D.Phase is Phase.Main1 && s.D.Pending!.Player == 1 && !s.D.P(1).MonstersOnField.Any(); k++) s.D.Submit(ai.Decide(s.D));
+            var g = s.D.P(1).MonstersOnField.FirstOrDefault();
+            check(g != null && !g.Defense, $"Giant Soldier of Stone: {(g == null ? "not summoned" : g.Defense ? "Defense" : "Attack")}");
         });
 
         foreach (bool lethal in new[] { true, false })

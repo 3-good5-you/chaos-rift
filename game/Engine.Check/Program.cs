@@ -14,6 +14,7 @@ static class Program
 
     static int Main(string[] args)
     {
+        Ai.Threads = int.Parse(Environment.GetEnvironmentVariable("AI_THREADS") ?? "1");   // checks and leagues play many duels at once
         if (Environment.GetEnvironmentVariable("JUDGE_LOG") == "1") Ai.Overruled = m => { lock (Console.Out) Console.WriteLine("  " + m); };
         if (args.Length == 2 && args[0] == "one")
         {
@@ -31,6 +32,8 @@ static class Program
         if (args.Length >= 1 && args[0] == "scenarios") { RemasteredChecks(); Scenarios.Run(Check); Console.WriteLine(failures == 0 ? "ALL CHECKS PASSED" : $"{failures} CHECK(S) FAILED"); return failures == 0 ? 0 : 1; }
         if (args.Length >= 1 && args[0] == "godduels") return GodDuels.Run(args.Length > 1 ? int.Parse(args[1]) : 50, args.Contains("seer"));
         if (args.Length >= 1 && args[0] == "puzzles") { PuzzleChecks(); return 0; }
+        if (args.Length >= 1 && args[0] == "menus") { MenuChecks(); Console.WriteLine(failures == 0 ? "ALL CHECKS PASSED" : $"{failures} CHECK(S) FAILED"); return failures == 0 ? 0 : 1; }
+        if (args.Length >= 1 && args[0] == "draft") { DraftChecks(args.Length > 1 ? int.Parse(args[1]) : 300); Console.WriteLine(failures == 0 ? "ALL CHECKS PASSED" : $"{failures} CHECK(S) FAILED"); return failures == 0 ? 0 : 1; }
         if (args.Length >= 1 && args[0] == "labtest") return LabTests.Run(args.Length > 1 ? args[1] : "");
         if (args.Length >= 1 && args[0] == "audit") return Audit.Run(args.Length > 1 ? args[1] : "");
         if (args.Length >= 1 && args[0] == "poolcheck") return PoolCheck.Run(args.Length > 1 ? args[1] : "");
@@ -63,10 +66,12 @@ static class Program
         if (args.Length >= 1 && args[0] == "levels") { League.Levels(args[1], args[2], args.Length > 3 ? int.Parse(args[3]) : 200); return 0; }
         if (args.Length >= 1 && args[0] == "decks") { League.Decks(args.Length > 1 ? int.Parse(args[1]) : 100, args.Length > 2 ? Enum.Parse<Brain>(args[2]) : Brain.Classic, args.Length > 3 ? args[3] : ""); return 0; }
         if (args.Length >= 3 && args[0] == "valuevs") { League.ValueVs(args[1], int.Parse(args[2])); return 0; }
+        if (args.Length >= 1 && args[0] == "cards") { League.Cards(args.Length > 1 ? int.Parse(args[1]) : 3000, args.Length > 2 ? args[2] : "Plus"); return 0; }
         if (args.Length >= 1 && args[0] == "rivals") { League.Rivals(args.Length > 1 ? int.Parse(args[1]) : 200, args.Length > 2 ? args[2] : "Plus"); return 0; }
         if (args.Length >= 1 && args[0] == "ladder") { League.Ladder(args.Length > 1 ? int.Parse(args[1]) : 300); return 0; }
         if (args.Length >= 1 && args[0] == "sidetest") { League.SideTest(args.Length > 1 ? int.Parse(args[1]) : 600); return 0; }
         if (args.Length >= 1 && args[0] == "passive") { League.Passive(args.Length > 1 ? int.Parse(args[1]) : 40, args.Length > 2 ? args[2] : null); return 0; }
+        if (args.Length >= 1 && args[0] == "idle") { League.Idle(args.Length > 1 ? int.Parse(args[1]) : 400, args.Length > 2 ? args[2] : "Plus"); return 0; }
         if (args.Length >= 1 && args[0] == "seerbench") { League.SeerBench(); return 0; }
         if (args.Length >= 1 && args[0] == "bench") { League.Bench(); return 0; }
         if (args.Length >= 1 && args[0] == "replays")
@@ -142,6 +147,43 @@ static class Program
         Check(evs.Count == 300 && evs.Select(e => e.Amount).SequenceEqual(rolls) && evs.All(e => e.Player == 0 && e.Other == src), "dice: one Die event per roll with result and source");
     }
 
+    /// Menu Lab build (2026-11-16): the 8-floor gauntlet pays the top floor's prize; achievements claim once and
+    /// survive a save round trip; an old save tells its done achievements quietly.
+    static void MenuChecks()
+    {
+        var g = Gauntlet.Climb(Tournament.Roster, new Rng(9));
+        Check(g.Order.Length == 8 && g.Order.Select(o => o.Rival).Distinct().Count() == 8, "gauntlet: eight different rivals");
+        Check(g.Order.Zip(g.Order.Skip(1)).All(x => x.First.Level <= x.Second.Level), "gauntlet: easiest first");
+        Check(g.Order.All(o => CardDb.Shared.Deck(o.DeckKey).Main.Count >= 40), "gauntlet: every floor's deck exists");
+        Check(g.Prize == (0, 0), "gauntlet: nothing before floor 1");
+        g.Record(true, 7000); g.Record(true, 6000); g.Record(true, 5000);
+        Check(g.Prize == (250, 1), "gauntlet: beat 3 = 250 DP + 1 card");
+        g.Record(true, 4000); g.Record(true, 3000);
+        Check(g.Prize == (600, 2), "gauntlet: beat 5 = 600 DP + 2 cards");
+        g.Record(false, 0);
+        Check(g.Over && g.Prize == (600, 2), "gauntlet: losing keeps the highest floor's prize");
+        var p = new Profile();
+        var first = Achievements.All.First(a => a.Id == "first_blood");
+        Check(!Achievements.Done(first, p, 0) && !Achievements.Claim(first, p, 0), "achievement: not claimable before it's done");
+        Achievements.Bump(p, "wins");
+        var told = Achievements.TellNew(p, 0);
+        Check(told.Any(a => a.Id == "first_blood") && Achievements.TellNew(p, 0).Count == 0, "achievement: told once");
+        int dp = p.Dp;
+        Check(Achievements.Claim(first, p, 0) && p.Dp == dp + first.Dp && !Achievements.Claim(first, p, 0), "achievement: claimed once, DP paid");
+        Achievements.Bump(p, "untouched");
+        var unt = Achievements.All.First(a => a.Id == "untouched");
+        Check(Achievements.Claim(unt, p, 0) && p.Frames.Contains(unt.Key), "achievement: the cosmetic prize is owned");
+        Check(Achievements.All.All(a => a.Kind == Achievements.Prize.Dp || (a.Kind == Achievements.Prize.Back ? Shop.Backs : a.Kind == Achievements.Prize.Mat ? Shop.Mats : Shop.Frames).Any(i => i.Key == a.Key)), "achievement: every prize is a real cosmetic");
+        Check(Achievements.All.All(a => CardDb.Shared.ByName.ContainsKey(a.Card)), "achievement: every medal card exists");
+        var s = new SaveData.State(); s.Profile.Stats["wins"] = 3; s.Profile.Claimed.Add("first_blood"); s.Profile.Told.Add("first_blood");
+        var back = SaveData.FromJson(SaveData.ToJson(s)).Profile;
+        Check(back.Stats["wins"] == 3 && back.Claimed.Contains("first_blood") && back.Told.Contains("first_blood"), "achievement: save round trip");
+        var old = System.Text.Json.Nodes.JsonNode.Parse(SaveData.ToJson(s))!;
+        old["Profile"]!.AsObject().Remove("Told");
+        var o2 = SaveData.FromJson(old.ToJsonString()).Profile;
+        Check(o2.Told.Contains("first_blood") && o2.Told.Contains("duelist") == false, "achievement: an old save tells done ones quietly");
+    }
+
     /// The hand-built EXPERT decks: 40 cards, legal under the 2004 list, every Fusion has its materials, effects scripted.
     /// Tournament mode: every roster deck exists, a bracket runs to a champion whether you win or lose, prizes draw.
     static void TournamentChecks()
@@ -159,18 +201,6 @@ static class Program
         }
         var p = new Profile();
         { // game modes
-          var packs = Modes.OpenPacks(new Rng(3)); Check(packs.Count == 6 && packs.All(k => k.Count == 9), "six packs of nine");
-          for (ulong seed = 1; seed <= 40; seed++)
-          {
-              // themed packs: one Type or Attribute covers a good share of the monsters, and no card needs a named partner
-              var cards = Modes.OpenPacks(new Rng(seed)).SelectMany(k => k).Select(CardDb.Shared.Get).ToList();
-              var mons = cards.Where(c => c.IsMonster).ToList();
-              int top = mons.GroupBy(c => c.Race).Concat(mons.GroupBy(c => c.Attribute)).Max(g => g.Count());
-              Check(mons.Count == 30 && top >= 9 && cards.All(c => !c.Desc.Contains('"') && !c.IsFusion), $"pack pool {seed} is themed ({top} of {mons.Count} monsters share a Type / Attribute)");
-          }
-          var pp = Modes.PoolProfile(packs.SelectMany(k => k)); var pd = new Deck("pack");
-          foreach (var i in packs.SelectMany(k => k).Distinct()) while (DeckRules.Add(pd, db.Get(i), pp)) { }
-          Check(pd.Main.Count >= 40 && pd.Main.All(i => packs.Any(k => k.Contains(i))), $"a pack deck is built only from the packs ({pd.Main.Count})");
           var g = new Gauntlet(new[] { new OpponentPick("kaiba", "k", 6), new OpponentPick("joey", "j", 2) });
           Check(g.Current!.Rival == "joey", "gauntlet starts with the easiest rival");
           g.Record(true, 3100); Check(g.Lp == 3100 && g.Current!.Rival == "kaiba", "gauntlet carries LP to the next rival");
@@ -200,6 +230,8 @@ static class Program
         Check(got.Count == 5 && got.All(g => g.New), "tournament: final prize draws 5 new cards");
     }
 
+    static readonly HashSet<string> CoreCards = new() { "Proto-Cyber Dragon", "Unshaven Angler", "Maiden of the Aqua", "Gyroid", "The Sanctuary in the Sky" };
+
     static void RemasteredChecks()
     {
         var db = CardDb.Shared;
@@ -207,6 +239,16 @@ static class Program
         foreach (var c in db.ByIdx.Values) all.Owned[c.Idx] = 3;
         var keys = db.RemasteredDeckNames().ToList();
         Check(new[] { "yugi", "kaiba", "joey", "jaden" }.All(r => Enumerable.Range(1, 7).All(l => keys.Contains($"{r}/x_lv{l}"))) && keys.Contains("yugi/x_exodia_insta") && keys.Contains("yugi/x_exodia_gy"), "rival decks: one per rival per level 1-7, plus Yugi's Exodia decks");
+        string[] four = { "mai", "alexis", "odion" };   // 2026-11-16: levels 2, 4, 6 and 7
+        Check(Tournament.Roster.All(d => (four.Contains(d.Key) ? new[] { 2, 4, 6, 7 } : Enumerable.Range(1, 7)).All(l => keys.Contains($"{d.Key}/x_lv{l}"))), "tournament duelists: a ladder deck per level");
+        Check(Progression.LadderLevel("mai", 1) == 2 && Progression.LadderLevel("mai", 3) == 4 && Progression.LadderLevel("mai", 7) == 7 && Progression.LadderLevel("mai", 5) == 6 && Progression.LadderLevel("rex", 3) == 3, "ladder: a missing level uses the nearest deck");
+        Check(Tournament.Roster.All(d => Modes.HasLegend(d.Key)) && (Modes.Legend("rex", new DateTime(2026, 11, 17)).DeckKey is var lg && (lg == "rex/x_lv7" || Progression.GodDecks.Contains(lg))), "Legend: everyone with a level-7 deck");
+        { var q = new Profile(); q.Of("marik").Level = 7; var rr = new Rng(4); var gods = Enumerable.Range(0, 2000).Select(_ => Progression.Pick("marik", q, rr).DeckKey).Where(k => k.Contains("god")).Distinct().ToList();
+          Check(gods.SequenceEqual(new[] { "marik/x_god" }) && Progression.OwnGod("bakura") == "bakura/x_god" && Progression.OwnGod("rex") == null, $"Marik and Bakura bring their own God deck ({string.Join(",", gods)})"); }
+        { var q = new Profile(); q.Of("rex").Level = 5; var rp = Progression.Pick("rex", q, new Rng(1));
+          Check(rp.DeckKey is "rex/x_lv5" || Progression.GodDecks.Contains(rp.DeckKey), $"rex at level 5 brings his level-5 deck ({rp.DeckKey})");
+          Progression.Record(q, "rex", true); Progression.Record(q, "rex", true); Progression.Record(q, "rex", true); Progression.Record(q, "rex", true); Progression.Record(q, "rex", true);
+          Check(q.Of("rex").Level == 6, $"rex climbs Joey's ladder ({q.Of("rex").Level})"); }
         foreach (var k in keys)
         {
             var (main, extra) = db.Deck(k);
@@ -216,10 +258,15 @@ static class Program
             Check(DeckRules.FusionsMissingMaterials(deck).All(f => f.Modern), $"{k}: Fusion materials in the deck");   // CPU decks: the original fusion table only (newer Fusions are prompted in the deck builder)
             var unscripted = main.Select(db.Get).Where(c => db.Effects.ContainsKey(c.KonamiId) && Scripts.Get(c) is not { Implemented: true }).Select(c => c.Name).Distinct().ToList();
             Check(unscripted.Count == 0, $"{k}: every effect scripted ({string.Join(", ", unscripted)})");
+            // A card with an effect but no script at all is a blank (2026-11-16: Shadow Spell sat in Kaiba's decks, never able to activate).
+            // Rituals and the few cards the engine core plays by name (Duel.cs: Proto-Cyber Dragon, Unshaven Angler...) have no script of their own.
+            var blank = main.Concat(db.DeckSide(k)).Select(db.Get).Where(c => !c.IsNormalMonster && !c.Is("Ritual") && !CoreCards.Contains(c.Name)
+                && Scripts.Get(c) is not ({ Implemented: true } or { TreatedAs: not null })).Select(c => c.Name).Distinct().ToList();
+            Check(blank.Count == 0, $"{k}: no blank effect cards ({string.Join(", ", blank)})");
             deck.Side.AddRange(db.DeckSide(k));
             Check(deck.Side.Count is > 0 and <= 15 && DeckRules.Problem(deck, all, "joey") is null, $"{k}: side deck legal ({DeckRules.Problem(deck, all, "joey")})");
             // The 2003 list forbids the Gods themselves (blank cards then); the CPU keeps its decks as-is under 2003 (ForCpu).
-            if (k.StartsWith("god/"))
+            if (k.StartsWith("god/") || k.EndsWith("/x_god"))
             {
                 var noGods = new Deck(k, main.Where(i => db.Get(i).Race != "Divine-Beast"), extra);
                 noGods.Side.AddRange(deck.Side);
@@ -350,6 +397,9 @@ static class Program
         node["Profile"]!.AsObject().Remove("Brain");
         var fresh = SaveData.FromJson(node.ToJsonString()).Profile;
         Check(fresh.Brain.W.SequenceEqual(Value.Trained.W), "brain: a save from before CPU learning starts from the shipped model");
+        var gone = System.Text.Json.Nodes.JsonNode.Parse(json)!;   // Wicked Canon (3053) was taken out of the game
+        gone["Profile"]!["Owned"]!["3053"] = 2;
+        Check(!SaveData.FromJson(gone.ToJsonString()).Profile.Owned.ContainsKey(3053), "save: copies of a removed card are dropped, the save still loads");
     }
 
     /// Seer's re-deal: hidden cards move, nothing visible does, every card stays in exactly one place, play goes on.
@@ -479,6 +529,12 @@ static class Program
         sp.Profile.Dp = 5000; sp.Profile.Seen.Add(bewd[0].Idx);
         Check(Shop.Buy(sp.Profile, Shop.Mats.First(m => m.Key == "magma")) && Shop.Equip(sp.Profile, Shop.Mats.First(m => m.Key == "magma")), "shop: buy + equip a mat");
         Check(!Shop.Equip(sp.Profile, Shop.Backs.First(b => b.Key == "07_fire")), "shop: can't equip a back you don't own");
+        { int was = sp.Profile.Dp; sp.Profile.Dp = 99999; var prizes = Shop.Mats.Concat(Shop.Backs).Concat(Shop.Frames).Where(i => Shop.EarnedBy(i) != null).ToList();
+          Check(prizes.Count > 0 && prizes.All(i => !Shop.Sold(i) && !Shop.Buy(sp.Profile, i)), $"shop: achievement prizes are never sold ({prizes.Count})"); sp.Profile.Dp = was; }
+        { var claimedP = new Profile(); claimedP.Claimed.Add("duelist"); Shop.Tidy(claimedP); Check(claimedP.Backs.Contains("ach_duelist"), "shop: an achievement claimed earlier gives its new prize");
+          var cups = new[] { "obsidian", "ivory", "eclipse", "crimson" }.Select(k => Shop.EarnedBy(Shop.Mats.First(m => m.Key == k))).ToList();
+          Check(cups.All(a => a != null && a.Group == "MODES") && cups.Select(a => a!.Goal).SequenceEqual(new[] { 3, 5, 10, 20 }), "shop: the 4 tournament mats come from 3 / 5 / 10 / 20 tournament wins");
+          var champ = new Profile(); champ.Stats["champion"] = 5; Check(Achievements.All.Count(a => a.Id.StartsWith("cups_") && Achievements.Done(a, champ, 0)) == 2, "achievements: 5 tournament wins = 2 cup mats ready"); }
         sp.Profile.Frames.Add("fire"); sp.Profile.Frame = "fire";
         Check(Shop.Buy(sp.Profile, bewd[0]) && sp.Profile.Count(bewd[0].Idx) == 1 && sp.Profile.Dp == 5000 - 3000 - Shop.Price(bewd[0]), "shop: buy a seen card");
         sp.Profile.Dp += 10000;
@@ -525,9 +581,10 @@ static class Program
         var e = new Deck("x");
         int n = 0; while (DeckRules.Add(e, bewd, q)) n++;
         Check(n == 3, "max 3 copies even when owning 5");
-        var forbidden = db.ByIdx.Values.First(c => DeckRules.Limit(c) == 0);
-        q.Owned[forbidden.Idx] = 3;
-        Check(!DeckRules.Add(e, forbidden, q), $"forbidden card can't be added ({forbidden.Name})");
+        Check(db.ByIdx.Values.All(c => DeckRules.Limit(c) > 0 && DeckRules.Limit(c, "kaiba") > 0), "nothing is forbidden");
+        var once = new Deck("once"); var raigeki = db.Named("Raigeki"); q.Owned[raigeki.Idx] = 3;
+        int rn = 0; while (DeckRules.Add(once, raigeki, q)) rn++;
+        Check(rn == 1, $"a once-forbidden card is limited to 1 (Raigeki x{rn})");
         var fusion = db.ByIdx.Values.First(c => c.IsFusion && DeckRules.Limit(c) == 3);
         q.Owned[fusion.Idx] = 1;
         Check(DeckRules.Add(e, fusion, q) && e.Extra.Contains(fusion.Idx) && !e.Main.Contains(fusion.Idx), "fusion monsters go to the Fusion Deck");
@@ -683,6 +740,56 @@ static class Program
             path = full.Take(i).Append(full[i] + 1).ToList();
         }
         return (runs, wins, stuck);
+    }
+
+    /// Pack Duel drafts (Engine/Draft.cs) over many seeds, both sides on AUTO: packs of 8 (or close), no card twice
+    /// in a pack, kits of equal size, every card dealt ends in exactly one deck, same seed = same draft.
+    static void DraftChecks(int n)
+    {
+        var db = CardDb.Shared;
+        int shortPacks = 0, noKits = 0;
+        var sizes = new List<int>();
+        for (int i = 0; i < n; i++)
+        {
+            var rng = new Rng((ulong)(500 + i));
+            var d = Draft.Random(rng);
+            string tag = $"draft {i} {d.Source[0]} + {d.Source[1]}";
+            var all = d.Packs.SelectMany(x => x).ToList();
+            Check(all.Count == Draft.PackCount, tag + ": 10 packs");
+            foreach (var p in all)
+            {
+                Check(p.Count <= 8, tag + ": pack over 8");
+                if (p.Count < 8) shortPacks++;
+                Check(p.GroupBy(s => db.Get(s.Card).Name).All(g => g.Count() == 1), tag + ": a card twice in one pack: " + string.Join(", ", p.Select(s => db.Get(s.Card).Name)));
+            }
+            Check(d.Kits.Select(k => k.Count).Distinct().Count() <= 1, tag + ": kits of different sizes");
+            if (d.Kits.Count == 0) noKits++;
+            while (!d.Done)
+            {
+                if (d.Bonus) d.PickKit(d.AutoKit(0), d.AutoKit(1));
+                else d.Pick(d.Auto(0), d.Auto(1));
+            }
+            int dealt = all.Sum(p => p.Count);
+            Check(d.Kept[0].Count + d.Kept[1].Count + d.Got[0].Count + d.Got[1].Count == dealt, tag + ": cards lost or doubled");
+            for (int p = 0; p < 2; p++)
+            {
+                var deck = d.Deck(p, "PACK DECK");
+                sizes.Add(deck.Main.Count);
+                Check(deck.Main.Count >= 36, tag + $": player {p} main deck only {deck.Main.Count}");
+                var drafted = d.Kept[p].Concat(d.Got[p]).GroupBy(s => db.Get(s.Card).Name).ToDictionary(g => g.Key, g => g.Count());
+                foreach (var g in deck.Main.Concat(deck.Extra).GroupBy(i => db.Get(i).Name))
+                    Check(g.Count() <= Math.Max(2, drafted.GetValueOrDefault(g.Key)), tag + $": player {p} has {g.Count()} {g.Key} (kit over the cap)");
+            }
+        }
+        var a = new Draft("yugi/x_lv3", "kaiba/x_lv3", 42);
+        var b = new Draft("yugi/x_lv3", "kaiba/x_lv3", 42);
+        Check(a.Packs.SelectMany(x => x).SelectMany(x => x).SequenceEqual(b.Packs.SelectMany(x => x).SelectMany(x => x)), "draft: same seed, same packs");
+        Console.WriteLine($"{n} drafts: main deck {sizes.Min()}-{sizes.Max()} (avg {sizes.Average():0.0}), short packs {shortPacks}, no bonus pack {noKits}");
+        // one sample to eyeball
+        var s = new Draft("yugi/x_lv1", "joey/x_lv2", 7);
+        Console.WriteLine($"sample {s.Source[0]} + {s.Source[1]}");
+        for (int r = 0; r < Draft.Rounds; r++) Console.WriteLine($"  you r{r + 1}: " + string.Join(" | ", s.Packs[0][r].Select(x => (x.Src == 0 ? "A " : "B ") + db.Get(x.Card).Name)));
+        foreach (var k in s.Kits) Console.WriteLine("  kit: " + string.Join(" + ", k.Select(i => db.Get(i).Name)));
     }
 
     static void PuzzleChecks()

@@ -40,35 +40,6 @@ public static partial class Scripts
             s.Note = "Its card text in the data is cut short: when it leaves the field face-up, its controller loses 3000 LP.";
         }
         {
-            var s = Spell("Wicked Canon", async x => { x.Self.Vars["stay"] = 1; x.Self.Vars["canonturn"] = x.D.Turn; });
-            s.On = async (x, e) => { if (e.Kind == EvKind.AttackDeclared && e.Player == x.Opp && x.Self.OnField && x.Self.FaceUp) AddCounter(x, x.Self, 1, "doctrine"); };
-            s.AddFx(f =>
-            {
-                f.Label = "Add a DARK Fiend, discard a Fiend"; f.InSpellZone = true;
-                f.Can = x => x.Self.FaceUp && Hopt(x, "1") && x.Self.Var("canonturn") == x.D.Turn && x.D.TurnPlayer == x.Me && x.My.Deck.Any(c => c.Data.IsMonster && c.Data.Attribute == "DARK" && c.Data.Race == "Fiend");
-                f.Cost = async x => UseHopt(x, "1");
-                f.Run = async x =>
-                {
-                    await x.Search(c => c.Data.IsMonster && c.Data.Attribute == "DARK" && c.Data.Race == "Fiend", "Add which DARK Fiend?");
-                    var l = x.My.Hand.Where(c => c.Data.IsMonster && c.Data.Race == "Fiend").ToList();
-                    if (l.Count > 0) await x.D.Discard(x.Me, await x.PickN(l, 1, 1, "Discard 1 Fiend"), x.Self);
-                };
-            });
-            s.AddFx(f =>
-            {
-                f.Label = "Send with 4 counters: Special Summon a Fiend"; f.InSpellZone = true;
-                f.Can = x => x.Self.FaceUp && Hopt(x, "2") && x.Self.Counters("doctrine") >= 4 && x.My.Deck.Any(c => c.Data.IsMonster && c.Data.Race == "Fiend" && x.D.CanSpecialSummon(c, x.Me, by: x.Self));
-                f.Cost = async x => { UseHopt(x, "2"); await x.D.ToGrave(x.Self, x.Self); };
-                f.Run = async x =>
-                {
-                    await SummonPick(x, x.My.Deck.Where(c => c.Data.IsMonster && c.Data.Race == "Fiend"), "Special Summon which Fiend?");
-                    if (x.My.Deck.Any(c => c.Name == "Super Polymerization") && await x.Ask("Add Super Polymerization from your Deck?")) await x.Search(c => c.Name == "Super Polymerization", "Add Super Polymerization");
-                    else x.D.Shuffle(x.Me);
-                };
-            });
-            s.Note = "Its card text in the data is cut short: the second effect can then add Super Polymerization.";
-        }
-        {
             var s = Spell("Wicked-Breaking Flamberge - Baou", async x => { if (x.T0 is { } t && t.Valid() && t.FaceUp) await x.D.Equip(x.Self, t); },
                 x => x.My.Hand.Any(c => c != x.Self) && x.Targetable(x.D.FaceUpMonsters).Any(),
                 async x => { await x.D.ToGrave((await x.PickN(x.My.Hand.Where(c => c != x.Self), 1, 1, "Send 1 card from your hand to the GY"))[0], x.Self); await x.Target(x.D.FaceUpMonsters, "Equip to which monster?"); });

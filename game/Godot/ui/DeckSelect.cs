@@ -101,17 +101,9 @@ public partial class DeckSelect : RiftMenu
         {
             Put(detail, k, Thin, 15, Mist, new Vector2(tx, y)); Put(detail, v, Title, 20, Silver, new Vector2(tx, y + 22)); y += 60;
         }
-        Put(detail, "BAN LIST", Thin, 15, Mist, new Vector2(tx, y));
-        float lx = tx;
-        foreach (var (name, key) in DeckRules.Formats)
-        {
-            var pr = DeckRules.Problem(d, P, key);
-            var l = Put(detail, $"{name} {(pr == null ? "✓" : "✕")}", Title, 20, pr == null ? Silver : new Color(1f, 0.55f, 0.5f), new Vector2(lx, y + 22));
-            if (pr != null) l.TooltipText = pr;
-            lx += Title.GetStringSize(Lang.Tr(l.Text), HorizontalAlignment.Left, -1, Z(20)).X + 34;
-        }
+        // no ban list choice any more (user 2026-11-17): only what keeps the deck from being played
         var why = DeckRules.Problem(d, P);
-        if (why != null) Put(detail, why, Body, 17, new Color(1f, 0.6f, 0.55f), new Vector2(tx, y + 56), new Vector2(W - tx - 60, 24)).ClipText = true;
+        if (why != null) Put(detail, Lang.Duel(why), Body, 17, new Color(1f, 0.6f, 0.55f), new Vector2(tx, y), new Vector2(W - tx - 60, 24)).ClipText = true;
 
         // the main action, then the others as a column of clear buttons
         Button(detail, "EDIT DECK", new Vector2(rx + 150, H * 0.74f), Edit, 30);
@@ -161,6 +153,7 @@ public partial class DeckSelect : RiftMenu
     {
         CloseToast();
         toast = new Control { Size = new Vector2(W, 150), Position = new Vector2(0, H - 150), ZIndex = 40 };
+        toast.SetMeta("dark", true);
         AddChild(toast);
         toast.AddChild(new ColorRect { Size = toast.Size, Color = new Color(0.02f, 0.02f, 0.03f, 0.94f), MouseFilter = MouseFilterEnum.Stop });
         Hair(toast, Vector2.Zero, W, GoldC with { A = 0.6f });

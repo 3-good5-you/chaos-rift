@@ -36,6 +36,7 @@ public partial class DuelField
             case "timewizard": you = new[] { "Time Wizard", "Mystical Elf", "Silver Fang", "Battle Ox", "Celtic Guardian" }; them = new[] { "Gemini Elf" }; break;
             case "dice": you = new[] { "Celtic Guardian", "Graceful Dice", "Mystical Elf", "Silver Fang", "Battle Ox" }; them = new[] { "Gemini Elf" }; break;
             case "search": you = new[] { "Sangan", "Trap Hole", "Battle Ox", "Mystical Elf", "Feral Imp" }; them = new[] { "Gemini Elf" }; break;
+            case "sangan": you = new[] { "Gemini Elf", "Battle Ox", "Mystical Elf", "Feral Imp", "Silver Fang" }; them = new[] { "Sangan", "Mystical Elf", "Battle Ox", "Silver Fang", "Feral Imp" }; break;   // Sangan dies in battle, live (its trigger)
             case "mutualtrap": you = new[] { "Celtic Guardian", "Mystical Elf", "Silver Fang", "Battle Ox", "Feral Imp" }; them = new[] { "Celtic Guardian", "Call Of The Haunted" }; break;
             case "mutual": you = new[] { "Celtic Guardian", "Mystical Elf", "Silver Fang", "Battle Ox", "Feral Imp" }; them = new[] { "Celtic Guardian" }; break;
             case "exodia": you = new[] { "Exodia the Forbidden One", "Left Arm of the Forbidden One", "Right Arm of the Forbidden One", "Left Leg of the Forbidden One", "Celtic Guardian", "Mystical Elf", "Right Leg of the Forbidden One" }; them = new[] { "Gemini Elf", "Battle Ox" }; break;
@@ -122,6 +123,10 @@ public partial class DuelField
                 Do(Is(Act.Summon, "Masaki the Legendary Swordsman"));
                 Do(Is(Act.Activate, "Polymerization"));          // stops at the Fusion prompts: they and the summon play live
                 break;
+            case "sangan":
+                Do(Is(Act.EndTurn)); Do(Is(Act.Summon, "Sangan")); Do(Is(Act.EndTurn));
+                Do(Is(Act.Summon, "Gemini Elf")); Do(Is(Act.ToBattle)); liveMove = Is(Act.Attack, "Gemini Elf", "Sangan");
+                break;
             case "search":
                 Do(Is(Act.Summon, "Sangan")); Do(Is(Act.EndTurn));
                 Do(Is(Act.Summon, "Gemini Elf")); Do(Is(Act.ToBattle)); Do(Is(Act.Attack, "Gemini Elf", "Sangan"));
@@ -155,7 +160,8 @@ public partial class DuelField
             var name = pointName; pointName = null;
             After(0.6, () =>
             {
-                var v = views.Values.FirstOrDefault(v => v.Card.Name == name && v.S.Loc is Loc.Hand or Loc.Monster or Loc.Spell or Loc.Field);
+                var v = name.StartsWith("deck:") ? PileTop(name[5] - '0', Loc.Deck)   // --point=deck:0 / deck:1
+                    : views.Values.FirstOrDefault(v => v.Card.Name == name && v.S.Loc is Loc.Hand or Loc.Monster or Loc.Spell or Loc.Field);
                 if (v != null) GetViewport().WarpMouse(cam.UnprojectPosition(v.Root.GlobalPosition));
             });
         }

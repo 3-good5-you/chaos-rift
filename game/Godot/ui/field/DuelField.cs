@@ -116,6 +116,7 @@ public partial class DuelField : MenuBase
     protected override void OnChoose(int i) { }
 
     /// What lies around a forged mat's table, far below it: 0 lava sea, 1 water, 2 clouds, 3 stone tiles, 4 circuitry, 5 cosmos.
+    /// Achievement mats only: 6 shattered void, 7 aurora over ice, 8 god-rays and embers, 9 champion hall, 10 holo sea.
     /// Deep = the depths, Glow = the mat's accent (same as matforge.py's corner colour).
     static readonly Dictionary<string, (int Kind, Color Deep, Color Glow)> Surrounds = new()
     {
@@ -129,6 +130,10 @@ public partial class DuelField : MenuBase
         ["art_red_eyes"] = (5, new Color("2a0606"), new Color("ff5a3a")),
         ["obsidian"] = (2, new Color("0a0908"), new Color("e8c070")), ["ivory"] = (2, new Color("3a3630"), new Color("fff2d0")),
         ["eclipse"] = (5, new Color("05040c"), new Color("c8d2ff")), ["crimson"] = (0, new Color("1a0406"), new Color("f0c060")),
+        // achievement-only mats: worlds no shop mat has
+        ["ach_all_comers"] = (6, new Color("0a0a10"), new Color("f0f4ff")), ["ach_triple_white"] = (7, new Color("142434"), new Color("8ad0ff")),
+        ["ach_veteran"] = (8, new Color("06180e"), new Color("e0a060")), ["ach_champion"] = (9, new Color("060e30"), new Color("ffd070")),
+        ["ach_half_way"] = (10, new Color("0c0818"), new Color("e8e8ff")),
     };
 
     /// The world under a plain (not forged) mat (2026-11-09: they were a bare grey gradient): the arena's gold-seamed
@@ -255,8 +260,12 @@ public partial class DuelField : MenuBase
         // Smooth over sharp: the table renders at 77% and FSR upscales it, and the duel holds a steady 60 FPS
         // (an even split of 120/144 Hz screens) instead of wandering between 60 and 90, which reads as jitter.
         GetViewport().Scaling3DMode = Viewport.Scaling3DModeEnum.Fsr;
-        GetViewport().Scaling3DScale = 0.77f;
-        Godot.Engine.MaxFps = 60;
+        // Retina / 4K screens render in real pixels (macOS export has high_res on): 77% of 2234 px tall was ~4x the
+        // work of a 1080p screen and the duel lagged on Macs. Cap the 3D image near 1100 px tall; FSR fills the rest.
+        GetViewport().Scaling3DScale = Math.Min(0.77f, 1100f / Math.Max(1, GetWindow().Size.Y));
+        // The 60 FPS limiter fights vsync on 120 Hz ProMotion Macs (frames land 1 or 3 refreshes apart = stutter);
+        // their variable refresh paces frames itself.
+        if (OS.GetName() != "macOS") Godot.Engine.MaxFps = 60;
         BuildWorld();
         if (matView) { MatView(); return; }
         if (vsView != null) { VsView(); return; }
@@ -287,6 +296,12 @@ public partial class DuelField : MenuBase
             Place(v, s);
         }
         if (scenario == "vfxlab") { VfxLab(); return; }
+        // dev: `--fieldshot=<file.png> [--delay=S]` saves the duel as it stands after S seconds (default 6), then quits (mat previews in action)
+        if (OS.GetCmdlineUserArgs().FirstOrDefault(a => a.StartsWith("--fieldshot=")) is { } fs)
+        {
+            var dl = OS.GetCmdlineUserArgs().FirstOrDefault(a => a.StartsWith("--delay="));
+            GetTree().CreateTimer(dl != null ? double.Parse(dl[8..], System.Globalization.CultureInfo.InvariantCulture) : 6, true, false, true).Timeout += () => { GetViewport().GetTexture().GetImage().SavePng(fs[12..]); GetTree().Quit(); };
+        }
         steps.Add(now);
         Loop();
     }
@@ -674,6 +689,9 @@ void fragment() {
         }
     }
 
+    static readonly Vector3[] CardCorners = { new(-CW / 2, 0, -CH / 2), new(CW / 2, 0, -CH / 2), new(CW / 2, 0, CH / 2), new(-CW / 2, 0, CH / 2) };
+    readonly Vector2[] hoverPoly = new Vector2[4];
+
     void Hover()
     {
         var m = GetViewport().GetMousePosition();
@@ -684,9 +702,8 @@ void fragment() {
         {
             if (overSheet || !v.Root.Visible || v.S.Loc == Loc.None) continue;
             var t = v.Root.GlobalTransform;
-            var poly = new[] { new Vector3(-CW / 2, 0, -CH / 2), new Vector3(CW / 2, 0, -CH / 2), new Vector3(CW / 2, 0, CH / 2), new Vector3(-CW / 2, 0, CH / 2) }
-                .Select(c => cam.UnprojectPosition(t * c)).ToArray();
-            if (!Geometry2D.IsPointInPolygon(m, poly)) continue;
+            for (int i = 0; i < 4; i++) hoverPoly[i] = cam.UnprojectPosition(t * CardCorners[i]);   // every card, every frame: no allocations
+            if (!Geometry2D.IsPointInPolygon(m, hoverPoly)) continue;
             // Hand above field above piles; the top card of a pile wins.
             float z = v.S.Loc == Loc.Hand ? 100 + v.S.Index : v.S.Loc is Loc.Monster or Loc.Spell or Loc.Field ? 50
                 : 1 + (v.S.Loc is Loc.Deck or Loc.Extra ? v.S.Count - v.S.Index : v.S.Index) / 100f;
@@ -833,7 +850,10 @@ void fragment() {
                     // (each batch ends with a plain snapshot taken after the command: look past those)
                     int cut = batch.Count;
                     while (cut > 0 && (batch[cut - 1].Ev == null || batch[cut - 1].Ev!.Kind is EvKind.LeftField or EvKind.ToGrave)) cut--;
-                    if (batch.Skip(cut).Any(x => x.Ev != null))
+                    // ...unless the prompt is that card's own effect (Sangan, Witch of the Black Forest: it dies, then it searches;
+                    // held back it glowed on the field, then died and went to the Graveyard after its search: playtest 2026-11-17)
+                    bool ownMove = D.Pending?.Source is { } ps && batch.Skip(cut).Any(x => x.Ev?.Card?.Uid == ps.Uid);
+                    if (!ownMove && batch.Skip(cut).Any(x => x.Ev != null))
                     {
                         carried.AddRange(batch.Skip(cut));
                         batch.RemoveRange(cut, batch.Count - cut);
@@ -909,7 +929,13 @@ void fragment() {
                     thinking = true;
                     try { cmd = p.Player != Me ? (Lan.On ? await Remote() : await Task.Run(() => cpu.Decide(D))) : Bot(p); }
                     finally { thinking = false; }
-                    if (p.Player == Me && p.Kind is Ask.Respond or Ask.YesNo or Ask.Choose or Ask.Pick) await AskYou(p, cmd);
+                    // demo bot (`--autoplay`, recordings): your real window opens, then the bot's answer goes in
+                    if (p.Player == Me && p.Kind is Ask.Respond or Ask.YesNo or Ask.Choose or Ask.Pick)
+                    {
+                        var shown = Human(p); var bot = cmd; var tcs = answer;
+                        GetTree().CreateTimer(1.4).Timeout += () => tcs?.TrySetResult(bot);
+                        cmd = await shown;
+                    }
                 }
                 if (surrendered) throw new OperationCanceledException();
                 if (lanOver) return;
@@ -920,6 +946,7 @@ void fragment() {
                     catch (ArgumentException) { throw new LanEnded("OUT OF SYNC", true); }   // their answer doesn't fit our prompt
                 }
                 else D.Submit(cmd);
+                cmds++;
                 if (Lan.On) SendHash();
                 steps.Add(Snap(null));
             }
@@ -1333,7 +1360,7 @@ void fragment() {
                 if (V(e.Card) is { } gm) { FrameBurst(gm, FxGold, 0.98f, 1.12f, 0.45, alpha: 0.7f); gm.Badge.Visible = false; groupBadged.Remove(gm); }
                 return 0.35;
             case EvKind.Triggered:
-                if (e.Card!.Uid == lastRays && Time.GetTicksMsec() - lastRaysAt < 4000) return 0;
+                if (GlowedNow(e.Card!)) return 0;
                 if (V(e.Card) is { } tv) GoldRays(tv);
                 Focus(e.Card);
                 return Math.Max(1.1, ShowActivation(V(e.Card), e.Card));
@@ -1358,7 +1385,7 @@ void fragment() {
                 if (CardSounds.TryGetValue(e.Card!.Name, out var cs)) Sfx(cs);   // Master Duel's own sound for this card
                 if (!e.Card.Data.IsMonster) Cue("flip_st");
                 // Glow: Spells green, Traps pink, monster effects gold.
-                if (V(e.Card) is { } av) { GoldRays(av, e.Card.Data.IsSpell ? FxGreen : e.Card.Data.IsTrap ? FxPink : null); if (s.Chain > 0) ChainLinkFx(av); }
+                if (V(e.Card) is { } av && !GlowedNow(e.Card)) { GoldRays(av, e.Card.Data.IsSpell ? FxGreen : e.Card.Data.IsTrap ? FxPink : null); if (s.Chain > 0) ChainLinkFx(av); }
                 if (s.Chain > 0) Badge(V(e.Card), s.Chain);
                 Focus(e.Card);
                 return ShowActivation(V(e.Card), e.Card);   // it glows in place
@@ -1586,6 +1613,40 @@ vec3 world(int k, vec2 p, vec3 dc, vec3 gc, float t) {
     float pulse = pow(fract(along * 0.06 - t * 0.25 + r * 7.0), 24.0);
     float node = (1.0 - smoothstep(0.08, 0.13, length(fp - 0.5))) * step(0.8, h(id + 7.0));
     return dc * 0.6 + gc * (line * (0.05 + 1.2 * pulse) + node * 0.35);
+  } else if (k == 6) {   // shattered void: black glass cracked into shards, light pulsing out through the cracks
+    vec2 g = p * 0.18; vec2 id = floor(g), f = fract(g); float d1 = 9.0, d2 = 9.0;
+    for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) {
+      vec2 o = vec2(float(x), float(y)); vec2 c = o + vec2(h(id + o), h(id + o + 5.0)) - f; float d = dot(c, c);
+      if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) { d2 = d; } }
+    float edge = 1.0 - smoothstep(0.0, 0.035, sqrt(d2) - sqrt(d1));
+    float pulse = 0.5 + 0.5 * sin(length(p) * 0.15 - t * 1.2);
+    return dc * (0.3 + 0.5 * fbm(p * 0.2)) + gc * edge * (0.08 + 0.55 * pulse);
+  } else if (k == 7) {   // a frozen sea under an aurora: cracked ice, ribbons of light drifting over it
+    float ice = fbm(p * 0.25);
+    float vein = 1.0 - smoothstep(0.0, 0.03, abs(fbm(p * 0.12 + 4.0) - 0.5));
+    float rib = 0.0;
+    for (int i = 0; i < 3; i++) { float fi = float(i); float y = p.y + fi * 18.0 - 20.0 + sin(p.x * 0.05 + t * 0.3 + fi * 2.0) * 6.0;
+      rib += exp(-abs(y) * 0.25) * (0.5 + 0.5 * n(vec2(p.x * 0.08 - t * 0.4, fi * 3.0))); }
+    return dc * (0.8 + 0.6 * ice) + gc * (vein * 0.5 + rib * 0.45) + vec3(0.8, 0.9, 1.0) * vein * 0.15;
+  } else if (k == 8) {   // a hall of slow god-rays turning round the table, embers drifting through them
+    float r = length(p), a = atan(p.y, p.x);
+    float rays = pow(0.5 + 0.5 * sin(a * 14.0 + t * 0.08), 8.0) * exp(-r * 0.02);
+    vec2 g = p * 0.5 + vec2(0.0, t * 0.6); vec2 id = floor(g); vec2 fp = fract(g) - 0.5;
+    float em = step(0.9, h(id)) * (1.0 - smoothstep(0.0, 0.12, length(fp))) * (0.5 + 0.5 * sin(t * 3.0 + h(id) * 40.0));
+    return dc * (0.5 + 0.5 * fbm(p * 0.1)) + gc * (rays * 0.22 + em * 1.2);
+  } else if (k == 9) {   // a champion's hall: gold rings rippling out from the table, gold stars glinting on a lattice
+    float r = length(p);
+    float ring = pow(0.5 + 0.5 * sin(r * 0.35 - t * 1.0), 12.0) * exp(-r * 0.015);
+    vec2 g = p * 0.8; vec2 id = floor(g); vec2 fp = fract(g) - 0.5; float s = h(id);
+    float st = step(0.93, s) * pow(max(0.0, 1.0 - (abs(fp.x) + abs(fp.y)) * 5.0), 2.0) * (0.5 + 0.5 * sin(t * 2.5 + s * 60.0));
+    float lat = 1.0 - smoothstep(0.0, 0.04, min(abs(fract((p.x + p.y) * 0.06) - 0.5), abs(fract((p.x - p.y) * 0.06) - 0.5)));
+    return dc * (0.7 + 0.4 * fbm(p * 0.15)) + gc * (ring * 0.6 + st * 1.5 + lat * 0.12);
+  } else if (k == 10) {  // a holographic sea: a rainbow sheen sliding over slow swells
+    float sw = fbm(p * 0.08 + vec2(t * 0.04, t * 0.03));
+    float hue = fract(sw * 2.0 + (p.x + p.y) * 0.01 - t * 0.05);
+    vec3 rb = clamp(abs(mod(hue * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+    float band = pow(0.5 + 0.5 * sin(sw * 20.0 + t * 0.5), 6.0);
+    return dc * (0.6 + 0.5 * sw) + rb * (0.08 + 0.4 * band) * 0.4 + gc * band * 0.06;
   }
   // cosmos: a slow nebula swirl with twinkling stars
   float r = length(p), a = atan(p.y, p.x);

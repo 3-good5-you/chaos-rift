@@ -21,7 +21,7 @@ public partial class Replays : RiftMenu
         Session.Watch = null;
         Rift(0.56f, 0.5f);
         Back();
-        Heading("REPLAYS", new Vector2(80, 60), 46);
+        HeadTabs(RecordTabs, 1, new Vector2(80, 54));
         list = new Control { Size = new Vector2(W, H), MouseFilter = MouseFilterEnum.Ignore };
         detail = new Control { Size = new Vector2(W, H), MouseFilter = MouseFilterEnum.Ignore };
         AddChild(list); AddChild(detail);
@@ -69,9 +69,10 @@ public partial class Replays : RiftMenu
         Put(detail, $"{Res(r)}  ·  {Lang.Tr(r.Reason)}", Title, 22, r.Winner == 0 ? GoldLight : Mist, new Vector2(x, y + 76), new Vector2(w, 34));
         Put(detail, Lang.F("{0}  ·  {1} turns  ·  {2}", Lang.Tr(r.Mode), r.Turns, r.When), Body, 20, Mist, new Vector2(x, y + 120), new Vector2(w, 30));
         bool plays = r.Plays();
-        if (plays) Button(detail, "WATCH", new Vector2(x + 140, H - 160), () => Watch(r), 30);
+        var row = new List<Control>();
+        if (plays) row.Add(Button(detail, "WATCH", new Vector2(x + 140, H - 160), () => Watch(r), 30));
         else Put(detail, "Saved by an older version: cards have changed since, so it can't be played back.", Body, 20, Mist, new Vector2(x, H - 190), new Vector2(w, 60)).AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        Button(detail, "RENAME", new Vector2(x + (plays ? 640 : 360), H - 160), () => NamePrompt("RENAME THIS REPLAY", r.Title, name =>
+        var ren = Button(detail, "RENAME", new Vector2(x + (plays ? 640 : 360), H - 160), () => NamePrompt("RENAME THIS REPLAY", r.Title, name =>
         {
             r.Name = name;
             try { r.Write(e.Path); } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { GD.PrintErr(ex.Message); }
@@ -84,6 +85,8 @@ public partial class Replays : RiftMenu
             if (!sure) { sure = true; del.GetChild<Label>(0).Text = "SURE?"; return; }
             if (OS.MoveToTrash(e.Path) == Error.Ok) { all.Remove(e); Refresh(); }   // the recycle bin, not gone for good
         }, 20);
+        row.Add(del); row.Add(ren);
+        Flow(new Vector2(x, H - 200), W - 24, row.ToArray());
     }
 
     void Watch(Replay r)
@@ -91,7 +94,7 @@ public partial class Replays : RiftMenu
         Session.ClearMode();
         Session.Tour = null;
         Session.Match = false;
-        int i = Array.FindIndex(RivalPanels.All, x => x.File == r.Rival);
+        int i = Array.FindIndex(Session.Roster, x => x.File == r.Rival);
         Session.Selected = i < 0 ? 0 : i;
         Session.Watch = r;
         Transition.Go(this, "res://ui/field/DuelField.tscn");

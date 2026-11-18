@@ -92,13 +92,13 @@ def finish(img, metal_name, accent, calm=0.55):
     """Inlays under the zones, the border rim, the centre seam glow; then save-ready."""
     # calm the zones: darker, softer, so the cards and the zone frames read
     soft = cv2.GaussianBlur(img, (0, 0), 6)
-    z = ZMASK[..., None]
+    ZM = ZMASK
+    z = ZM[..., None]
     img = img * (1 - z) + (soft * calm) * z
     # recessed inlay: shadow on the upper-left inner edge, a faint accent line on the lower edge
-    inner = np.clip(ZMASK - glow(ZMASK, 5) * 0.0, 0, 1)
-    shade = glow(np.clip(np.roll(ZMASK, 6, axis=0) - ZMASK, 0, 1), 3) + glow(np.clip(np.roll(ZMASK, 6, axis=1) - ZMASK, 0, 1), 3)
+    shade = glow(np.clip(np.roll(ZM, 6, axis=0) - ZM, 0, 1), 3) + glow(np.clip(np.roll(ZM, 6, axis=1) - ZM, 0, 1), 3)
     img = img * (1 - np.clip(shade, 0, 0.6)[..., None])
-    lip = np.clip(ZMASK - np.roll(ZMASK, -3, axis=0), 0, 1)
+    lip = np.clip(ZM - np.roll(ZM, -3, axis=0), 0, 1)
     img = add(img, glow(symm(lip), 1.2), accent, 0.35)
     # border rim: metal band with a bevel, the inner edge glowing in the accent
     t = 0.5 + 0.5 * np.sin((xx / W * 0.7 + yy / H * 1.3) * math.pi * 3) * 0.8 + fbm(901, base=2, octaves=4, aspect=(1, 30)) * 0.15
@@ -495,7 +495,106 @@ def crimson():
     img = corners(img, hexc('f0c060'), "gold")
     return finish(img, "gold", hexc('f0c060'))
 
+# ---------------------------------------------------------------- prize families (samples 2026-11-17, see backforge)
+
+def p_rift(seed=331, seam='ffffff', metal_name="gold", accent='fff2c8', rivals=False):
+    """RIFT: light floods out of a white crack along the divider and fades to night at each player's edge."""
+    t = np.clip(DIV_D / (H * 0.5), 0, 1)
+    img = ramp(t * 0.85 + fbm(seed, base=3) * 0.15, [(0, 'cfcac0'), (0.18, '8a8780'), (0.45, '22212a'), (1, '07070b')])
+    r = rng(seed + 1); st = np.zeros((H, W), np.float32)
+    for _ in range(420): cv2.circle(st, (int(r.uniform(0, W)), int(r.uniform(0, H))), int(r.uniform(1, 2.2)), 1.0, -1, cv2.LINE_AA)
+    img = add(img, glow(st, 0.8) * 1.2 * (1 - ZMASK) * np.clip(t * 2 - 0.4, 0, 1), 'eef0ff')
+    crack = rift_crack(seed + 2, CY, 3, 5)
+    img = add(img, crack * 1.2 + glow(crack, 6) * 0.9 + glow(crack, 40) * 0.5, seam)
+    ring = np.exp(-((pr - 1.25 * U) ** 2) / 6)
+    img = add(img, symm(ring) * FIELD, 'e8e4dc', 0.25)
+    img = sym(img)
+    if rivals:                                                 # your light blue, the rival's red, meeting at the crack
+        w = np.exp(-DIV_D / (H * 0.22))[..., None]
+        side = np.where((yy > CY)[..., None], np.array([0.45, 0.7, 1.0], np.float32), np.array([1.0, 0.42, 0.38], np.float32))
+        img = img * (1 - w) + img * side * w
+    img = corners(img, hexc(accent), metal_name)
+    return finish(img, metal_name, hexc(accent), calm=0.6)
+
+def p_gilded(seed=341, n_rays=40, gold='d7a23c', leaf='e8b850', line_c='f0c060', metal_name="gold", base=('050404', '17120f')):
+    """GILDED: black lacquer, gold art-deco rays from each half's centrepiece, a laurel ring, a gold divider."""
+    img = ramp(fbm(seed, base=3, aspect=(1, 2)) * 0.5, [(0, base[0]), (1, base[1])])
+    rays = ((0.5 + 0.5 * np.cos(pth * n_rays)) ** 30) * np.clip((pr - 0.55 * U) / 40, 0, 1) * np.exp(-pr / (1.6 * U))
+    img = add(img, symm(rays) * FIELD, gold, 0.5)
+    leaves = np.zeros((H, W), np.float32)
+    for i in range(24):
+        a = 2 * math.pi * i / 24
+        cx, cy = PIECE[0] + 0.48 * U * math.cos(a), PIECE[1] + 0.48 * U * math.sin(a)
+        cv2.ellipse(leaves, (int(cx), int(cy)), (14, 5), math.degrees(a) + 60, 0, 360, 1.0, -1, cv2.LINE_AA)
+    img = add(img, symm(leaves + glow(leaves, 4) * 0.4) * (1 - BORDER), leaf, 0.8)
+    line = np.exp(-DIV_D ** 2 / 4)
+    img = add(img, line * 1.1 + glow(line, 10) * 0.4, line_c)
+    img = sym(img)
+    img = corners(img, hexc(line_c), metal_name)
+    return finish(img, metal_name, hexc(line_c))
+
+def p_prism():
+    """PRISMATIC: dark slate with holographic foil running through the border, the divider and the gaps."""
+    img = ramp(fbm(351, base=2) * 0.5, [(0, '0a0614'), (1, '1c1030')])
+    hue = ((xx * 0.5 + yy * 0.35) / 520 + fbm(352, base=3) * 0.7) % 1.0
+    foil = cv2.cvtColor(np.dstack([hue * 360, np.full((H, W), 0.5, np.float32), np.ones((H, W), np.float32)]).astype(np.float32), cv2.COLOR_HSV2RGB)
+    bands = 0.5 + 0.5 * np.sin((xx * 0.8 - yy * 0.6) / 46.0)
+    k = (0.18 + 0.55 * bands ** 3) * FIELD * (1 - NEAR_ZONE * 0.4)
+    img = img * (1 - k[..., None]) + foil * k[..., None]
+    line = np.exp(-DIV_D ** 2 / 5)
+    img = img + (line + glow(line, 10) * 0.5)[..., None] * (foil * 0.6 + 0.4)
+    img = sym(img)
+    img = corners(img, hexc('e8e8ff'), "silver", "ring")
+    return finish(img, "silver", hexc('e8e8ff'))
+
+def p_frost(seed=511):
+    """RIFT, white: a pale frost-white table split by a dark crack edged in ice blue; blue rings round each half."""
+    base = fbm(seed, base=3) * 0.5 + fbm(seed + 1, base=20, octaves=3) * 0.5
+    img = ramp(base, [(0, 'aab4c0'), (0.6, 'd6dee6'), (1, 'f2f6fa')])
+    v = fbm(seed + 2, base=5)
+    vein = np.exp(-(np.abs(v - 0.5) * 70) ** 2) * fbm(seed + 3, base=5)
+    img = over(img, vein * 0.35 * FIELD, '7a9ab8')
+    crack = rift_crack(seed + 4, CY, 4, 3)
+    img = over(img, np.clip(glow(crack, 6) * 2.2 + glow(crack, 30) * 1.2, 0, 1), '5ab0ff')
+    img = over(img, np.clip(crack * 1.5, 0, 1), '06080e')
+    ring = np.exp(-((pr - 1.25 * U) ** 2) / 10) + np.exp(-((pr - 1.1 * U) ** 2) / 4) * 0.7
+    img = over(img, symm(ring) * FIELD * 0.6, '3a80c8')
+    img = sym(img)
+    img = corners(img, hexc('3a90e0'), "silver")
+    return finish(img, "silver", hexc('3a90e0'), calm=0.5)
+
+def p_velvet(seed=531):
+    """GILDED, royal: deep blue velvet with a gold diamond lattice, a big gold laurel and crown star in each half."""
+    img = ramp(fbm(seed, base=3) * 0.6 + fbm(seed + 1, base=40, octaves=2) * 0.2, [(0, '040a24'), (0.6, '0c1a4a'), (1, '18307a')])
+    lat = np.minimum(np.abs(((xx + yy) / 120) % 1 - 0.5), np.abs(((xx - yy) / 120) % 1 - 0.5))
+    img = add(img, np.exp(-(lat * 40) ** 2) * FIELD * 0.35, 'e8b850')
+    leaves = np.zeros((H, W), np.float32)
+    for side in (-1, 1):
+        for i in range(11):
+            deg = 100 + i * 14 if side < 0 else 80 - i * 14
+            a = math.radians(deg)
+            for off in (-1, 1):
+                rr = 0.62 * U + off * 18
+                cx, cy = PIECE[0] + rr * math.cos(a) * 1.25, PIECE[1] + rr * math.sin(a) * 0.8
+                cv2.ellipse(leaves, (int(cx), int(cy)), (22, 8), deg + 90 + off * side * -35, 0, 360, 1.0, -1, cv2.LINE_AA)
+    star = np.zeros((H, W), np.float32)
+    pts = [(PIECE[0] + (40 if k % 2 == 0 else 16) * math.cos(math.radians(-90 + k * 36)), PIECE[1] - 0.55 * U + (40 if k % 2 == 0 else 16) * math.sin(math.radians(-90 + k * 36))) for k in range(10)]
+    cv2.fillPoly(star, [np.array(pts, np.int32)], 1.0, cv2.LINE_AA)
+    deco = symm(leaves + star) * (1 - BORDER)
+    img = add(img, glow(deco, 8) * 0.5, 'ffc040')
+    img = over(img, deco, 'f0c050')
+    line = np.exp(-DIV_D ** 2 / 4)
+    img = add(img, line * 1.1 + glow(line, 10) * 0.4, 'ffd070')
+    img = sym(img)
+    img = corners(img, hexc('ffd070'), "gold")
+    return finish(img, "gold", hexc('ffd070'))
+
 STYLES = [
+    ("p_rift", p_rift), ("p_gilded", p_gilded), ("p_prism", p_prism),
+    # achievement prizes (never sold; Engine/Achievements.cs gives them)
+    ("ach_all_comers", lambda: p_rift(501, metal_name="silver", accent='f0f4ff', rivals=True)), ("ach_triple_white", p_frost),
+    ("ach_veteran", lambda: p_gilded(521, gold='c08040', leaf='e0a060', line_c='f0b070', metal_name="bronze", base=('03100a', '0e3220'))), ("ach_champion", p_velvet),
+    ("ach_half_way", p_prism),
     ("magma", magma), ("tide", tide), ("storm", storm), ("radiant", radiant), ("ruins", ruins), ("skyway", skyway),
     ("pharaoh", pharaoh), ("datastream", datastream), ("cup_arena", cup_arena), ("twin_vortex", twin_vortex),
     ("steel", steel), ("starlane", starlane),
